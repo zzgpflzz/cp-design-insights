@@ -30,9 +30,13 @@ export default function Home() {
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
 
   const fetchProjects = useCallback(async () => {
+    console.log('🔵 fetchProjects started');
+    const startTime = performance.now();
     try {
       const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
+      console.log(`✅ Projects fetched: ${querySnapshot.docs.length} docs in ${(performance.now() - startTime).toFixed(2)}ms`);
+
       const projectsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -64,9 +68,13 @@ export default function Home() {
   }, []);
 
   const fetchAgendas = useCallback(async () => {
+    console.log('🔵 fetchAgendas started');
+    const startTime = performance.now();
     try {
       const q = query(collection(db, 'agendas'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
+      console.log(`✅ Agendas fetched: ${querySnapshot.docs.length} docs in ${(performance.now() - startTime).toFixed(2)}ms`);
+
       const agendasData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -79,12 +87,16 @@ export default function Home() {
   }, []);
 
   const fetchProjectProgresses = useCallback(async () => {
+    console.log('🔵 fetchProjectProgresses started');
+    const startTime = performance.now();
     try {
       const q = query(
         collection(db, 'projectProgresses'),
         orderBy('createdAt', 'desc')
       );
       const querySnapshot = await getDocs(q);
+      console.log(`✅ ProjectProgresses fetched: ${querySnapshot.docs.length} docs in ${(performance.now() - startTime).toFixed(2)}ms`);
+
       // projectId가 있는 신규 데이터만 필터링
       const progressData = querySnapshot.docs
         .filter((doc) => doc.data().projectId)
@@ -93,6 +105,8 @@ export default function Home() {
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate(),
         })) as ProjectProgress[];
+
+      console.log(`✅ Filtered to ${progressData.length} items with projectId`);
       setProjectProgresses(progressData);
     } catch (error) {
       console.error('Error fetching project progresses:', error);
@@ -100,19 +114,30 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    console.log('🚀 Component mounted - starting data fetch');
+    const mountTime = performance.now();
+
     setIsLoggedIn(isAuthenticated());
 
     // 한 번만 실행
     const initializeData = async () => {
+      const startTime = performance.now();
       await Promise.all([
         fetchProjects(),
         fetchAgendas(),
         fetchProjectProgresses()
       ]);
+      console.log(`✅ All data loaded in ${(performance.now() - startTime).toFixed(2)}ms`);
+      console.log(`✅ Total time from mount: ${(performance.now() - mountTime).toFixed(2)}ms`);
     };
 
     initializeData();
   }, []); // 빈 의존성 배열 - 마운트 시 한 번만 실행
+
+  // 리렌더링 감지
+  useEffect(() => {
+    console.log('🔄 Component re-rendered');
+  });
 
   const handleLogin = () => {
     setIsLoggedIn(true);
