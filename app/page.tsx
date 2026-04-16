@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -29,14 +29,7 @@ export default function Home() {
   const [selectedStatus, setSelectedStatus] = useState<Status | 'all'>('all');
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
 
-  useEffect(() => {
-    setIsLoggedIn(isAuthenticated());
-    fetchProjects();
-    fetchAgendas();
-    fetchProjectProgresses();
-  }, []);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
@@ -62,19 +55,15 @@ export default function Home() {
       grouped.sort((a, b) => b.month.localeCompare(a.month));
       setMonthlyData(grouped);
 
-      // 최초 진입 시 가장 최신 월 선택
-      if (grouped.length > 0) {
-        setSelectedMonth(grouped[0].month);
-      }
+      // 최초 진입 시 가장 최신 월 선택 (setSelectedMonth 제거 - 초기값은 state 선언에서 설정)
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-
-  const fetchAgendas = async () => {
+  const fetchAgendas = useCallback(async () => {
     try {
       const q = query(collection(db, 'agendas'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
@@ -87,9 +76,9 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching agendas:', error);
     }
-  };
+  }, []);
 
-  const fetchProjectProgresses = async () => {
+  const fetchProjectProgresses = useCallback(async () => {
     try {
       const q = query(
         collection(db, 'projectProgresses'),
@@ -108,7 +97,22 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching project progresses:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+
+    // 한 번만 실행
+    const initializeData = async () => {
+      await Promise.all([
+        fetchProjects(),
+        fetchAgendas(),
+        fetchProjectProgresses()
+      ]);
+    };
+
+    initializeData();
+  }, []); // 빈 의존성 배열 - 마운트 시 한 번만 실행
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -116,33 +120,37 @@ export default function Home() {
     router.push('/admin');
   };
 
-  const formatMonth = (month: string) => {
+  const formatMonth = useCallback((month: string) => {
     const [year, monthNum] = month.split('-');
     return `${year}년 ${parseInt(monthNum)}월`;
-  };
+  }, []);
 
-  // 필터링된 프로젝트
-  const filteredProjects = projects.filter(project => {
-    if (selectedMonth !== 'all' && project.month !== selectedMonth) return false;
-    if (selectedCategory !== 'all' && project.category !== selectedCategory) return false;
-    if (selectedTier !== 'all' && project.tier !== selectedTier) return false;
-    if (selectedStatus !== 'all' && project.status !== selectedStatus) return false;
-    if (selectedDesigner !== 'all' && project.designer !== selectedDesigner) return false;
-    return true;
-  });
+  // 필터링된 프로젝트 (useMemo로 최적화)
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project => {
+      if (selectedMonth !== 'all' && project.month !== selectedMonth) return false;
+      if (selectedCategory !== 'all' && project.category !== selectedCategory) return false;
+      if (selectedTier !== 'all' && project.tier !== selectedTier) return false;
+      if (selectedStatus !== 'all' && project.status !== selectedStatus) return false;
+      if (selectedDesigner !== 'all' && project.designer !== selectedDesigner) return false;
+      return true;
+    });
+  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner]);
 
-  // 선택된 월의 아젠다
-  const currentAgenda = selectedMonth !== 'all'
-    ? agendas.find(agenda => agenda.month === selectedMonth)
-    : null;
+  // 선택된 월의 아젠다 (useMemo로 최적화)
+  const currentAgenda = useMemo(() => {
+    return selectedMonth !== 'all'
+      ? agendas.find(agenda => agenda.month === selectedMonth)
+      : null;
+  }, [agendas, selectedMonth]);
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setSelectedMonth('all');
     setSelectedCategory('all');
     setSelectedTier('all');
     setSelectedStatus('all');
     setSelectedDesigner('all');
-  };
+  }, []);
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -70,19 +70,7 @@ export default function AdminPage() {
   const [progressEndDate, setProgressEndDate] = useState('');
   const [progressPercent, setProgressPercent] = useState<number>(0);
 
-  useEffect(() => {
-    // 인증 확인
-    if (!isAuthenticated()) {
-      router.push('/');
-      return;
-    }
-    fetchProjects();
-    fetchAgendas();
-    fetchRoadmapProjects();
-    fetchProjectProgresses();
-  }, [router]);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
@@ -97,9 +85,29 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchAgendas = async () => {
+  useEffect(() => {
+    // 인증 확인
+    if (!isAuthenticated()) {
+      router.push('/');
+      return;
+    }
+
+    // 데이터 한 번만 로드
+    const initializeData = async () => {
+      await Promise.all([
+        fetchProjects(),
+        fetchAgendas(),
+        fetchRoadmapProjects(),
+        fetchProjectProgresses()
+      ]);
+    };
+
+    initializeData();
+  }, []); // 빈 의존성 배열 - 마운트 시 한 번만 실행
+
+  const fetchAgendas = useCallback(async () => {
     try {
       const q = query(collection(db, 'agendas'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
@@ -112,7 +120,7 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error fetching agendas:', error);
     }
-  };
+  }, []);
 
   const handleAgendaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,7 +175,7 @@ export default function AdminPage() {
     }
   };
 
-  const fetchRoadmapProjects = async () => {
+  const fetchRoadmapProjects = useCallback(async () => {
     try {
       const q = query(collection(db, 'roadmapProjects'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
@@ -180,9 +188,9 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error fetching roadmap projects:', error);
     }
-  };
+  }, []);
 
-  const fetchProjectProgresses = async () => {
+  const fetchProjectProgresses = useCallback(async () => {
     try {
       const q = query(
         collection(db, 'projectProgresses'),
@@ -201,7 +209,7 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error fetching project progresses:', error);
     }
-  };
+  }, []);
 
   const handleRoadmapProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -448,22 +456,26 @@ export default function AdminPage() {
     }
   };
 
-  const formatMonth = (month: string) => {
+  const formatMonth = useCallback((month: string) => {
     const [year, monthNum] = month.split('-');
     return `${year}년 ${parseInt(monthNum)}월`;
-  };
+  }, []);
 
-  // 필터링된 프로젝트
-  const filteredProjects = projects.filter(project => {
-    if (filterMonth !== 'all' && project.month !== filterMonth) return false;
-    if (filterTier !== 'all' && project.tier !== filterTier) return false;
-    if (filterDesigner !== 'all' && project.designer !== filterDesigner) return false;
-    if (filterStatus !== 'all' && project.status !== filterStatus) return false;
-    return true;
-  });
+  // 필터링된 프로젝트 (useMemo로 최적화)
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project => {
+      if (filterMonth !== 'all' && project.month !== filterMonth) return false;
+      if (filterTier !== 'all' && project.tier !== filterTier) return false;
+      if (filterDesigner !== 'all' && project.designer !== filterDesigner) return false;
+      if (filterStatus !== 'all' && project.status !== filterStatus) return false;
+      return true;
+    });
+  }, [projects, filterMonth, filterTier, filterDesigner, filterStatus]);
 
-  // 사용 가능한 월 목록
-  const availableMonths = Array.from(new Set(projects.map(p => p.month))).sort((a, b) => b.localeCompare(a));
+  // 사용 가능한 월 목록 (useMemo로 최적화)
+  const availableMonths = useMemo(() => {
+    return Array.from(new Set(projects.map(p => p.month))).sort((a, b) => b.localeCompare(a));
+  }, [projects]);
 
   if (loading) {
     return (
