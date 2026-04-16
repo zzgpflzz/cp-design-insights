@@ -61,25 +61,25 @@ export interface MonthlyAgenda {
 // 로드맵 프로젝트 (상위 개념)
 export interface RoadmapProject {
   id: string;
-  projectName: string; // 프로젝트명
-  designer: Designer; // 담당 디자이너
-  description?: string; // 프로젝트 설명
-  startDate?: string; // 전체 프로젝트 시작일
-  endDate?: string; // 전체 프로젝트 종료일
+  projectName: string;
+  designer: Designer;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
   createdAt: Date;
 }
 
 // 프로젝트 진행 작업 (하위 개념)
 export interface ProjectProgress {
   id: string;
-  projectId: string; // 상위 프로젝트 ID
-  projectName: string; // 프로젝트명 (기존 데이터 호환용)
-  designer?: Designer; // 담당 디자이너 (기존 데이터 호환)
-  taskName: string; // 작업명 (예: 레퍼런스 서치, 화면 디자인 등)
-  status: 'nextup' | 'inprogress' | 'completed' | 'pending' | 'paused'; // 진행 상태
-  startDate: string; // 시작일 (YYYY-MM-DD)
-  endDate: string; // 종료일 (YYYY-MM-DD)
-  description?: string; // 상세 설명 (선택)
-  progress?: number; // 진척률 (0-100) (선택)
+  projectId: string;
+  projectName: string;
+  designer: Designer;
+  taskName: string;
+  status: 'nextup' | 'inprogress' | 'completed' | 'pending' | 'paused';
+  startDate: string;
+  endDate: string;
+  description?: string;
+  progress?: number;
   createdAt: Date;
 }

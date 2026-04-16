@@ -184,13 +184,19 @@ export default function AdminPage() {
 
   const fetchProjectProgresses = async () => {
     try {
-      const q = query(collection(db, 'projectProgresses'), orderBy('createdAt', 'desc'));
+      const q = query(
+        collection(db, 'projectProgresses'),
+        orderBy('createdAt', 'desc')
+      );
       const querySnapshot = await getDocs(q);
-      const progressData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-      })) as ProjectProgress[];
+      // projectId가 있는 신규 데이터만 필터링
+      const progressData = querySnapshot.docs
+        .filter((doc) => doc.data().projectId)
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate(),
+        })) as ProjectProgress[];
       setProjectProgresses(progressData);
     } catch (error) {
       console.error('Error fetching project progresses:', error);

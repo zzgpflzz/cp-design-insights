@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "add-sample-data": "tsx scripts/add-sample-data.ts"
+    "add-sample-data": "tsx scripts/add-sample-data.ts",
+    "check-legacy-data": "tsx scripts/check-legacy-data.ts",
+    "delete-legacy-data": "tsx scripts/delete-legacy-data.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

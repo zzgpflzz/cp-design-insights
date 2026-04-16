@@ -8,7 +8,7 @@ import { isAuthenticated } from '@/lib/auth';
 import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
 import CardView from '@/components/CardView';
-import CalendarView from '@/components/CalendarView';
+import RoadmapView from '@/components/RoadmapView';
 import Link from 'next/link';
 
 type TabType = 'monthly' | 'roadmap';
@@ -91,13 +91,19 @@ export default function Home() {
 
   const fetchProjectProgresses = async () => {
     try {
-      const q = query(collection(db, 'projectProgresses'), orderBy('createdAt', 'desc'));
+      const q = query(
+        collection(db, 'projectProgresses'),
+        orderBy('createdAt', 'desc')
+      );
       const querySnapshot = await getDocs(q);
-      const progressData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-      })) as ProjectProgress[];
+      // projectId가 있는 신규 데이터만 필터링
+      const progressData = querySnapshot.docs
+        .filter((doc) => doc.data().projectId)
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate(),
+        })) as ProjectProgress[];
       setProjectProgresses(progressData);
     } catch (error) {
       console.error('Error fetching project progresses:', error);
@@ -371,7 +377,7 @@ export default function Home() {
             <CardView projects={filteredProjects} />
           </>
         ) : (
-          <CalendarView projectProgresses={projectProgresses} />
+          <RoadmapView projectProgresses={projectProgresses} />
         )}
       </main>
 

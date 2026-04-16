@@ -3,16 +3,16 @@
 import { ProjectProgress, DESIGNERS } from '@/lib/types';
 import { useState } from 'react';
 
-interface CalendarViewProps {
+interface RoadmapViewProps {
   projectProgresses: ProjectProgress[];
 }
 
-export default function CalendarView({ projectProgresses }: CalendarViewProps) {
+export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
-  // projectId가 있는 새로운 구조의 데이터만 필터링하고 프로젝트별로 그룹화
+  // 프로젝트별로 그룹화 (projectId가 있는 신규 데이터만)
   const progressByProject = projectProgresses
-    .filter(progress => progress.projectId) // projectId가 있는 것만 표시
+    .filter(progress => progress.projectId)
     .reduce((acc, progress) => {
       if (!acc[progress.projectName]) {
         acc[progress.projectName] = [];
@@ -38,10 +38,9 @@ export default function CalendarView({ projectProgresses }: CalendarViewProps) {
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
-  const getStatusInfo = (status: ProjectProgress['status'] | 'planning' | 'onhold') => {
+  const getStatusInfo = (status: ProjectProgress['status']) => {
     switch (status) {
       case 'nextup':
-      case 'planning': // 기존 데이터 호환
         return { label: 'Next Up', color: 'bg-blue-100 text-blue-700', border: 'border-l-blue-500', dot: 'bg-blue-500' };
       case 'inprogress':
         return { label: 'In Progress', color: 'bg-orange-50 text-orange-600', border: 'border-l-orange-500', dot: 'bg-orange-500' };
@@ -50,11 +49,7 @@ export default function CalendarView({ projectProgresses }: CalendarViewProps) {
       case 'pending':
         return { label: 'Pending', color: 'bg-yellow-50 text-yellow-600', border: 'border-l-yellow-500', dot: 'bg-yellow-500' };
       case 'paused':
-      case 'onhold': // 기존 데이터 호환
         return { label: 'Paused', color: 'bg-gray-100 text-gray-700', border: 'border-l-gray-400', dot: 'bg-gray-400' };
-      default:
-        // 예상치 못한 status 값 처리
-        return { label: 'Unknown', color: 'bg-gray-100 text-gray-700', border: 'border-l-gray-400', dot: 'bg-gray-400' };
     }
   };
 
@@ -93,7 +88,7 @@ export default function CalendarView({ projectProgresses }: CalendarViewProps) {
         {Object.entries(progressByProject).map(([projectName, progresses], projectIndex) => {
           const isExpanded = expandedProjects.has(projectName);
           const stats = getProjectStats(progresses);
-          const designers = Array.from(new Set(progresses.map(p => p.designer).filter(Boolean)));
+          const designers = Array.from(new Set(progresses.map(p => p.designer)));
 
           return (
             <div key={projectName} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
@@ -144,16 +139,12 @@ export default function CalendarView({ projectProgresses }: CalendarViewProps) {
 
                 {/* 담당 디자이너들 */}
                 <div className="flex items-center gap-2">
-                  {designers.map(designer => {
-                    if (!designer) return null;
-                    const designerInfo = DESIGNERS[designer];
-                    return (
-                      <div key={designer} className="flex items-center gap-1.5">
-                        <span className="text-lg">{designerInfo.emoji}</span>
-                        <span className="text-sm text-gray-600">{designerInfo.name}</span>
-                      </div>
-                    );
-                  })}
+                  {designers.map(designer => (
+                    <div key={designer} className="flex items-center gap-1.5">
+                      <span className="text-lg">{DESIGNERS[designer].emoji}</span>
+                      <span className="text-sm text-gray-600">{DESIGNERS[designer].name}</span>
+                    </div>
+                  ))}
                 </div>
 
                 {/* 화살표 아이콘 */}
@@ -183,7 +174,7 @@ export default function CalendarView({ projectProgresses }: CalendarViewProps) {
                   <div className="space-y-3">
                     {progresses.map((progress, taskIndex) => {
                       const statusInfo = getStatusInfo(progress.status);
-                      const designerInfo = progress.designer ? DESIGNERS[progress.designer] : null;
+                      const designerInfo = DESIGNERS[progress.designer];
 
                       return (
                         <div
@@ -226,12 +217,10 @@ export default function CalendarView({ projectProgresses }: CalendarViewProps) {
                           </div>
 
                           {/* 담당자 */}
-                          {designerInfo && (
-                            <div className="flex-shrink-0 w-24 flex items-center gap-1.5">
-                              <span className="text-sm">{designerInfo.emoji}</span>
-                              <span className="text-sm text-gray-700">{designerInfo.name}</span>
-                            </div>
-                          )}
+                          <div className="flex-shrink-0 w-24 flex items-center gap-1.5">
+                            <span className="text-sm">{designerInfo.emoji}</span>
+                            <span className="text-sm text-gray-700">{designerInfo.name}</span>
+                          </div>
                         </div>
                       );
                     })}
