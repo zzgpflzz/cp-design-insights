@@ -469,7 +469,7 @@ export default function Playground() {
             {/* Calendar Container with Glassmorphism */}
             <div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-[#313131]/10 p-2">
               <iframe
-                src="https://calendar.google.com/calendar/embed?height=800&wkst=1&ctz=Asia%2FSeoul&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=0&mode=MONTH&src=c_a13b8279ccde85ea035bc0ca0f0b829908215b8d7e69e8fa6697a088fa2e8ce6@group.calendar.google.com&src=c_a38406e8a6469fcdc5fa7973ff07675042c76d976d5caa8ef92e2cab2999505e@group.calendar.google.com&src=c_53e28c48acc385e081b0a9bab77c0acca54e6770382c116529543dd914a390c3@group.calendar.google.com&color=%23039BE5&color=%2333B679&color=%23E67C73"
+                src="https://calendar.google.com/calendar/embed?height=800&wkst=1&ctz=Asia%2FSeoul&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=0&mode=MONTH&src=c_a13b8279ccde85ea035bc0ca0f0b829908215b8d7e69e8fa6697a088fa2e8ce6@group.calendar.google.com&src=c_a38406e8a6469fcdc5fa7973ff07675042c76d976d5caa8ef92e2cab2999505e@group.calendar.google.com&src=c_53e28c48acc385e081b0a9bab77c0acca54e6770382c116529543dd914a390c3@group.calendar.google.com&color=%236BBD1B&color=%23397AF2&color=%23EE8800"
                 style={{ border: 0 }}
                 width="100%"
                 height="800"
@@ -485,16 +485,16 @@ export default function Playground() {
               <h3 className="text-sm font-bold text-gray-900 mb-3">📅 캘린더 정보</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#039BE5]"></span>
-                  <span>캘린더 1 (파랑)</span>
+                  <span className="w-3 h-3 rounded-full bg-[#6BBD1B]"></span>
+                  <span>LFSQ 출시/릴리즈 일정</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#33B679]"></span>
-                  <span>캘린더 2 (초록)</span>
+                  <span className="w-3 h-3 rounded-full bg-[#397AF2]"></span>
+                  <span>배너(PT)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#E67C73]"></span>
-                  <span>캘린더 3 (빨강)</span>
+                  <span className="w-3 h-3 rounded-full bg-[#EE8800]"></span>
+                  <span>마크업(LB)</span>
                 </li>
               </ul>
             </div>
