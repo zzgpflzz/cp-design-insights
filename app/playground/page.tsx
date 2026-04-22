@@ -11,7 +11,7 @@ import CardView from '@/components/CardView';
 import RoadmapView from '@/components/RoadmapView';
 import Link from 'next/link';
 
-type TabType = 'monthly' | 'roadmap';
+type TabType = 'monthly' | 'roadmap' | 'calendar';
 
 export default function Playground() {
   const router = useRouter();
@@ -232,6 +232,16 @@ export default function Playground() {
                 >
                   Project Roadmap
                 </button>
+                <button
+                  onClick={() => setActiveTab('calendar')}
+                  className={`text-sm font-medium transition-colors ${
+                    activeTab === 'calendar'
+                      ? 'text-[#313131]'
+                      : 'text-gray-400 hover:text-[#313131]'
+                  }`}
+                >
+                  Calendar
+                </button>
               </nav>
             </div>
 
@@ -446,8 +456,49 @@ export default function Playground() {
             {/* Content */}
             <CardView projects={filteredProjects} />
           </>
-        ) : (
+        ) : activeTab === 'roadmap' ? (
           <RoadmapView projectProgresses={projectProgresses} />
+        ) : (
+          /* Calendar View */
+          <div className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Design Calendar</h2>
+              <p className="text-sm text-gray-600">디자인 팀 일정 캘린더</p>
+            </div>
+
+            {/* Calendar Container with Glassmorphism */}
+            <div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-[#313131]/10 p-2">
+              <iframe
+                src="https://calendar.google.com/calendar/embed?height=800&wkst=1&ctz=Asia%2FSeoul&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=0&mode=MONTH&src=c_a13b8279ccde85ea035bc0ca0f0b829908215b8d7e69e8fa6697a088fa2e8ce6@group.calendar.google.com&src=c_a38406e8a6469fcdc5fa7973ff07675042c76d976d5caa8ef92e2cab2999505e@group.calendar.google.com&src=c_53e28c48acc385e081b0a9bab77c0acca54e6770382c116529543dd914a390c3@group.calendar.google.com&color=%23039BE5&color=%2333B679&color=%23E67C73"
+                style={{ border: 0 }}
+                width="100%"
+                height="800"
+                frameBorder="0"
+                scrolling="no"
+                title="Design Team Calendar"
+                className="rounded-lg"
+              />
+            </div>
+
+            {/* Calendar Info */}
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h3 className="text-sm font-bold text-gray-900 mb-3">📅 캘린더 정보</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#039BE5]"></span>
+                  <span>캘린더 1 (파랑)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#33B679]"></span>
+                  <span>캘린더 2 (초록)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#E67C73]"></span>
+                  <span>캘린더 3 (빨강)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         )}
       </main>
 
