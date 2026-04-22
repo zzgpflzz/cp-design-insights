@@ -7,9 +7,7 @@ import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
 import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
-import CardView from '@/components/CardView';
 import RoadmapView from '@/components/RoadmapView';
-import Link from 'next/link';
 
 type TabType = 'monthly' | 'roadmap';
 
@@ -513,15 +511,71 @@ export default function Playground() {
 
             {/* Content - 클릭 가능한 카드 그리드 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProjects.map((project) => (
-                <div
-                  key={project.id}
-                  onClick={() => handleProjectClick(project)}
-                  className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer border border-gray-100"
-                >
-                  <CardView projects={[project]} />
-                </div>
-              ))}
+              {filteredProjects.map((project) => {
+                const categoryLabel = project.category === 'uiux' ? 'UI/UX' : 'CONTENTS';
+                const categoryStyle = project.category === 'uiux'
+                  ? { backgroundColor: 'rgba(248, 59, 170, 0.08)', color: '#F83BAA', borderColor: 'rgba(248, 59, 170, 0.2)' }
+                  : { backgroundColor: 'rgba(0, 166, 255, 0.08)', color: '#00A6FF', borderColor: 'rgba(0, 166, 255, 0.2)' };
+
+                const tierLabel = project.tier === 's-tier' ? 'S TIER' : project.tier === 'ab-tier' ? 'A-B TIER' : 'ETC';
+                const tierStyle = project.tier === 's-tier'
+                  ? { backgroundColor: 'rgba(87, 180, 0, 0.08)', color: '#57B400', borderColor: 'rgba(87, 180, 0, 0.2)' }
+                  : project.tier === 'ab-tier'
+                  ? { backgroundColor: 'rgba(130, 128, 255, 0.08)', color: '#8280FF', borderColor: 'rgba(130, 128, 255, 0.2)' }
+                  : { backgroundColor: 'rgba(136, 136, 136, 0.08)', color: '#888888', borderColor: 'rgba(136, 136, 136, 0.2)' };
+
+                const statusStyle = project.status === 'release'
+                  ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D', borderColor: 'rgba(0, 188, 125, 0.2)' }
+                  : { backgroundColor: 'rgba(255, 157, 0, 0.08)', color: '#FF9D00', borderColor: 'rgba(255, 157, 0, 0.2)' };
+
+                return (
+                  <div
+                    key={project.id}
+                    onClick={() => handleProjectClick(project)}
+                    className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
+                  >
+                    {/* 상단: 제목 + 뱃지들 */}
+                    <div className="mb-4">
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <h3 className="text-lg font-bold text-gray-900 leading-snug flex-1">{project.title}</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <span
+                          className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
+                          style={categoryStyle}
+                        >
+                          {categoryLabel}
+                        </span>
+                        {project.tier && (
+                          <span
+                            className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
+                            style={tierStyle}
+                          >
+                            {tierLabel}
+                          </span>
+                        )}
+                        <span
+                          className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
+                          style={statusStyle}
+                        >
+                          {project.status === 'release' ? 'RELEASE' : 'IN PROGRESS'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-gray-600 text-sm mb-5 line-clamp-2 leading-relaxed">{project.description}</p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-600">
+                        {project.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}
+                      </div>
+                      <div className="text-sm font-semibold text-[#313131]">
+                        자세히 보기 →
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </>
         ) : (
