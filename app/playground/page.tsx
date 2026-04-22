@@ -18,6 +18,11 @@ interface ProjectInsight {
   label: string;
   labelEmoji: string;
   aiComment: string;
+  pmInsight: string;
+  uiuxInsight: string;
+  productInsight: string;
+  agenda: string[];
+  topMetric: { name: string; value: number; color: string }[];
 }
 
 export default function Playground() {
@@ -37,6 +42,7 @@ export default function Playground() {
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isInsightOpen, setIsInsightOpen] = useState(false);
+  const [isMonthlyReportOpen, setIsMonthlyReportOpen] = useState(false);
 
   // Development-only access check
   useEffect(() => {
@@ -193,7 +199,7 @@ export default function Playground() {
     setSelectedDesigner('all');
   }, []);
 
-  // 목업 인사이트 데이터 생성
+  // 목업 인사이트 데이터 생성 (고도화)
   const generateMockInsight = (project: Project): ProjectInsight => {
     const ctr = Math.random() * 15; // 0-15% CTR
     const views = Math.floor(Math.random() * 10000) + 1000;
@@ -203,24 +209,68 @@ export default function Playground() {
     let label = '';
     let labelEmoji = '';
     let aiComment = '';
+    let pmInsight = '';
+    let uiuxInsight = '';
+    let productInsight = '';
+    let agenda: string[] = [];
 
     if (ctr >= 10) {
       label = 'TOP TIER';
       labelEmoji = '🔥';
-      aiComment = '이 프로젝트는 사용자 참여도가 매우 높습니다. 현재의 디자인 전략을 다른 프로젝트에도 적용해보세요.';
+      aiComment = '현재 CTR 10% 이상의 탁월한 성과를 기록 중입니다.';
+      pmInsight = '사용자 참여도가 매우 높으며, 목표 전환율을 150% 초과 달성했습니다.';
+      uiuxInsight = '시각적 계층 구조와 CTA 배치가 효과적으로 작동하고 있습니다. 현재 디자인 패턴을 다른 프로젝트에도 적용할 것을 권장합니다.';
+      productInsight = '이번 분기 핵심 지표를 달성했으며, 다음 스프린트에서 A/B 테스트를 통한 추가 최적화를 제안합니다.';
+      agenda = [
+        'A/B 테스트로 추가 최적화 가능성 탐색',
+        '성공 패턴을 다른 프로젝트에 적용',
+        '사용자 피드백 수집 및 분석'
+      ];
     } else if (ctr >= 5) {
       label = 'PERFORMING WELL';
       labelEmoji = '✨';
-      aiComment = '안정적인 성과를 보이고 있습니다. CTA 버튼의 위치를 상단으로 이동하면 더 나은 결과를 얻을 수 있습니다.';
+      aiComment = '안정적인 성과를 보이고 있으나, 개선 여지가 있습니다.';
+      pmInsight = 'CTR이 안정적이나, 체류시간 대비 전환율이 낮은 편입니다.';
+      uiuxInsight = 'CTA 버튼의 위치를 상단으로 이동하고, 시각적 대비를 강화하면 클릭률을 7-8%p 개선할 수 있습니다.';
+      productInsight = '다음 스프린트에서 정보 아키텍처 개선을 통해 사용자 여정(User Journey)을 단순화할 것을 제안합니다.';
+      agenda = [
+        'CTA 버튼 위치 및 디자인 개선',
+        '정보 아키텍처 재설계 검토',
+        '사용자 이탈 구간 분석'
+      ];
     } else if (ctr >= 3) {
       label = 'AVERAGE';
       labelEmoji = '📊';
-      aiComment = '평균적인 성과입니다. 시각적 계층 구조를 개선하고 주요 액션 버튼의 대비를 높여보세요.';
+      aiComment = '평균적인 성과이나, 뚜렷한 개선 포인트가 존재합니다.';
+      pmInsight = '현재 CTR은 평균 수준이며, 사용자 유입은 충분하나 전환으로 이어지지 않고 있습니다.';
+      uiuxInsight = '시각적 계층 구조가 명확하지 않아 사용자가 핵심 액션을 찾기 어려워하고 있습니다. 주요 버튼의 대비를 높이고, 불필요한 요소를 제거하세요.';
+      productInsight = '컨텐츠 우선순위를 재정의하고, 핵심 가치 제안(Value Proposition)을 명확히 전달할 필요가 있습니다.';
+      agenda = [
+        '시각적 계층 구조 명확화',
+        '불필요한 UI 요소 제거',
+        '핵심 가치 제안 재정의'
+      ];
     } else {
       label = 'NEED REVISION';
       labelEmoji = '🛠';
-      aiComment = '이 프로젝트는 시각적 주목도는 높으나 실제 클릭으로 이어지는 CTA가 약합니다. 버튼 컬러를 #313131로 변경해보세요.';
+      aiComment = '시각적 주목도는 높으나, 실제 클릭으로 이어지지 않고 있습니다.';
+      pmInsight = 'CTR 3% 미만으로 목표 대비 50% 수준입니다. 썸네일의 클릭은 발생하지만, 상세 페이지에서 즉시 이탈이 발생하고 있습니다.';
+      uiuxInsight = '상세 페이지의 정보 계층(Hierarchy)이 복잡하여 사용자 혼란을 야기하고 있습니다. CTA 버튼 컬러를 #313131로 변경하고, 주요 액션을 폴드 상단으로 이동하세요.';
+      productInsight = '긴급 재설계가 필요합니다. 다음 스프린트에서 정보 구조 전면 재검토와 사용자 테스트를 진행할 것을 강력히 권장합니다.';
+      agenda = [
+        '긴급: 정보 구조 전면 재설계',
+        'CTA 디자인 및 배치 개선',
+        '사용자 테스트 진행 (최소 5명)',
+        '경쟁사 벤치마킹 분석'
+      ];
     }
+
+    // 미니 차트 데이터
+    const topMetric = [
+      { name: '조회수', value: views, color: '#313131' },
+      { name: 'CTR', value: ctr, color: '#00A6FF' },
+      { name: '체류시간', value: avgMinutes, color: '#57B400' }
+    ];
 
     return {
       views,
@@ -228,7 +278,12 @@ export default function Playground() {
       avgTime: `${avgMinutes}분 ${avgSeconds}초`,
       label,
       labelEmoji,
-      aiComment
+      aiComment,
+      pmInsight,
+      uiuxInsight,
+      productInsight,
+      agenda,
+      topMetric
     };
   };
 
@@ -327,6 +382,110 @@ export default function Playground() {
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
         {activeTab === 'monthly' ? (
           <>
+            {/* 이달의 종합 인사이트 대시보드 - Accordion */}
+            <div className="mb-8">
+              <button
+                onClick={() => setIsMonthlyReportOpen(!isMonthlyReportOpen)}
+                className="w-full bg-white rounded-xl border border-gray-200 p-6 hover:border-[#313131] transition-all text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#313131] mb-1">📊 이달의 종합 인사이트</h3>
+                    <p className="text-sm text-gray-600">전체 프로젝트 성과 분석 및 개선 제안</p>
+                  </div>
+                  <svg
+                    className={`w-6 h-6 text-[#313131] transition-transform ${isMonthlyReportOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              {isMonthlyReportOpen && (
+                <div className="mt-4 bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+                  {/* 종합 총평 */}
+                  <div>
+                    <h4 className="text-sm font-bold text-[#313131] mb-3">🎯 종합 총평</h4>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      이번 달은 전반적으로 UIUX 개편 이후 체류시간이 평균 15% 상승했습니다. 특히 S Tier 프로젝트들의 CTR이 12% 이상을 기록하며 목표를 초과 달성했습니다. 다만, 일부 A-B Tier 프로젝트에서 정보 계층 구조 개선이 필요한 것으로 분석됩니다.
+                    </p>
+                  </div>
+
+                  {/* 2단 분할 레이아웃 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* 좌측: Agenda */}
+                    <div>
+                      <h4 className="text-sm font-bold text-[#313131] mb-3">📋 우선순위 태스크</h4>
+                      <ul className="space-y-2">
+                        <li className="flex items-start gap-2 text-sm">
+                          <span className="text-[#313131] font-bold">1.</span>
+                          <span className="text-gray-700">A-B Tier 프로젝트 정보 구조 재설계</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-sm">
+                          <span className="text-[#313131] font-bold">2.</span>
+                          <span className="text-gray-700">CTA 버튼 대비 강화 및 위치 최적화</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-sm">
+                          <span className="text-[#313131] font-bold">3.</span>
+                          <span className="text-gray-700">S Tier 성공 패턴 분석 및 확산</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-sm">
+                          <span className="text-[#313131] font-bold">4.</span>
+                          <span className="text-gray-700">사용자 이탈 구간 심층 분석</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* 우측: Visual Screen (미니 차트) */}
+                    <div>
+                      <h4 className="text-sm font-bold text-[#313131] mb-3">📈 주요 지표</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-gray-600">평균 CTR</span>
+                            <span className="font-bold text-[#313131]">7.2%</span>
+                          </div>
+                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#00A6FF]" style={{ width: '72%' }} />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-gray-600">평균 체류시간</span>
+                            <span className="font-bold text-[#313131]">+15%</span>
+                          </div>
+                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#57B400]" style={{ width: '85%' }} />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-gray-600">목표 달성률</span>
+                            <span className="font-bold text-[#313131]">92%</span>
+                          </div>
+                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#313131]" style={{ width: '92%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 핵심 이슈 */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h4 className="text-sm font-bold text-[#313131] mb-3">⚠️ 핵심 이슈</h4>
+                    <div className="space-y-2 text-sm text-gray-700">
+                      <p>• CTR 3% 미만 프로젝트 3건 → 긴급 재설계 필요</p>
+                      <p>• 모바일 체류시간이 데스크톱 대비 40% 낮음 → 반응형 최적화 검토</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Month Filter Buttons - Awwwards Style */}
             <div className="mb-6">
               <div className="flex flex-wrap items-center gap-2">
@@ -664,18 +823,85 @@ export default function Playground() {
                       </div>
                     </div>
 
-                    {/* AI 인사이트 댓글 */}
-                    <div className="bg-white rounded-xl p-6 border-l-4 border-[#313131] shadow-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#313131] flex items-center justify-center flex-shrink-0">
-                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2Z" stroke="white" strokeWidth="2"/>
-                            <path d="M7 9V9.01M13 9V9.01M7 13C7 13 8 14 10 14C12 14 13 13 13 13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
+                    {/* 고도화된 AI 인사이트 - 3가지 관점 */}
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-bold text-[#313131]">💬 전문가 리뷰</h4>
+
+                      {/* PM View */}
+                      <div className="bg-white rounded-xl p-5 border-l-4 border-[#00A6FF] shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#00A6FF] flex items-center justify-center flex-shrink-0 text-white text-xs font-bold">
+                            PM
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-700 leading-relaxed">{insight.pmInsight}</p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <div className="font-bold text-sm text-[#313131] mb-2">AI 인사이트</div>
-                          <p className="text-sm text-gray-700 leading-relaxed">{insight.aiComment}</p>
+                      </div>
+
+                      {/* UIUX View */}
+                      <div className="bg-white rounded-xl p-5 border-l-4 border-[#F83BAA] shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#F83BAA] flex items-center justify-center flex-shrink-0 text-white text-[10px] font-bold">
+                            UX
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-700 leading-relaxed">{insight.uiuxInsight}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Product View */}
+                      <div className="bg-white rounded-xl p-5 border-l-4 border-[#57B400] shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#57B400] flex items-center justify-center flex-shrink-0 text-white text-[10px] font-bold">
+                            PD
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-700 leading-relaxed">{insight.productInsight}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2단 분할 대시보드 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* 좌측: Agenda */}
+                      <div className="bg-white rounded-xl p-5 border border-gray-200">
+                        <h4 className="text-xs font-bold text-[#313131] mb-3">📋 액션 아이템</h4>
+                        <ul className="space-y-2">
+                          {insight.agenda.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-xs">
+                              <span className="text-[#313131] font-bold mt-0.5">•</span>
+                              <span className="text-gray-700">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* 우측: Visual Screen (미니 차트) */}
+                      <div className="bg-white rounded-xl p-5 border border-gray-200">
+                        <h4 className="text-xs font-bold text-[#313131] mb-3">📊 핵심 지표</h4>
+                        <div className="space-y-3">
+                          {insight.topMetric.map((metric, idx) => (
+                            <div key={idx}>
+                              <div className="flex items-center justify-between text-[10px] mb-1">
+                                <span className="text-gray-600">{metric.name}</span>
+                                <span className="font-bold text-[#313131]">
+                                  {metric.name === 'CTR' ? `${metric.value}%` : metric.value.toLocaleString()}
+                                </span>
+                              </div>
+                              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full"
+                                  style={{
+                                    backgroundColor: metric.color,
+                                    width: metric.name === 'CTR' ? `${metric.value * 6.67}%` : '80%'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
