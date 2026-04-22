@@ -13,7 +13,7 @@ import Link from 'next/link';
 
 type TabType = 'monthly' | 'roadmap';
 
-export default function Home() {
+export default function Playground() {
   const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,6 +28,13 @@ export default function Home() {
   const [selectedTier, setSelectedTier] = useState<Tier | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<Status | 'all'>('all');
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
+
+  // Development-only access check
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') {
+      router.push('/');
+    }
+  }, [router]);
 
   const fetchProjects = useCallback(async () => {
     console.log('🔵 fetchProjects started');
@@ -187,6 +194,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
+      {/* Development Badge */}
+      <div className="fixed bottom-4 right-4 z-50 bg-yellow-500 text-black px-4 py-2 rounded-full text-xs font-bold shadow-lg">
+        🚧 PLAYGROUND MODE
+      </div>
+
       {/* Awwwards-style GNB */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">

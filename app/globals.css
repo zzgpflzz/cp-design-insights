@@ -1,7 +1,14 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 body {
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
   background: #FAFAFA;
   color: #171717;
+}
+
+/* Avant Garde style font for English text */
+.font-avant-garde {
+  font-family: 'ITC Avant Garde Gothic', 'Avant Garde', 'Century Gothic', 'Montserrat', sans-serif;
+  letter-spacing: -0.02em;
 }

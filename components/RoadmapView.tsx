@@ -163,7 +163,7 @@ export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
               {/* 프로그레스 바 (하단 보더) */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-100">
                 <div
-                  className="h-full bg-gradient-to-r from-[#06C755] to-[#05B04C] transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#313131] to-[#1a1a1a] transition-all duration-500"
                   style={{ width: `${stats.averageProgress}%` }}
                 />
               </div>

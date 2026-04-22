@@ -61,7 +61,7 @@ export default function LoginModal({ onClose, onSuccess }: LoginModalProps) {
               placeholder="비밀번호를 입력하세요"
               required
               autoFocus
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#06C755] focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
             />
           </div>
 
@@ -73,7 +73,7 @@ export default function LoginModal({ onClose, onSuccess }: LoginModalProps) {
 
           <button
             type="submit"
-            className="w-full bg-[#06C755] text-white py-2.5 px-4 rounded-lg hover:bg-[#05B04C] transition-colors font-medium"
+            className="w-full bg-[#313131] text-white py-2.5 px-4 rounded-lg hover:bg-[#1a1a1a] transition-colors font-medium"
           >
             확인
           </button>
