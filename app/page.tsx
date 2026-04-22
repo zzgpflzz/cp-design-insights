@@ -194,7 +194,7 @@ export default function Home() {
             {/* Left: Logo + Navigation */}
             <div className="flex items-center gap-8">
               {/* Logo */}
-              <h1 className="font-avant-garde text-xl font-bold text-[#313131]">
+              <h1 className="font-jost-logo text-xl text-[#313131]">
                 CP Design.
               </h1>
 
@@ -202,7 +202,7 @@ export default function Home() {
               <nav className="hidden md:flex items-center gap-6">
                 <button
                   onClick={() => setActiveTab('monthly')}
-                  className={`font-avant-garde text-sm font-medium transition-colors ${
+                  className={`font-jost text-sm transition-colors ${
                     activeTab === 'monthly'
                       ? 'text-[#313131]'
                       : 'text-gray-400 hover:text-[#313131]'
@@ -212,7 +212,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setActiveTab('roadmap')}
-                  className={`font-avant-garde text-sm font-medium transition-colors ${
+                  className={`font-jost text-sm transition-colors ${
                     activeTab === 'roadmap'
                       ? 'text-[#313131]'
                       : 'text-gray-400 hover:text-[#313131]'
@@ -228,14 +228,14 @@ export default function Home() {
               {isLoggedIn ? (
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="font-avant-garde px-5 py-2 bg-[#313131] text-white rounded-md text-xs font-medium hover:bg-[#1a1a1a] transition-all duration-200"
+                  className="font-jost px-5 py-2 bg-[#313131] text-white rounded-md text-xs hover:bg-[#1a1a1a] transition-all duration-200"
                 >
                   Admin
                 </button>
               ) : (
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="font-avant-garde px-5 py-2 bg-[#313131] text-white rounded-md text-xs font-medium hover:bg-[#1a1a1a] transition-all duration-200"
+                  className="font-jost px-5 py-2 bg-[#313131] text-white rounded-md text-xs hover:bg-[#1a1a1a] transition-all duration-200"
                 >
                   Log in
                 </button>
@@ -287,7 +287,7 @@ export default function Home() {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value as Category | 'all')}
-                    className="font-avant-garde px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs font-medium text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
+                    className="font-jost px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
                       backgroundPosition: 'right 12px center',
@@ -305,7 +305,7 @@ export default function Home() {
                   <select
                     value={selectedTier}
                     onChange={(e) => setSelectedTier(e.target.value as Tier | 'all')}
-                    className="font-avant-garde px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs font-medium text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
+                    className="font-jost px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
                       backgroundPosition: 'right 12px center',
@@ -324,7 +324,7 @@ export default function Home() {
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value as Status | 'all')}
-                    className="font-avant-garde px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs font-medium text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
+                    className="font-jost px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
                       backgroundPosition: 'right 12px center',
@@ -342,7 +342,7 @@ export default function Home() {
                   <select
                     value={selectedDesigner}
                     onChange={(e) => setSelectedDesigner(e.target.value as Designer | 'all')}
-                    className="font-avant-garde px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs font-medium text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
+                    className="font-jost px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
                       backgroundPosition: 'right 12px center',
@@ -369,7 +369,7 @@ export default function Home() {
 
                   return activeFilters > 0 ? (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full">
-                      <span className="font-avant-garde text-xs font-medium">{activeFilters}</span>
+                      <span className="font-jost text-xs">{activeFilters}</span>
                     </div>
                   ) : null;
                 })()}
@@ -378,7 +378,7 @@ export default function Home() {
                 {(selectedCategory !== 'all' || selectedTier !== 'all' || selectedStatus !== 'all' || selectedDesigner !== 'all') && (
                   <button
                     onClick={resetFilters}
-                    className="font-avant-garde px-4 py-2 bg-white hover:bg-gray-50 border-0 text-[#666] rounded-md text-xs font-medium transition-all duration-200 hover:shadow-sm flex items-center gap-2"
+                    className="font-jost px-4 py-2 bg-white hover:bg-gray-50 border-0 text-[#666] rounded-md text-xs transition-all duration-200 hover:shadow-sm flex items-center gap-2"
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

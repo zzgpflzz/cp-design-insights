@@ -11,8 +11,16 @@ body {
   font-family: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
 }
 
-/* Avant Garde 스타일도 Pretendard로 통일 */
-.font-avant-garde {
-  font-family: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
-  letter-spacing: -0.02em;
+/* Jost 폰트 (영문/숫자 전용) - GNB 로고용 */
+.font-jost-logo {
+  font-family: 'Jost', "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Jost 폰트 (영문/숫자 전용) - 메뉴 및 필터용 */
+.font-jost {
+  font-family: 'Jost', "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
