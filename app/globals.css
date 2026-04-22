@@ -1,13 +1,18 @@
 @import "tailwindcss";
 
 body {
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
   background: #FAFAFA;
   color: #171717;
 }
 
-/* Avant Garde style font for English text */
+/* 모든 텍스트 요소에 Pretendard 강제 적용 */
+* {
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
+}
+
+/* Avant Garde 스타일도 Pretendard로 통일 */
 .font-avant-garde {
-  font-family: 'ITC Avant Garde Gothic', 'Avant Garde', 'Century Gothic', 'Montserrat', sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
   letter-spacing: -0.02em;
 }
