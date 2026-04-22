@@ -11,7 +11,16 @@ import CardView from '@/components/CardView';
 import RoadmapView from '@/components/RoadmapView';
 import Link from 'next/link';
 
-type TabType = 'monthly' | 'roadmap' | 'calendar';
+type TabType = 'monthly' | 'roadmap';
+
+interface ProjectInsight {
+  views: number;
+  ctr: number;
+  avgTime: string;
+  label: string;
+  labelEmoji: string;
+  aiComment: string;
+}
 
 export default function Playground() {
   const router = useRouter();
@@ -28,6 +37,8 @@ export default function Playground() {
   const [selectedTier, setSelectedTier] = useState<Tier | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<Status | 'all'>('all');
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isInsightOpen, setIsInsightOpen] = useState(false);
 
   // Development-only access check
   useEffect(() => {
@@ -184,6 +195,63 @@ export default function Playground() {
     setSelectedDesigner('all');
   }, []);
 
+  // 목업 인사이트 데이터 생성
+  const generateMockInsight = (project: Project): ProjectInsight => {
+    const ctr = Math.random() * 15; // 0-15% CTR
+    const views = Math.floor(Math.random() * 10000) + 1000;
+    const avgMinutes = Math.floor(Math.random() * 10) + 1;
+    const avgSeconds = Math.floor(Math.random() * 60);
+
+    let label = '';
+    let labelEmoji = '';
+    let aiComment = '';
+
+    if (ctr >= 10) {
+      label = 'TOP TIER';
+      labelEmoji = '🔥';
+      aiComment = '이 프로젝트는 사용자 참여도가 매우 높습니다. 현재의 디자인 전략을 다른 프로젝트에도 적용해보세요.';
+    } else if (ctr >= 5) {
+      label = 'PERFORMING WELL';
+      labelEmoji = '✨';
+      aiComment = '안정적인 성과를 보이고 있습니다. CTA 버튼의 위치를 상단으로 이동하면 더 나은 결과를 얻을 수 있습니다.';
+    } else if (ctr >= 3) {
+      label = 'AVERAGE';
+      labelEmoji = '📊';
+      aiComment = '평균적인 성과입니다. 시각적 계층 구조를 개선하고 주요 액션 버튼의 대비를 높여보세요.';
+    } else {
+      label = 'NEED REVISION';
+      labelEmoji = '🛠';
+      aiComment = '이 프로젝트는 시각적 주목도는 높으나 실제 클릭으로 이어지는 CTA가 약합니다. 버튼 컬러를 #313131로 변경해보세요.';
+    }
+
+    return {
+      views,
+      ctr: parseFloat(ctr.toFixed(2)),
+      avgTime: `${avgMinutes}분 ${avgSeconds}초`,
+      label,
+      labelEmoji,
+      aiComment
+    };
+  };
+
+  // 랜덤 이모지 생성
+  const getRandomEmoji = () => {
+    const emojis = ['(^Д^)/', '(⌐■_■)', '(◕‿◕)', '(づ｡◕‿‿◕｡)づ', '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧', '(｡♥‿♥｡)', '(✿◠‿◠)'];
+    return emojis[Math.floor(Math.random() * emojis.length)];
+  };
+
+  // 프로젝트 클릭 핸들러
+  const handleProjectClick = (project: Project) => {
+    setSelectedProject(project);
+    setIsInsightOpen(true);
+  };
+
+  // 팝업 닫기
+  const closeInsight = () => {
+    setIsInsightOpen(false);
+    setTimeout(() => setSelectedProject(null), 300);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
@@ -231,16 +299,6 @@ export default function Playground() {
                   }`}
                 >
                   Project Roadmap
-                </button>
-                <button
-                  onClick={() => setActiveTab('calendar')}
-                  className={`text-sm font-medium transition-colors ${
-                    activeTab === 'calendar'
-                      ? 'text-[#313131]'
-                      : 'text-gray-400 hover:text-[#313131]'
-                  }`}
-                >
-                  Calendar
                 </button>
               </nav>
             </div>
@@ -453,52 +511,21 @@ export default function Playground() {
               </div>
             )}
 
-            {/* Content */}
-            <CardView projects={filteredProjects} />
+            {/* Content - 클릭 가능한 카드 그리드 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProjects.map((project) => (
+                <div
+                  key={project.id}
+                  onClick={() => handleProjectClick(project)}
+                  className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer border border-gray-100"
+                >
+                  <CardView projects={[project]} />
+                </div>
+              ))}
+            </div>
           </>
-        ) : activeTab === 'roadmap' ? (
-          <RoadmapView projectProgresses={projectProgresses} />
         ) : (
-          /* Calendar View */
-          <div className="space-y-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Design Calendar</h2>
-              <p className="text-sm text-gray-600">디자인 팀 일정 캘린더</p>
-            </div>
-
-            {/* Calendar Container with Glassmorphism */}
-            <div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-[#313131]/10 p-2">
-              <iframe
-                src="https://calendar.google.com/calendar/embed?height=800&wkst=1&ctz=Asia%2FSeoul&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=0&mode=MONTH&src=c_a13b8279ccde85ea035bc0ca0f0b829908215b8d7e69e8fa6697a088fa2e8ce6@group.calendar.google.com&src=c_a38406e8a6469fcdc5fa7973ff07675042c76d976d5caa8ef92e2cab2999505e@group.calendar.google.com&src=c_53e28c48acc385e081b0a9bab77c0acca54e6770382c116529543dd914a390c3@group.calendar.google.com&color=%233D7A0D&color=%231E4FA5&color=%23B86600"
-                style={{ border: 0 }}
-                width="100%"
-                height="800"
-                frameBorder="0"
-                scrolling="no"
-                title="Design Team Calendar"
-                className="rounded-lg"
-              />
-            </div>
-
-            {/* Calendar Info */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">📅 캘린더 정보</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#3D7A0D]"></span>
-                  <span>LFSQ 출시/릴리즈 일정 (진한 그린 + 화이트 텍스트)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#1E4FA5]"></span>
-                  <span>배너(PT) (진한 블루 + 화이트 텍스트)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-[#B86600]"></span>
-                  <span>마크업(LB) (진한 오렌지 + 화이트 텍스트)</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <RoadmapView projectProgresses={projectProgresses} />
         )}
       </main>
 
@@ -509,6 +536,150 @@ export default function Playground() {
           onSuccess={handleLogin}
         />
       )}
+
+      {/* 인사이트 대시보드 팝업 - 90% 높이 */}
+      {isInsightOpen && selectedProject && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={closeInsight}
+        >
+          {/* Backdrop Blur */}
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+
+          {/* Drawer/Modal */}
+          <div
+            className="relative w-full max-w-2xl h-[90vh] bg-[#FAFAFA] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between z-10">
+              <div>
+                <h2 className="text-2xl font-bold text-[#313131]">{selectedProject.title}</h2>
+                <p className="text-sm text-gray-600 mt-1">디자인 인사이트 대시보드</p>
+              </div>
+              <button
+                onClick={closeInsight}
+                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M15 5L5 15M5 5L15 15" stroke="#313131" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+              {/* 썸네일 또는 이모지 */}
+              <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center border border-gray-300">
+                {selectedProject.link ? (
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🖼️</div>
+                    <p className="text-sm text-gray-600">미리보기 썸네일</p>
+                    <p className="text-xs text-gray-400 mt-2">{selectedProject.link}</p>
+                  </div>
+                ) : (
+                  <div className="text-9xl">{getRandomEmoji()}</div>
+                )}
+              </div>
+
+              {/* 성과 지표 */}
+              {(() => {
+                const insight = generateMockInsight(selectedProject);
+                return (
+                  <>
+                    {/* 라벨 */}
+                    <div className="flex items-center gap-3">
+                      <span className="px-4 py-2 bg-white rounded-full text-sm font-bold border-2 border-[#313131]">
+                        {insight.labelEmoji} {insight.label}
+                      </span>
+                    </div>
+
+                    {/* 숫자 대시보드 */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white rounded-xl p-6 border border-gray-200">
+                        <div className="text-xs text-gray-600 mb-2 font-medium">조회수</div>
+                        <div className="text-3xl font-bold text-[#313131]">{insight.views.toLocaleString()}</div>
+                      </div>
+                      <div className="bg-white rounded-xl p-6 border border-gray-200">
+                        <div className="text-xs text-gray-600 mb-2 font-medium">클릭률</div>
+                        <div className="text-3xl font-bold text-[#313131]">{insight.ctr}%</div>
+                      </div>
+                      <div className="bg-white rounded-xl p-6 border border-gray-200">
+                        <div className="text-xs text-gray-600 mb-2 font-medium">체류시간</div>
+                        <div className="text-2xl font-bold text-[#313131]">{insight.avgTime}</div>
+                      </div>
+                    </div>
+
+                    {/* AI 인사이트 댓글 */}
+                    <div className="bg-white rounded-xl p-6 border-l-4 border-[#313131] shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#313131] flex items-center justify-center flex-shrink-0">
+                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2Z" stroke="white" strokeWidth="2"/>
+                            <path d="M7 9V9.01M13 9V9.01M7 13C7 13 8 14 10 14C12 14 13 13 13 13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-bold text-sm text-[#313131] mb-2">AI 인사이트</div>
+                          <p className="text-sm text-gray-700 leading-relaxed">{insight.aiComment}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 프로젝트 상세 정보 */}
+                    <div className="bg-white rounded-xl p-6 border border-gray-200">
+                      <h3 className="font-bold text-sm text-[#313131] mb-4">프로젝트 정보</h3>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">담당자</span>
+                          <span className="font-medium">{selectedProject.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">카테고리</span>
+                          <span className="font-medium">{selectedProject.category === 'uiux' ? 'UI/UX' : 'Contents'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">상태</span>
+                          <span className="font-medium">{selectedProject.status === 'release' ? 'Release' : 'In Progress'}</span>
+                        </div>
+                        {selectedProject.link && (
+                          <div className="pt-3 border-t border-gray-200">
+                            <a
+                              href={selectedProject.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#313131] hover:underline font-medium flex items-center gap-2"
+                            >
+                              프로젝트 바로가기 →
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 애니메이션 */}
+      <style jsx>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
