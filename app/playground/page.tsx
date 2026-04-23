@@ -382,8 +382,8 @@ export default function Playground() {
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
         {activeTab === 'monthly' ? (
           <>
-            {/* 이달의 종합 인사이트 대시보드 - Accordion */}
-            <div className="mb-8">
+            {/* Month Filter Buttons - Awwwards Style */}
+            <div className="mb-6">
               <button
                 onClick={() => setIsMonthlyReportOpen(!isMonthlyReportOpen)}
                 className="w-full bg-white rounded-xl border border-gray-200 p-6 hover:border-[#313131] transition-all text-left"
@@ -486,8 +486,8 @@ export default function Playground() {
               )}
             </div>
 
-            {/* Month Filter Buttons - Awwwards Style */}
-            <div className="mb-6">
+            {/* 이달의 종합 인사이트 대시보드 - Accordion (Agenda 아래로 이동) */}
+            <div className="mb-8">
               <div className="flex flex-wrap items-center gap-2">
                 {monthlyData.map((data) => (
                   <button
