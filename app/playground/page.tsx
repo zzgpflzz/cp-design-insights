@@ -200,7 +200,7 @@ export default function Playground() {
   }, []);
 
   // 목업 인사이트 데이터 생성 (고도화)
-  const generateMockInsight = (project: Project): ProjectInsight => {
+  const generateMockInsight = useCallback((project: Project): ProjectInsight => {
     const ctr = Math.random() * 15; // 0-15% CTR
     const views = Math.floor(Math.random() * 10000) + 1000;
     const avgMinutes = Math.floor(Math.random() * 10) + 1;
@@ -285,13 +285,109 @@ export default function Playground() {
       agenda,
       topMetric
     };
-  };
+  }, []);
 
   // 랜덤 이모지 생성
   const getRandomEmoji = () => {
     const emojis = ['(^Д^)/', '(⌐■_■)', '(◕‿◕)', '(づ｡◕‿‿◕｡)づ', '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧', '(｡♥‿♥｡)', '(✿◠‿◠)'];
     return emojis[Math.floor(Math.random() * emojis.length)];
   };
+
+  // 월간 통합 인사이트 생성 (필터링된 프로젝트 기반)
+  const generateMonthlyInsight = useCallback((projects: Project[]) => {
+    if (projects.length === 0) {
+      return {
+        avgCtr: 0,
+        totalViews: 0,
+        avgTime: '0분 0초',
+        inProgressCount: 0,
+        releaseCount: 0,
+        isInProgressDominant: false,
+        monthlyComment: '',
+        pmComment: '',
+        uiuxComment: '',
+        priorities: []
+      };
+    }
+
+    // 각 프로젝트의 목업 데이터 생성 및 집계
+    const insights = projects.map(p => generateMockInsight(p));
+    const avgCtr = insights.reduce((sum, i) => sum + i.ctr, 0) / insights.length;
+    const totalViews = insights.reduce((sum, i) => sum + i.views, 0);
+    const inProgressCount = projects.filter(p => p.status === 'inprogress').length;
+    const releaseCount = projects.filter(p => p.status === 'release').length;
+    const isInProgressDominant = inProgressCount > releaseCount;
+
+    // 월간 코멘트 생성
+    let monthlyComment = '';
+    let pmComment = '';
+    let uiuxComment = '';
+    let priorities: string[] = [];
+
+    if (isInProgressDominant) {
+      // In Progress 중심 월
+      monthlyComment = `이번 달은 ${inProgressCount}개의 프로젝트가 진행 중이며, 다음 달 릴리즈를 목표로 활발한 개발이 진행되고 있습니다.`;
+      pmComment = '릴리즈 일정 준수를 위해 우선순위 관리가 중요합니다. 주간 체크인을 통해 블로커를 사전에 제거하세요.';
+      uiuxComment = '디자인 QA와 프로토타입 검증에 충분한 시간을 할애하여, 릴리즈 후 재작업을 최소화하세요.';
+      priorities = [
+        '주간 체크인 및 블로커 제거',
+        '디자인 QA 및 프로토타입 검증',
+        '크로스 브라우저 테스트 준비',
+        '릴리즈 노트 작성 시작'
+      ];
+    } else if (avgCtr >= 8) {
+      // 고성과 월
+      monthlyComment = `이번 달은 평균 CTR ${avgCtr.toFixed(1)}%로 목표를 크게 초과 달성했습니다. 전월 대비 UI 디자인의 통일성이 높아져 사용자 체류시간이 평균 10% 상승했습니다.`;
+      pmComment = '목표를 150% 초과 달성했으며, 현재 전략이 효과적으로 작동하고 있습니다. 다음 분기에도 이 방향을 유지하세요.';
+      uiuxComment = '시각적 일관성과 CTA 배치가 매우 효과적입니다. 이번 달의 디자인 패턴을 다른 프로젝트에도 확산할 것을 권장합니다.';
+      priorities = [
+        '성공 패턴 문서화 및 확산',
+        'A/B 테스트로 추가 최적화',
+        '사용자 피드백 심층 분석',
+        '다음 분기 목표 상향 조정 검토'
+      ];
+    } else if (avgCtr >= 5) {
+      // 안정 월
+      monthlyComment = `이번 달은 평균 CTR ${avgCtr.toFixed(1)}%로 안정적인 성과를 보였습니다. 전반적으로 양호하나, 일부 개선 여지가 있습니다.`;
+      pmComment = '목표 달성률 85% 수준으로 안정적이나, 10-15% 추가 개선 가능성이 있습니다.';
+      uiuxComment = '정보 계층 구조를 명확히 하고, CTA 버튼의 시각적 대비를 강화하면 CTR을 7-8%p 개선할 수 있습니다.';
+      priorities = [
+        'CTA 버튼 디자인 및 배치 개선',
+        '정보 아키텍처 재검토',
+        '사용자 이탈 구간 분석',
+        '경쟁사 벤치마킹'
+      ];
+    } else {
+      // 개선 필요 월
+      monthlyComment = `이번 달은 평균 CTR ${avgCtr.toFixed(1)}%로 목표에 미달했습니다. 사용자 유입은 충분하나 전환으로 이어지지 않고 있습니다.`;
+      pmComment = '긴급 개선이 필요합니다. CTR이 목표 대비 60% 수준이며, 사용자 여정의 근본적인 재검토가 필요합니다.';
+      uiuxComment = '시각적 계층이 불명확하여 사용자가 핵심 액션을 찾기 어려워하고 있습니다. 정보 구조 전면 재설계를 권장합니다.';
+      priorities = [
+        '긴급: 정보 구조 전면 재설계',
+        '사용자 테스트 진행 (최소 5명)',
+        'CTA 디자인 대비 강화',
+        '경쟁사 벤치마킹 및 분석'
+      ];
+    }
+
+    return {
+      avgCtr: parseFloat(avgCtr.toFixed(2)),
+      totalViews,
+      avgTime: `${Math.floor(Math.random() * 10) + 1}분 ${Math.floor(Math.random() * 60)}초`,
+      inProgressCount,
+      releaseCount,
+      isInProgressDominant,
+      monthlyComment,
+      pmComment,
+      uiuxComment,
+      priorities
+    };
+  }, [generateMockInsight]);
+
+  // 월별 종합 인사이트 (필터링된 프로젝트 기반) - 메모이제이션
+  const monthlyInsight = useMemo(() => {
+    return generateMonthlyInsight(filteredProjects);
+  }, [filteredProjects, generateMonthlyInsight]);
 
   // 프로젝트 클릭 핸들러
   const handleProjectClick = (project: Project) => {
@@ -406,82 +502,106 @@ export default function Playground() {
 
               {isMonthlyReportOpen && (
                 <div className="mt-4 bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-                  {/* 종합 총평 */}
-                  <div>
-                    <h4 className="text-sm font-bold text-[#313131] mb-3">🎯 종합 총평</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      이번 달은 전반적으로 UIUX 개편 이후 체류시간이 평균 15% 상승했습니다. 특히 S Tier 프로젝트들의 CTR이 12% 이상을 기록하며 목표를 초과 달성했습니다. 다만, 일부 A-B Tier 프로젝트에서 정보 계층 구조 개선이 필요한 것으로 분석됩니다.
-                    </p>
-                  </div>
-
-                  {/* 2단 분할 레이아웃 */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* 좌측: Agenda */}
-                    <div>
-                      <h4 className="text-sm font-bold text-[#313131] mb-3">📋 우선순위 태스크</h4>
-                      <ul className="space-y-2">
-                        <li className="flex items-start gap-2 text-sm">
-                          <span className="text-[#313131] font-bold">1.</span>
-                          <span className="text-gray-700">A-B Tier 프로젝트 정보 구조 재설계</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm">
-                          <span className="text-[#313131] font-bold">2.</span>
-                          <span className="text-gray-700">CTA 버튼 대비 강화 및 위치 최적화</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm">
-                          <span className="text-[#313131] font-bold">3.</span>
-                          <span className="text-gray-700">S Tier 성공 패턴 분석 및 확산</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm">
-                          <span className="text-[#313131] font-bold">4.</span>
-                          <span className="text-gray-700">사용자 이탈 구간 심층 분석</span>
-                        </li>
-                      </ul>
+                  {monthlyInsight.avgCtr === 0 ? (
+                    // 데이터 없음 상태
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 text-sm">선택한 필터 조건에 해당하는 프로젝트가 없습니다.</p>
                     </div>
+                  ) : (
+                    <>
+                      {/* 종합 총평 */}
+                      <div>
+                        <h4 className="text-sm font-bold text-[#313131] mb-3">🎯 종합 총평</h4>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {monthlyInsight.monthlyComment}
+                        </p>
+                      </div>
 
-                    {/* 우측: Visual Screen (미니 차트) */}
-                    <div>
-                      <h4 className="text-sm font-bold text-[#313131] mb-3">📈 주요 지표</h4>
-                      <div className="space-y-3">
+                      {/* 2단 분할 레이아웃 */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 좌측: Agenda */}
                         <div>
-                          <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-gray-600">평균 CTR</span>
-                            <span className="font-bold text-[#313131]">7.2%</span>
-                          </div>
-                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#00A6FF]" style={{ width: '72%' }} />
-                          </div>
+                          <h4 className="text-sm font-bold text-[#313131] mb-3">📋 우선순위 태스크</h4>
+                          <ul className="space-y-2">
+                            {monthlyInsight.priorities.map((priority, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-sm">
+                                <span className="text-[#313131] font-bold">{idx + 1}.</span>
+                                <span className="text-gray-700">{priority}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
+
+                        {/* 우측: Visual Screen (미니 차트) */}
                         <div>
-                          <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-gray-600">평균 체류시간</span>
-                            <span className="font-bold text-[#313131]">+15%</span>
-                          </div>
-                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#57B400]" style={{ width: '85%' }} />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-gray-600">목표 달성률</span>
-                            <span className="font-bold text-[#313131]">92%</span>
-                          </div>
-                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#313131]" style={{ width: '92%' }} />
+                          <h4 className="text-sm font-bold text-[#313131] mb-3">📈 주요 지표</h4>
+                          <div className="space-y-3">
+                            <div>
+                              <div className="flex items-center justify-between text-xs mb-1">
+                                <span className="text-gray-600">평균 CTR</span>
+                                <span className="font-bold text-[#313131]">{monthlyInsight.avgCtr}%</span>
+                              </div>
+                              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-[#00A6FF]" style={{ width: `${Math.min(monthlyInsight.avgCtr * 6.67, 100)}%` }} />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex items-center justify-between text-xs mb-1">
+                                <span className="text-gray-600">총 조회수</span>
+                                <span className="font-bold text-[#313131]">{monthlyInsight.totalViews.toLocaleString()}</span>
+                              </div>
+                              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-[#57B400]" style={{ width: '85%' }} />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex items-center justify-between text-xs mb-1">
+                                <span className="text-gray-600">프로젝트 현황</span>
+                                <span className="font-bold text-[#313131]">
+                                  {monthlyInsight.isInProgressDominant ?
+                                    `진행중 ${monthlyInsight.inProgressCount}` :
+                                    `릴리즈 ${monthlyInsight.releaseCount}`}
+                                </span>
+                              </div>
+                              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-[#313131]" style={{ width: `${monthlyInsight.isInProgressDominant ? (monthlyInsight.inProgressCount / (monthlyInsight.inProgressCount + monthlyInsight.releaseCount)) * 100 : (monthlyInsight.releaseCount / (monthlyInsight.inProgressCount + monthlyInsight.releaseCount)) * 100}%` }} />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* 핵심 이슈 */}
-                  <div className="border-t border-gray-200 pt-4">
-                    <h4 className="text-sm font-bold text-[#313131] mb-3">⚠️ 핵심 이슈</h4>
-                    <div className="space-y-2 text-sm text-gray-700">
-                      <p>• CTR 3% 미만 프로젝트 3건 → 긴급 재설계 필요</p>
-                      <p>• 모바일 체류시간이 데스크톱 대비 40% 낮음 → 반응형 최적화 검토</p>
-                    </div>
-                  </div>
+                      {/* PM/UIUX 전문가 관점 */}
+                      <div className="border-t border-gray-200 pt-4">
+                        <h4 className="text-sm font-bold text-[#313131] mb-3">💬 전문가 관점</h4>
+                        <div className="space-y-3">
+                          {/* PM Comment */}
+                          <div className="bg-[#00A6FF]/5 rounded-lg p-4 border-l-4 border-[#00A6FF]">
+                            <div className="flex items-start gap-3">
+                              <div className="w-7 h-7 rounded-full bg-[#00A6FF] flex items-center justify-center flex-shrink-0 text-white text-xs font-bold">
+                                PM
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-xs text-gray-700 leading-relaxed">{monthlyInsight.pmComment}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* UIUX Comment */}
+                          <div className="bg-[#F83BAA]/5 rounded-lg p-4 border-l-4 border-[#F83BAA]">
+                            <div className="flex items-start gap-3">
+                              <div className="w-7 h-7 rounded-full bg-[#F83BAA] flex items-center justify-center flex-shrink-0 text-white text-[10px] font-bold">
+                                UX
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-xs text-gray-700 leading-relaxed">{monthlyInsight.uiuxComment}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
