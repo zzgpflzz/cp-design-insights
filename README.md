@@ -4,6 +4,7 @@
 
 ## 주요 기능
 
+### 📊 코어 기능
 - 📅 **월별 아카이빙**: 매달 진행한 작업물을 월별로 분류하여 관리
 - 🎨 **디자이너 구분**: 장혜리, 김아영 디자이너별 작업물 표시 (이모지 캐릭터)
 - 🏷️ **상태 관리**: Release / In Progress 상태로 구분
@@ -11,12 +12,22 @@
 - 🔗 **링크 연결**: 각 작업물에 외부 링크 연결 가능
 - 🛠️ **관리자 페이지**: 프로젝트 추가, 수정, 삭제 기능
 
+### 📈 인사이트 대시보드 (v1.0.0)
+- **동적 월별 인사이트**: 필터 선택 시 실시간 데이터 집계 및 분석
+- **3-Tier 전문가 리뷰**: PM, UIUX, Product 관점의 프로페셔널 코멘트
+- **2단 분할 레이아웃**: 우선순위 태스크 + 시각화된 주요 지표
+- **실시간 성과 분석**: 평균 CTR, 총 조회수, 프로젝트 현황 자동 계산
+- **90vh 인사이트 모달**: 프로젝트별 상세 분석 대시보드
+- **필터 동기화**: 월별, 카테고리, Tier, Status, Designer 필터 완전 연동
+
 ## 기술 스택
 
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS
+- **Frontend**: Next.js 16.2.3, React 19.2.4, TypeScript
+- **Styling**: Tailwind CSS 4.0
+- **Typography**: Pretendard Variable (via jsDelivr CDN)
 - **Database**: Firebase Firestore
-- **Hosting**: Vercel (권장)
+- **Hosting**: Vercel
+- **Performance**: useMemo, useCallback hooks for optimization
 
 ## 프로젝트 구조
 
@@ -70,6 +81,21 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
+
+#### 필수 환경 변수 목록
+
+현재 프로덕션 환경(Vercel)에서 필요한 환경 변수:
+
+| 변수명 | 용도 | 필수 여부 |
+|--------|------|-----------|
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase 인증 키 | ✅ 필수 |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase 인증 도메인 | ✅ 필수 |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase 프로젝트 ID | ✅ 필수 |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase Storage 버킷 | ✅ 필수 |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | FCM Sender ID | ✅ 필수 |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase 앱 ID | ✅ 필수 |
+
+> **⚠️ 보안 주의**: 실제 값은 절대 Git에 커밋하지 마세요. `.env.local`은 `.gitignore`에 포함되어 있습니다.
 
 ### 4. 개발 서버 실행
 
@@ -138,11 +164,57 @@ service cloud.firestore {
 1. [Vercel](https://vercel.com)에 가입
 2. GitHub 저장소 연결
 3. 환경 변수 설정 (Firebase 구성)
+   - Vercel Dashboard → 프로젝트 → Settings → Environment Variables
+   - 위의 필수 환경 변수 6개 모두 입력
 4. 배포
 
 ```bash
 npm run build
 ```
+
+**현재 프로덕션 URL**: https://cp-design-insights.vercel.app/
+
+## 버전 관리 및 백업
+
+### 안정 버전 복원 방법
+
+현재 프로젝트는 안정적인 버전을 태그와 백업 브랜치로 보존하고 있습니다.
+
+#### 태그로 복원
+```bash
+# 사용 가능한 태그 확인
+git tag -l
+
+# 특정 태그로 체크아웃
+git checkout v1.0.0-stable-dashboard
+
+# 새 브랜치로 복원 (수정 작업 시)
+git checkout -b restore-from-v1 v1.0.0-stable-dashboard
+```
+
+#### 백업 브랜치로 복원
+```bash
+# 백업 브랜치 확인
+git branch -a | grep backup
+
+# 백업 브랜치로 전환
+git checkout backup/stable-insight-v1
+
+# main에 병합 (조심!)
+git checkout main
+git merge backup/stable-insight-v1
+```
+
+### 주요 안정 버전
+
+| 버전 | 태그 | 브랜치 | 설명 |
+|------|------|--------|------|
+| v1.0.0 | `v1.0.0-stable-dashboard` | `backup/stable-insight-v1` | 월별 인사이트 대시보드 + Pretendard 폰트 통일 |
+
+**복원 권장 시나리오**:
+- 코드 수정 후 버그가 발생했을 때
+- 새 기능 추가 전 안정 버전 확인이 필요할 때
+- 디자인/로직이 꼬여서 처음부터 다시 시작하고 싶을 때
 
 ## 개선 사항 제안
 
