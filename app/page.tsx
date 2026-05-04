@@ -207,23 +207,13 @@ export default function Home() {
   // 필터링 및 정렬된 프로젝트 (useMemo로 최적화)
   const filteredProjects = useMemo(() => {
     let filtered = projects.filter(project => {
-      // 월 필터: releaseDate 기준 (없으면 month)
-      if (selectedMonth && selectedMonth !== 'all') {
-        const projectMonth = project.releaseDate
-          ? project.releaseDate.substring(0, 7)
-          : project.month;
-        if (projectMonth !== selectedMonth) return false;
-      }
+      const projectMonth = getProjectMonth(project);
+      const actualStatus = getActualStatus(project);
 
+      if (selectedMonth && selectedMonth !== 'all' && projectMonth !== selectedMonth) return false;
       if (selectedCategory !== 'all' && project.category !== selectedCategory) return false;
       if (selectedTier !== 'all' && project.tier !== selectedTier) return false;
-
-      // 상태 필터: 실제 상태 기준 (자동 전환 적용)
-      if (selectedStatus !== 'all') {
-        const actualStatus = getActualStatus(project);
-        if (actualStatus !== selectedStatus) return false;
-      }
-
+      if (selectedStatus !== 'all' && actualStatus !== selectedStatus) return false;
       if (selectedDesigner !== 'all' && project.designer !== selectedDesigner) return false;
       return true;
     });
@@ -232,8 +222,10 @@ export default function Home() {
     if (sortBy === 'recent-release') {
       // 최근 릴리즈 순 (릴리즈된 프로젝트 중 releaseDate가 최신인 순)
       filtered = [...filtered].sort((a, b) => {
-        if (a.status === 'release' && b.status !== 'release') return -1;
-        if (a.status !== 'release' && b.status === 'release') return 1;
+        const aStatus = getActualStatus(a);
+        const bStatus = getActualStatus(b);
+        if (aStatus === 'release' && bStatus !== 'release') return -1;
+        if (aStatus !== 'release' && bStatus === 'release') return 1;
         if (a.releaseDate && b.releaseDate) {
           return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
         }
@@ -245,8 +237,10 @@ export default function Home() {
       // 릴리즈 임박 순 (In Progress 중 releaseDate가 가까운 순)
       filtered = [...filtered].sort((a, b) => {
         const today = new Date().getTime();
-        if (a.status === 'inprogress' && b.status !== 'inprogress') return -1;
-        if (a.status !== 'inprogress' && b.status === 'inprogress') return 1;
+        const aStatus = getActualStatus(a);
+        const bStatus = getActualStatus(b);
+        if (aStatus === 'inprogress' && bStatus !== 'inprogress') return -1;
+        if (aStatus !== 'inprogress' && bStatus === 'inprogress') return 1;
         if (a.releaseDate && b.releaseDate) {
           const diffA = Math.abs(new Date(a.releaseDate).getTime() - today);
           const diffB = Math.abs(new Date(b.releaseDate).getTime() - today);
@@ -259,7 +253,7 @@ export default function Home() {
     }
 
     return filtered;
-  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner, sortBy, getActualStatus]);
+  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner, sortBy, getActualStatus, getProjectMonth]);
 
   // 월별 요약 지표 계산 (실제 분석 데이터 포함)
   const monthlyStats = useMemo(() => {
@@ -285,12 +279,7 @@ export default function Home() {
       };
     }
 
-    // releaseDate 기준으로 필터링
-    const monthProjects = projects.filter(p => {
-      const projectMonth = p.releaseDate ? p.releaseDate.substring(0, 7) : p.month;
-      return projectMonth === selectedMonth;
-    });
-
+    const monthProjects = projects.filter(p => getProjectMonth(p) === selectedMonth);
     let monthSessions = 0;
     let monthProjectsWithData = 0;
 
@@ -310,7 +299,7 @@ export default function Home() {
       totalSessions: monthSessions,
       projectsWithData: monthProjectsWithData,
     };
-  }, [projects, selectedMonth, getActualStatus, analyticsData]);
+  }, [projects, selectedMonth, getActualStatus, getProjectMonth, analyticsData]);
 
   // 선택된 월의 아젠다 (useMemo로 최적화)
   const currentAgenda = useMemo(() => {
