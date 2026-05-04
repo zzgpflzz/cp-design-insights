@@ -7,7 +7,8 @@ import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
 import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
-import RoadmapView from '@/components/RoadmapView';
+import PipelineCalendar from '@/components/PipelineCalendar';
+import { loadAnalyticsData, getProjectAnalytics, AggregatedAnalytics } from '@/lib/analyticsData';
 
 type TabType = 'monthly' | 'roadmap';
 
@@ -35,14 +36,17 @@ export default function Playground() {
   const [agendas, setAgendas] = useState<MonthlyAgenda[]>([]);
   const [projectProgresses, setProjectProgresses] = useState<ProjectProgress[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
   const [selectedTier, setSelectedTier] = useState<Tier | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<Status | 'all'>('all');
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
+  const [sortBy, setSortBy] = useState<'default' | 'recent-release' | 'upcoming-release'>('default');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isInsightOpen, setIsInsightOpen] = useState(false);
   const [isMonthlyReportOpen, setIsMonthlyReportOpen] = useState(false);
+  const [isAgendaOpen, setIsAgendaOpen] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState<Map<string, AggregatedAnalytics>>(new Map());
 
   // Development-only access check
   useEffect(() => {
@@ -66,13 +70,17 @@ export default function Playground() {
       })) as Project[];
       setProjects(projectsData);
 
-      // 월별 데이터 그룹화
+      // 월별 데이터 그룹화 (releaseDate 기준, 없으면 month 사용)
       const grouped = projectsData.reduce((acc, project) => {
-        const existingMonth = acc.find((m) => m.month === project.month);
+        const projectMonth = project.releaseDate
+          ? project.releaseDate.substring(0, 7) // YYYY-MM
+          : project.month;
+
+        const existingMonth = acc.find((m) => m.month === projectMonth);
         if (existingMonth) {
           existingMonth.projects.push(project);
         } else {
-          acc.push({ month: project.month, projects: [project] });
+          acc.push({ month: projectMonth, projects: [project] });
         }
         return acc;
       }, [] as MonthlyData[]);
@@ -81,7 +89,10 @@ export default function Playground() {
       grouped.sort((a, b) => b.month.localeCompare(a.month));
       setMonthlyData(grouped);
 
-      // 최초 진입 시 가장 최신 월 선택 (setSelectedMonth 제거 - 초기값은 state 선언에서 설정)
+      // 최초 진입 시 가장 최신 월 자동 선택
+      if (grouped.length > 0 && !selectedMonth) {
+        setSelectedMonth(grouped[0].month);
+      }
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
@@ -147,7 +158,8 @@ export default function Playground() {
       await Promise.all([
         fetchProjects(),
         fetchAgendas(),
-        fetchProjectProgresses()
+        fetchProjectProgresses(),
+        loadAnalyticsData().then(setAnalyticsData)
       ]);
       console.log(`✅ All data loaded in ${(performance.now() - startTime).toFixed(2)}ms`);
       console.log(`✅ Total time from mount: ${(performance.now() - mountTime).toFixed(2)}ms`);
@@ -172,17 +184,129 @@ export default function Playground() {
     return `${year}년 ${parseInt(monthNum)}월`;
   }, []);
 
-  // 필터링된 프로젝트 (useMemo로 최적화)
+  // 프로젝트의 실제 상태 계산 (릴리즈 날짜 기준 자동 전환)
+  const getActualStatus = useCallback((project: Project): Status => {
+    if (!project.releaseDate) {
+      return project.status;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const releaseDate = new Date(project.releaseDate);
+    releaseDate.setHours(0, 0, 0, 0);
+
+    // 릴리즈 날짜가 지났으면 자동으로 Release로 전환
+    if (releaseDate <= today && project.status === 'inprogress') {
+      return 'release';
+    }
+
+    return project.status;
+  }, []);
+
+  // 프로젝트의 월 추출 (releaseDate 우선, 없으면 month 사용)
+  const getProjectMonth = useCallback((project: Project): string => {
+    if (project.releaseDate) {
+      return project.releaseDate.substring(0, 7); // YYYY-MM
+    }
+    return project.month;
+  }, []);
+
+  // 필터링 및 정렬된 프로젝트 (useMemo로 최적화)
   const filteredProjects = useMemo(() => {
-    return projects.filter(project => {
-      if (selectedMonth !== 'all' && project.month !== selectedMonth) return false;
+    let filtered = projects.filter(project => {
+      const projectMonth = getProjectMonth(project);
+      const actualStatus = getActualStatus(project);
+
+      if (selectedMonth && selectedMonth !== 'all' && projectMonth !== selectedMonth) return false;
       if (selectedCategory !== 'all' && project.category !== selectedCategory) return false;
       if (selectedTier !== 'all' && project.tier !== selectedTier) return false;
-      if (selectedStatus !== 'all' && project.status !== selectedStatus) return false;
+      if (selectedStatus !== 'all' && actualStatus !== selectedStatus) return false;
       if (selectedDesigner !== 'all' && project.designer !== selectedDesigner) return false;
       return true;
     });
-  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner]);
+
+    // 정렬 적용
+    if (sortBy === 'recent-release') {
+      // 최근 릴리즈 순 (릴리즈된 프로젝트 중 releaseDate가 최신인 순)
+      filtered = [...filtered].sort((a, b) => {
+        const aStatus = getActualStatus(a);
+        const bStatus = getActualStatus(b);
+        if (aStatus === 'release' && bStatus !== 'release') return -1;
+        if (aStatus !== 'release' && bStatus === 'release') return 1;
+        if (a.releaseDate && b.releaseDate) {
+          return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+        }
+        if (a.releaseDate) return -1;
+        if (b.releaseDate) return 1;
+        return 0;
+      });
+    } else if (sortBy === 'upcoming-release') {
+      // 릴리즈 임박 순 (In Progress 중 releaseDate가 가까운 순)
+      filtered = [...filtered].sort((a, b) => {
+        const today = new Date().getTime();
+        const aStatus = getActualStatus(a);
+        const bStatus = getActualStatus(b);
+        if (aStatus === 'inprogress' && bStatus !== 'inprogress') return -1;
+        if (aStatus !== 'inprogress' && bStatus === 'inprogress') return 1;
+        if (a.releaseDate && b.releaseDate) {
+          const diffA = Math.abs(new Date(a.releaseDate).getTime() - today);
+          const diffB = Math.abs(new Date(b.releaseDate).getTime() - today);
+          return diffA - diffB;
+        }
+        if (a.releaseDate) return -1;
+        if (b.releaseDate) return 1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner, sortBy, getActualStatus, getProjectMonth]);
+
+  // 월별 요약 지표 계산 (실제 분석 데이터 포함)
+  const monthlyStats = useMemo(() => {
+    let totalSessions = 0;
+    let projectsWithData = 0;
+
+    projects.forEach(project => {
+      const analytics = getProjectAnalytics(analyticsData, project.link);
+      if (analytics) {
+        totalSessions += analytics.views;
+        projectsWithData++;
+      }
+    });
+
+    if (!selectedMonth || selectedMonth === 'all') {
+      return {
+        totalProjects: projects.length,
+        monthProjects: 0,
+        inProgressCount: projects.filter(p => getActualStatus(p) === 'inprogress').length,
+        releaseCount: projects.filter(p => getActualStatus(p) === 'release').length,
+        totalSessions,
+        projectsWithData,
+      };
+    }
+
+    const monthProjects = projects.filter(p => getProjectMonth(p) === selectedMonth);
+    let monthSessions = 0;
+    let monthProjectsWithData = 0;
+
+    monthProjects.forEach(project => {
+      const analytics = getProjectAnalytics(analyticsData, project.link);
+      if (analytics) {
+        monthSessions += analytics.views;
+        monthProjectsWithData++;
+      }
+    });
+
+    return {
+      totalProjects: projects.length,
+      monthProjects: monthProjects.length,
+      inProgressCount: monthProjects.filter(p => getActualStatus(p) === 'inprogress').length,
+      releaseCount: monthProjects.filter(p => getActualStatus(p) === 'release').length,
+      totalSessions: monthSessions,
+      projectsWithData: monthProjectsWithData,
+    };
+  }, [projects, selectedMonth, getActualStatus, getProjectMonth, analyticsData]);
 
   // 선택된 월의 아젠다 (useMemo로 최적화)
   const currentAgenda = useMemo(() => {
@@ -192,19 +316,29 @@ export default function Playground() {
   }, [agendas, selectedMonth]);
 
   const resetFilters = useCallback(() => {
-    setSelectedMonth('all');
+    // 최신 월로 리셋
+    if (monthlyData.length > 0) {
+      setSelectedMonth(monthlyData[0].month);
+    }
     setSelectedCategory('all');
     setSelectedTier('all');
     setSelectedStatus('all');
     setSelectedDesigner('all');
-  }, []);
+    setSortBy('default');
+  }, [monthlyData]);
 
-  // 목업 인사이트 데이터 생성 (고도화)
+  // 인사이트 데이터 생성 (실제 분석 데이터 우선, 없으면 목업)
   const generateMockInsight = useCallback((project: Project): ProjectInsight => {
-    const ctr = Math.random() * 15; // 0-15% CTR
-    const views = Math.floor(Math.random() * 10000) + 1000;
-    const avgMinutes = Math.floor(Math.random() * 10) + 1;
-    const avgSeconds = Math.floor(Math.random() * 60);
+    // 실제 분석 데이터 가져오기
+    const realAnalytics = getProjectAnalytics(analyticsData, project.link);
+
+    const views = realAnalytics?.views || Math.floor(Math.random() * 10000) + 1000;
+    const avgTime = realAnalytics?.avgTime || `${Math.floor(Math.random() * 10) + 1}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
+
+    // CTR은 조회수 기반으로 추정 (실제 데이터가 없으므로)
+    const ctr = realAnalytics ? Math.min(views / 1000, 15) : Math.random() * 15;
+
+    const avgMinutes = parseInt(avgTime.split(':')[0]);
 
     let label = '';
     let labelEmoji = '';
@@ -275,7 +409,7 @@ export default function Playground() {
     return {
       views,
       ctr: parseFloat(ctr.toFixed(2)),
-      avgTime: `${avgMinutes}분 ${avgSeconds}초`,
+      avgTime,
       label,
       labelEmoji,
       aiComment,
@@ -285,7 +419,7 @@ export default function Playground() {
       agenda,
       topMetric
     };
-  }, []);
+  }, [analyticsData]);
 
   // 랜덤 이모지 생성
   const getRandomEmoji = () => {
@@ -447,7 +581,7 @@ export default function Playground() {
                       : 'text-gray-400 hover:text-[#313131]'
                   }`}
                 >
-                  Project Roadmap
+                  Pipeline Calendar
                 </button>
               </nav>
             </div>
@@ -478,15 +612,41 @@ export default function Playground() {
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
         {activeTab === 'monthly' ? (
           <>
-            {/* Month Filter Buttons - Awwwards Style */}
-            <div className="mb-6">
+            {/* 월별 요약 지표 카드 */}
+            {selectedMonth && selectedMonth !== 'all' && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="text-xs text-gray-600 mb-2 font-medium">해당 월 프로젝트</div>
+                  <div className="text-3xl font-bold text-[#313131]">{monthlyStats.monthProjects}</div>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="text-xs text-gray-600 mb-2 font-medium">총 세션 수</div>
+                  <div className="text-3xl font-bold text-[#00A6FF]">{monthlyStats.totalSessions.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500 mt-1">{monthlyStats.projectsWithData}개 프로젝트 데이터</div>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="text-xs text-gray-600 mb-2 font-medium">진행 중</div>
+                  <div className="text-3xl font-bold text-[#FF9D00]">{monthlyStats.inProgressCount}</div>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="text-xs text-gray-600 mb-2 font-medium">릴리즈</div>
+                  <div className="text-3xl font-bold text-[#00BC7D]">{monthlyStats.releaseCount}</div>
+                </div>
+              </div>
+            )}
+
+            {/* 이달의 종합 인사이트 - Accordion */}
+            <div className="mb-10">
               <button
                 onClick={() => setIsMonthlyReportOpen(!isMonthlyReportOpen)}
                 className="w-full bg-white rounded-xl border border-gray-200 p-6 hover:border-[#313131] transition-all text-left"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-[#313131] mb-1">📊 이달의 종합 인사이트</h3>
+                    <h3 className="text-lg font-bold text-[#313131] mb-1 flex items-center gap-2">
+                      <span className="text-xl leading-none inline-block align-middle">📊</span>
+                      <span>이달의 종합 인사이트</span>
+                    </h3>
                     <p className="text-sm text-gray-600">전체 프로젝트 성과 분석 및 개선 제안</p>
                   </div>
                   <svg
@@ -521,7 +681,10 @@ export default function Playground() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* 좌측: Agenda */}
                         <div>
-                          <h4 className="text-sm font-bold text-[#313131] mb-3">📋 우선순위 태스크</h4>
+                          <h4 className="text-sm font-bold text-[#313131] mb-3 flex items-center gap-2">
+                            <span className="text-base leading-none inline-block align-middle">📋</span>
+                            <span>우선순위 태스크</span>
+                          </h4>
                           <ul className="space-y-2">
                             {monthlyInsight.priorities.map((priority, idx) => (
                               <li key={idx} className="flex items-start gap-2 text-sm">
@@ -534,7 +697,10 @@ export default function Playground() {
 
                         {/* 우측: Visual Screen (미니 차트) */}
                         <div>
-                          <h4 className="text-sm font-bold text-[#313131] mb-3">📈 주요 지표</h4>
+                          <h4 className="text-sm font-bold text-[#313131] mb-3 flex items-center gap-2">
+                            <span className="text-base leading-none inline-block align-middle">📈</span>
+                            <span>주요 지표</span>
+                          </h4>
                           <div className="space-y-3">
                             <div>
                               <div className="flex items-center justify-between text-xs mb-1">
@@ -606,8 +772,8 @@ export default function Playground() {
               )}
             </div>
 
-            {/* 이달의 종합 인사이트 대시보드 - Accordion (Agenda 아래로 이동) */}
-            <div className="mb-8">
+            {/* 월별 필터 버튼 */}
+            <div className="mb-4">
               <div className="flex flex-wrap items-center gap-2">
                 {monthlyData.map((data) => (
                   <button
@@ -636,9 +802,27 @@ export default function Playground() {
             </div>
 
             {/* Awwwards-style Filter Bar */}
-            <div className="mb-8 bg-[#F5F5F5] rounded-[12px] px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+            <div className="mb-6 bg-[#F5F5F5] rounded-[12px] px-4 py-3 flex items-center justify-between flex-wrap gap-3">
               {/* Left: Filter Buttons */}
               <div className="flex items-center gap-2 flex-wrap">
+                {/* Sort Filter */}
+                <div className="relative group">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'default' | 'recent-release' | 'upcoming-release')}
+                    className="px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs font-medium text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                      backgroundPosition: 'right 12px center',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  >
+                    <option value="default">기본 순서</option>
+                    <option value="recent-release">최근 릴리즈 순</option>
+                    <option value="upcoming-release">릴리즈 임박 순</option>
+                  </select>
+                </div>
+
                 {/* Category Filter */}
                 <div className="relative group">
                   <select
@@ -753,38 +937,51 @@ export default function Playground() {
               </p>
             </div>
 
-            {/* Monthly Agenda */}
+            {/* Monthly Agenda - Accordion */}
             {currentAgenda && (
-              <div className="mb-8 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#313131] to-[#1a1a1a]" />
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 pl-8">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#313131] to-[#1a1a1a] rounded-xl flex items-center justify-center shadow-md">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-4">
-                        <h3 className="text-xl font-bold text-gray-900">
-                          {formatMonth(currentAgenda.month)}
+              <div className="mb-8">
+                <button
+                  onClick={() => setIsAgendaOpen(!isAgendaOpen)}
+                  className="w-full bg-white rounded-xl border border-gray-200 p-6 hover:border-[#313131] transition-all text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#313131] to-[#1a1a1a] rounded-xl flex items-center justify-center shadow-md">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-[#313131] mb-1">
+                          {formatMonth(currentAgenda.month)} 아젠다
                         </h3>
-                        <span className="px-3 py-1 bg-[#313131]/10 text-[#313131] text-xs font-bold rounded-full">
-                          AGENDA
-                        </span>
+                        <p className="text-sm text-gray-600">이번 달 주요 업무 계획 및 목표</p>
                       </div>
-                      <div className="space-y-3">
-                        {currentAgenda.content.split('\n\n').map((section, index) => (
-                          <div key={index} className="pl-4 border-l-2 border-gray-200">
-                            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-[15px]">
-                              {section}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                    </div>
+                    <svg
+                      className={`w-6 h-6 text-[#313131] transition-transform flex-shrink-0 ${isAgendaOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+
+                {isAgendaOpen && (
+                  <div className="mt-4 bg-white rounded-xl border border-gray-200 p-6">
+                    <div className="space-y-3">
+                      {currentAgenda.content.split('\n\n').map((section, index) => (
+                        <div key={index} className="pl-4 border-l-2 border-[#313131]/20">
+                          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-[15px]">
+                            {section}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -803,9 +1000,16 @@ export default function Playground() {
                   ? { backgroundColor: 'rgba(130, 128, 255, 0.08)', color: '#8280FF', borderColor: 'rgba(130, 128, 255, 0.2)' }
                   : { backgroundColor: 'rgba(136, 136, 136, 0.08)', color: '#888888', borderColor: 'rgba(136, 136, 136, 0.2)' };
 
-                const statusStyle = project.status === 'release'
+                const actualStatus = getActualStatus(project);
+                const statusStyle = actualStatus === 'release'
                   ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D', borderColor: 'rgba(0, 188, 125, 0.2)' }
                   : { backgroundColor: 'rgba(255, 157, 0, 0.08)', color: '#FF9D00', borderColor: 'rgba(255, 157, 0, 0.2)' };
+
+                // 릴리즈 날짜 포맷팅
+                const formatReleaseDate = (dateStr: string) => {
+                  const date = new Date(dateStr);
+                  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                };
 
                 return (
                   <div
@@ -813,7 +1017,19 @@ export default function Playground() {
                     onClick={() => handleProjectClick(project)}
                     className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
                   >
-                    {/* 상단: 제목 + 뱃지들 */}
+                    {/* 상단: 릴리즈 예정일 (모든 상태에서 동일한 스타일) */}
+                    {project.releaseDate && (
+                      <div className="mb-3">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 font-medium">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-xs">릴리즈: {formatReleaseDate(project.releaseDate)}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 제목 + 뱃지들 */}
                     <div className="mb-4">
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <h3 className="text-lg font-bold text-gray-900 leading-snug flex-1">{project.title}</h3>
@@ -837,7 +1053,7 @@ export default function Playground() {
                           className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
                           style={statusStyle}
                         >
-                          {project.status === 'release' ? 'RELEASE' : 'IN PROGRESS'}
+                          {actualStatus === 'release' ? 'RELEASE' : 'IN PROGRESS'}
                         </span>
                       </div>
                     </div>
@@ -858,7 +1074,7 @@ export default function Playground() {
             </div>
           </>
         ) : (
-          <RoadmapView projectProgresses={projectProgresses} />
+          <PipelineCalendar projectProgresses={projectProgresses} />
         )}
       </main>
 
@@ -901,117 +1117,184 @@ export default function Playground() {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
-              {/* 썸네일 또는 이모지 */}
-              <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center border border-gray-300">
-                {selectedProject.link ? (
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">🖼️</div>
-                    <p className="text-sm text-gray-600">미리보기 썸네일</p>
-                    <p className="text-xs text-gray-400 mt-2">{selectedProject.link}</p>
-                  </div>
-                ) : (
-                  <div className="text-9xl">{getRandomEmoji()}</div>
-                )}
-              </div>
+            <div className="flex-1 overflow-y-auto px-8 py-6 space-y-5">
+              {/* 썸네일 */}
+              {selectedProject.detailImages && selectedProject.detailImages.length > 0 && (
+                <div className="w-full h-56 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+                  <img
+                    src={selectedProject.detailImages[0]}
+                    alt={selectedProject.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
 
               {/* 성과 지표 */}
               {(() => {
                 const insight = generateMockInsight(selectedProject);
+                const hasData = getProjectAnalytics(analyticsData, selectedProject.link) !== null;
+                const actualStatus = getActualStatus(selectedProject);
+                const isInProgress = actualStatus === 'inprogress';
+
                 return (
                   <>
-                    {/* 라벨 */}
-                    <div className="flex items-center gap-3">
-                      <span className="px-4 py-2 bg-white rounded-full text-sm font-bold border-2 border-[#313131]">
-                        {insight.labelEmoji} {insight.label}
-                      </span>
-                    </div>
-
                     {/* 숫자 대시보드 */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="text-xs text-gray-600 mb-2 font-medium">조회수</div>
-                        <div className="text-3xl font-bold text-[#313131]">{insight.views.toLocaleString()}</div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm">
+                        <div className="text-[10px] text-gray-500 mb-1.5 font-medium uppercase tracking-wide">세션</div>
+                        {hasData ? (
+                          <div className="text-2xl font-bold text-[#313131]">{insight.views.toLocaleString()}</div>
+                        ) : (
+                          <div className="flex flex-col gap-1">
+                            <div className="text-xl font-bold text-gray-300">–</div>
+                            {isInProgress && (
+                              <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                                <span>⏳</span>
+                                <span>집계 예정</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="text-xs text-gray-600 mb-2 font-medium">클릭률</div>
-                        <div className="text-3xl font-bold text-[#313131]">{insight.ctr}%</div>
+                      <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm">
+                        <div className="text-[10px] text-gray-500 mb-1.5 font-medium uppercase tracking-wide">CTR</div>
+                        {hasData ? (
+                          <div className="text-2xl font-bold text-[#313131]">{insight.ctr.toFixed(2)}%</div>
+                        ) : (
+                          <div className="flex flex-col gap-1">
+                            <div className="text-xl font-bold text-gray-300">–</div>
+                            {isInProgress && (
+                              <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                                <span>⏳</span>
+                                <span>집계 예정</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="text-xs text-gray-600 mb-2 font-medium">체류시간</div>
-                        <div className="text-2xl font-bold text-[#313131]">{insight.avgTime}</div>
+                      <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm">
+                        <div className="text-[10px] text-gray-500 mb-1.5 font-medium uppercase tracking-wide">체류시간</div>
+                        {hasData ? (
+                          <div className="text-xl font-bold text-[#313131]">{insight.avgTime}</div>
+                        ) : (
+                          <div className="flex flex-col gap-1">
+                            <div className="text-xl font-bold text-gray-300">–</div>
+                            {isInProgress && (
+                              <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                                <span>⏳</span>
+                                <span>집계 예정</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* 고도화된 AI 인사이트 - 3가지 관점 */}
-                    <div className="space-y-4">
-                      <h4 className="text-sm font-bold text-[#313131]">💬 전문가 리뷰</h4>
+                    {/* 성과 분석 */}
+                    {hasData && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-semibold text-[#313131] uppercase tracking-wide">Performance Insight</h4>
 
-                      {/* PM View */}
-                      <div className="bg-white rounded-xl p-5 border-l-4 border-[#00A6FF] shadow-sm">
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#00A6FF] flex items-center justify-center flex-shrink-0 text-white text-xs font-bold">
-                            PM
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs text-gray-700 leading-relaxed">{insight.pmInsight}</p>
+                        {/* 단일 분석 카드 */}
+                        <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm">
+                          <div className="flex items-start gap-3">
+                            <div className="w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <span className="text-sm">{insight.labelEmoji}</span>
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-xs font-semibold text-[#313131] mb-1">{insight.label}</div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{insight.aiComment}</p>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    )}
 
-                      {/* UIUX View */}
-                      <div className="bg-white rounded-xl p-5 border-l-4 border-[#F83BAA] shadow-sm">
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#F83BAA] flex items-center justify-center flex-shrink-0 text-white text-[10px] font-bold">
-                            UX
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs text-gray-700 leading-relaxed">{insight.uiuxInsight}</p>
-                          </div>
+                    {!hasData && (
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-lg p-6 border border-gray-200">
+                        <div className="flex flex-col items-center gap-2 text-center">
+                          <div className="text-2xl">📊</div>
+                          {isInProgress ? (
+                            <>
+                              <p className="text-sm font-semibold text-gray-700">릴리즈 후 데이터가 업데이트됩니다</p>
+                              <p className="text-xs text-gray-500">프로젝트가 출시되면 실시간 성과 지표를 확인할 수 있습니다</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-sm font-semibold text-gray-700">데이터 확인 중</p>
+                              <p className="text-xs text-gray-500">분석 데이터를 집계하고 있습니다</p>
+                            </>
+                          )}
                         </div>
                       </div>
+                    )}
 
-                      {/* Product View */}
-                      <div className="bg-white rounded-xl p-5 border-l-4 border-[#57B400] shadow-sm">
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#57B400] flex items-center justify-center flex-shrink-0 text-white text-[10px] font-bold">
-                            PD
+                    {/* 프로젝트 정보 */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-semibold text-[#313131] uppercase tracking-wide">Project Info</h4>
+
+                      <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm space-y-3">
+                        {selectedProject.description && (
+                          <div>
+                            <div className="text-[10px] text-gray-500 mb-1 font-medium uppercase tracking-wide">설명</div>
+                            <p className="text-xs text-gray-700 leading-relaxed">{selectedProject.description}</p>
                           </div>
-                          <div className="flex-1">
-                            <p className="text-xs text-gray-700 leading-relaxed">{insight.productInsight}</p>
+                        )}
+
+                        {selectedProject.releaseDate && (
+                          <div>
+                            <div className="text-[10px] text-gray-500 mb-1 font-medium uppercase tracking-wide">릴리즈</div>
+                            <p className="text-xs text-[#313131] font-medium">{selectedProject.releaseDate}</p>
                           </div>
-                        </div>
+                        )}
+
+                        {selectedProject.link && (
+                          <div>
+                            <div className="text-[10px] text-gray-500 mb-1 font-medium uppercase tracking-wide">링크</div>
+                            <a
+                              href={selectedProject.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-[#313131] hover:underline break-all"
+                            >
+                              {selectedProject.link}
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* 2단 분할 대시보드 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* 좌측: Agenda */}
-                      <div className="bg-white rounded-xl p-5 border border-gray-200">
-                        <h4 className="text-xs font-bold text-[#313131] mb-3">📋 액션 아이템</h4>
-                        <ul className="space-y-2">
-                          {insight.agenda.map((item, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-xs">
-                              <span className="text-[#313131] font-bold mt-0.5">•</span>
-                              <span className="text-gray-700">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
+                    {/* 개선 아이템 (데이터가 있을 때만) */}
+                    {hasData && insight.agenda.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-semibold text-[#313131] uppercase tracking-wide">Action Items</h4>
+                        <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm">
+                          <ul className="space-y-2">
+                            {insight.agenda.map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-xs">
+                                <span className="text-gray-400 mt-0.5">•</span>
+                                <span className="text-gray-700 leading-relaxed">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
+                    )}
 
-                      {/* 우측: Visual Screen (미니 차트) */}
-                      <div className="bg-white rounded-xl p-5 border border-gray-200">
-                        <h4 className="text-xs font-bold text-[#313131] mb-3">📊 핵심 지표</h4>
-                        <div className="space-y-3">
+                    {/* 지표 분포 */}
+                    {hasData && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-semibold text-[#313131] uppercase tracking-wide">Metrics</h4>
+                        <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm space-y-3">
                           {insight.topMetric.map((metric, idx) => (
                             <div key={idx}>
-                              <div className="flex items-center justify-between text-[10px] mb-1">
-                                <span className="text-gray-600">{metric.name}</span>
+                              <div className="flex items-center justify-between text-[10px] mb-1.5">
+                                <span className="text-gray-500 font-medium uppercase tracking-wide">{metric.name}</span>
                                 <span className="font-bold text-[#313131]">
-                                  {metric.name === 'CTR' ? `${metric.value}%` : metric.value.toLocaleString()}
+                                  {metric.name === 'CTR' ? `${metric.value.toFixed(2)}%` : metric.value.toLocaleString()}
                                 </span>
                               </div>
-                              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="w-full h-1 bg-gray-50 rounded-full overflow-hidden">
                                 <div
                                   className="h-full"
                                   style={{
@@ -1024,38 +1307,7 @@ export default function Playground() {
                           ))}
                         </div>
                       </div>
-                    </div>
-
-                    {/* 프로젝트 상세 정보 */}
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                      <h3 className="font-bold text-sm text-[#313131] mb-4">프로젝트 정보</h3>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">담당자</span>
-                          <span className="font-medium">{selectedProject.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">카테고리</span>
-                          <span className="font-medium">{selectedProject.category === 'uiux' ? 'UI/UX' : 'Contents'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">상태</span>
-                          <span className="font-medium">{selectedProject.status === 'release' ? 'Release' : 'In Progress'}</span>
-                        </div>
-                        {selectedProject.link && (
-                          <div className="pt-3 border-t border-gray-200">
-                            <a
-                              href={selectedProject.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[#313131] hover:underline font-medium flex items-center gap-2"
-                            >
-                              프로젝트 바로가기 →
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    )}
                   </>
                 );
               })()}
