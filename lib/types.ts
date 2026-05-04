@@ -39,6 +39,7 @@ export interface Project {
   category: Category;
   tier?: Tier; // 우선순위 티어 (선택)
   month: string; // YYYY-MM 형식
+  releaseDate?: string; // 릴리즈 예정일 (YYYY-MM-DD 형식)
   createdAt: Date;
   // 상세 페이지 관련
   hasDetail?: boolean; // 상세 페이지 존재 여부

@@ -41,15 +41,15 @@ export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
   const getStatusInfo = (status: ProjectProgress['status']) => {
     switch (status) {
       case 'nextup':
-        return { label: 'Next Up', color: 'bg-blue-100 text-blue-700', border: 'border-l-blue-500', dot: 'bg-blue-500' };
+        return { label: 'Next Up', color: 'bg-[#00A6FF]/8 text-[#00A6FF]', border: 'border-l-[#00A6FF]', dot: 'bg-[#00A6FF]' };
       case 'inprogress':
-        return { label: 'In Progress', color: 'bg-orange-50 text-orange-600', border: 'border-l-orange-500', dot: 'bg-orange-500' };
+        return { label: 'In Progress', color: 'bg-[#FF9D00]/8 text-[#FF9D00]', border: 'border-l-[#FF9D00]', dot: 'bg-[#FF9D00]' };
       case 'completed':
-        return { label: 'Completed', color: 'bg-emerald-100 text-emerald-700', border: 'border-l-emerald-500', dot: 'bg-emerald-500' };
+        return { label: 'Completed', color: 'bg-[#00BC7D]/8 text-[#00BC7D]', border: 'border-l-[#00BC7D]', dot: 'bg-[#00BC7D]' };
       case 'pending':
-        return { label: 'Pending', color: 'bg-yellow-50 text-yellow-600', border: 'border-l-yellow-500', dot: 'bg-yellow-500' };
+        return { label: 'Pending', color: 'bg-[#F83BAA]/8 text-[#F83BAA]', border: 'border-l-[#F83BAA]', dot: 'bg-[#F83BAA]' };
       case 'paused':
-        return { label: 'Paused', color: 'bg-gray-100 text-gray-700', border: 'border-l-gray-400', dot: 'bg-gray-400' };
+        return { label: 'Paused', color: 'bg-[#888888]/8 text-[#888888]', border: 'border-l-[#888888]', dot: 'bg-[#888888]' };
     }
   };
 
@@ -79,7 +79,7 @@ export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Project Roadmap</h2>
+        <h2 className="text-2xl font-bold text-[#313131] mb-2">Project Roadmap</h2>
         <p className="text-sm text-gray-600">프로젝트별 작업 진행 현황</p>
       </div>
 
@@ -105,29 +105,29 @@ export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
                 {/* 프로젝트 이름 */}
                 <div className="flex-1 text-left">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-bold text-gray-900">{projectName}</h3>
+                    <h3 className="text-lg font-bold text-[#313131]">{projectName}</h3>
                     {stats.inProgress > 0 && (
-                      <span className="text-xs px-2.5 py-1 bg-orange-50 text-orange-600 rounded-full font-semibold">
+                      <span className="text-xs px-2.5 py-1 bg-[#FF9D00]/8 text-[#FF9D00] rounded-full font-semibold border-[0.5px] border-[#FF9D00]/20">
                         In Progress
                       </span>
                     )}
                     {stats.nextUp > 0 && (
-                      <span className="text-xs px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full font-semibold">
+                      <span className="text-xs px-2.5 py-1 bg-[#00A6FF]/8 text-[#00A6FF] rounded-full font-semibold border-[0.5px] border-[#00A6FF]/20">
                         Next Up
                       </span>
                     )}
                     {stats.pending > 0 && (
-                      <span className="text-xs px-2.5 py-1 bg-orange-100 text-orange-700 rounded-full font-semibold">
+                      <span className="text-xs px-2.5 py-1 bg-[#F83BAA]/8 text-[#F83BAA] rounded-full font-semibold border-[0.5px] border-[#F83BAA]/20">
                         Pending
                       </span>
                     )}
                     {stats.paused > 0 && (
-                      <span className="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full font-semibold">
+                      <span className="text-xs px-2.5 py-1 bg-[#888888]/8 text-[#888888] rounded-full font-semibold border-[0.5px] border-[#888888]/20">
                         Paused
                       </span>
                     )}
                     {stats.completed > 0 && (
-                      <span className="text-xs px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full font-semibold">
+                      <span className="text-xs px-2.5 py-1 bg-[#00BC7D]/8 text-[#00BC7D] rounded-full font-semibold border-[0.5px] border-[#00BC7D]/20">
                         Completed
                       </span>
                     )}
@@ -170,7 +170,7 @@ export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
 
               {/* 작업 로드맵 (펼쳐졌을 때) */}
               {isExpanded && (
-                <div className="border-t border-gray-200 bg-gray-50 p-6">
+                <div className="border-t border-gray-200 bg-white p-6">
                   <div className="space-y-3">
                     {progresses.map((progress, taskIndex) => {
                       const statusInfo = getStatusInfo(progress.status);
@@ -193,7 +193,7 @@ export default function RoadmapView({ projectProgresses }: RoadmapViewProps) {
 
                           {/* 작업명 */}
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-gray-900 truncate">{progress.taskName}</h4>
+                            <h4 className="font-bold text-[#313131] truncate">{progress.taskName}</h4>
                             {progress.description && (
                               <p className="text-sm text-gray-600 truncate mt-1">{progress.description}</p>
                             )}

@@ -7,7 +7,7 @@ import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
 import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
-import RoadmapView from '@/components/RoadmapView';
+import PipelineCalendar from '@/components/PipelineCalendar';
 
 type TabType = 'monthly' | 'roadmap';
 
@@ -40,10 +40,10 @@ export default function Home() {
   const [selectedTier, setSelectedTier] = useState<Tier | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<Status | 'all'>('all');
   const [selectedDesigner, setSelectedDesigner] = useState<Designer | 'all'>('all');
+  const [sortBy, setSortBy] = useState<'default' | 'recent-release' | 'upcoming-release'>('default');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isInsightOpen, setIsInsightOpen] = useState(false);
   const [isMonthlyReportOpen, setIsMonthlyReportOpen] = useState(false);
-
 
   const fetchProjects = useCallback(async () => {
     console.log('🔵 fetchProjects started');
@@ -166,9 +166,9 @@ export default function Home() {
     return `${year}년 ${parseInt(monthNum)}월`;
   }, []);
 
-  // 필터링된 프로젝트 (useMemo로 최적화)
+  // 필터링 및 정렬된 프로젝트 (useMemo로 최적화)
   const filteredProjects = useMemo(() => {
-    return projects.filter(project => {
+    let filtered = projects.filter(project => {
       if (selectedMonth !== 'all' && project.month !== selectedMonth) return false;
       if (selectedCategory !== 'all' && project.category !== selectedCategory) return false;
       if (selectedTier !== 'all' && project.tier !== selectedTier) return false;
@@ -176,7 +176,39 @@ export default function Home() {
       if (selectedDesigner !== 'all' && project.designer !== selectedDesigner) return false;
       return true;
     });
-  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner]);
+
+    // 정렬 적용
+    if (sortBy === 'recent-release') {
+      // 최근 릴리즈 순 (릴리즈된 프로젝트 중 releaseDate가 최신인 순)
+      filtered = [...filtered].sort((a, b) => {
+        if (a.status === 'release' && b.status !== 'release') return -1;
+        if (a.status !== 'release' && b.status === 'release') return 1;
+        if (a.releaseDate && b.releaseDate) {
+          return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+        }
+        if (a.releaseDate) return -1;
+        if (b.releaseDate) return 1;
+        return 0;
+      });
+    } else if (sortBy === 'upcoming-release') {
+      // 릴리즈 임박 순 (In Progress 중 releaseDate가 가까운 순)
+      filtered = [...filtered].sort((a, b) => {
+        const today = new Date().getTime();
+        if (a.status === 'inprogress' && b.status !== 'inprogress') return -1;
+        if (a.status !== 'inprogress' && b.status === 'inprogress') return 1;
+        if (a.releaseDate && b.releaseDate) {
+          const diffA = Math.abs(new Date(a.releaseDate).getTime() - today);
+          const diffB = Math.abs(new Date(b.releaseDate).getTime() - today);
+          return diffA - diffB;
+        }
+        if (a.releaseDate) return -1;
+        if (b.releaseDate) return 1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [projects, selectedMonth, selectedCategory, selectedTier, selectedStatus, selectedDesigner, sortBy]);
 
   // 선택된 월의 아젠다 (useMemo로 최적화)
   const currentAgenda = useMemo(() => {
@@ -191,6 +223,7 @@ export default function Home() {
     setSelectedTier('all');
     setSelectedStatus('all');
     setSelectedDesigner('all');
+    setSortBy('default');
   }, []);
 
   // 목업 인사이트 데이터 생성 (고도화)
@@ -405,6 +438,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
+      {/* Development Badge */}
+      <div className="fixed bottom-4 right-4 z-50 bg-yellow-500 text-black px-4 py-2 rounded-full text-xs font-bold shadow-lg">
+        🚧 PLAYGROUND MODE
+      </div>
+
       {/* Awwwards-style GNB */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
@@ -436,7 +474,7 @@ export default function Home() {
                       : 'text-gray-400 hover:text-[#313131]'
                   }`}
                 >
-                  Project Roadmap
+                  Pipeline Calendar
                 </button>
               </nav>
             </div>
@@ -628,6 +666,24 @@ export default function Home() {
             <div className="mb-8 bg-[#F5F5F5] rounded-[12px] px-4 py-3 flex items-center justify-between flex-wrap gap-3">
               {/* Left: Filter Buttons */}
               <div className="flex items-center gap-2 flex-wrap">
+                {/* Sort Filter */}
+                <div className="relative group">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'default' | 'recent-release' | 'upcoming-release')}
+                    className="px-4 py-2 pr-9 bg-white hover:bg-gray-50 border-0 rounded-md text-xs font-medium text-[#1a1a1a] appearance-none cursor-pointer transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300 hover:shadow-sm"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                      backgroundPosition: 'right 12px center',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  >
+                    <option value="default">기본 순서</option>
+                    <option value="recent-release">최근 릴리즈 순</option>
+                    <option value="upcoming-release">릴리즈 임박 순</option>
+                  </select>
+                </div>
+
                 {/* Category Filter */}
                 <div className="relative group">
                   <select
@@ -796,13 +852,35 @@ export default function Home() {
                   ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D', borderColor: 'rgba(0, 188, 125, 0.2)' }
                   : { backgroundColor: 'rgba(255, 157, 0, 0.08)', color: '#FF9D00', borderColor: 'rgba(255, 157, 0, 0.2)' };
 
+                // 릴리즈 날짜 포맷팅
+                const formatReleaseDate = (dateStr: string) => {
+                  const date = new Date(dateStr);
+                  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                };
+
                 return (
                   <div
                     key={project.id}
                     onClick={() => handleProjectClick(project)}
                     className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
                   >
-                    {/* 상단: 제목 + 뱃지들 */}
+                    {/* 상단: 릴리즈 예정일 (In Progress인 경우 강조) */}
+                    {project.releaseDate && (
+                      <div className="mb-3">
+                        <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
+                          project.status === 'inprogress'
+                            ? 'bg-[#313131] text-white font-bold'
+                            : 'bg-gray-100 text-gray-700 font-medium'
+                        }`}>
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-xs">릴리즈: {formatReleaseDate(project.releaseDate)}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 제목 + 뱃지들 */}
                     <div className="mb-4">
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <h3 className="text-lg font-bold text-gray-900 leading-snug flex-1">{project.title}</h3>
@@ -847,7 +925,7 @@ export default function Home() {
             </div>
           </>
         ) : (
-          <RoadmapView projectProgresses={projectProgresses} />
+          <PipelineCalendar projectProgresses={projectProgresses} />
         )}
       </main>
 
