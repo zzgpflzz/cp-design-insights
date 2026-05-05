@@ -8,9 +8,11 @@ import { isAuthenticated } from '@/lib/auth';
 import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
 import PipelineCalendar from '@/components/PipelineCalendar';
+import ProjectCalendarView from '@/components/ProjectCalendarView';
 import { loadAnalyticsData, getProjectAnalytics, AggregatedAnalytics } from '@/lib/analyticsData';
 
 type TabType = 'monthly' | 'roadmap';
+type MonthlyViewType = 'list' | 'calendar';
 
 interface ProjectInsight {
   views: number;
@@ -47,6 +49,7 @@ export default function Home() {
   const [isMonthlyReportOpen, setIsMonthlyReportOpen] = useState(false);
   const [isAgendaOpen, setIsAgendaOpen] = useState(false);
   const [analyticsData, setAnalyticsData] = useState<Map<string, AggregatedAnalytics>>(new Map());
+  const [monthlyViewType, setMonthlyViewType] = useState<MonthlyViewType>('list');
 
   const fetchProjects = useCallback(async () => {
     console.log('🔵 fetchProjects started');
@@ -763,8 +766,9 @@ export default function Home() {
               )}
             </div>
 
-            {/* 월별 필터 버튼 */}
-            <div className="mb-4">
+            {/* 뷰 전환 버튼 + 월별 필터 버튼 */}
+            <div className="mb-4 flex items-center justify-between flex-wrap gap-4">
+              {/* 좌측: 월별 필터 */}
               <div className="flex flex-wrap items-center gap-2">
                 {monthlyData.map((data) => (
                   <button
@@ -788,6 +792,40 @@ export default function Home() {
                   }`}
                 >
                   전체
+                </button>
+              </div>
+
+              {/* 우측: 뷰 전환 버튼 */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setMonthlyViewType('list')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    monthlyViewType === 'list'
+                      ? 'bg-white text-[#313131] shadow-sm'
+                      : 'text-gray-600 hover:text-[#313131]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <span>리스트</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setMonthlyViewType('calendar')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    monthlyViewType === 'calendar'
+                      ? 'bg-white text-[#313131] shadow-sm'
+                      : 'text-gray-600 hover:text-[#313131]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>캘린더</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -976,9 +1014,11 @@ export default function Home() {
               </div>
             )}
 
-            {/* Content - 클릭 가능한 카드 그리드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProjects.map((project) => {
+            {/* Content - 리스트 뷰 또는 캘린더 뷰 */}
+            {monthlyViewType === 'list' ? (
+              /* 리스트 뷰 - 클릭 가능한 카드 그리드 */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProjects.map((project) => {
                 const categoryLabel = project.category === 'uiux' ? 'UI/UX' : 'CONTENTS';
                 const categoryStyle = project.category === 'uiux'
                   ? { backgroundColor: 'rgba(248, 59, 170, 0.08)', color: '#F83BAA', borderColor: 'rgba(248, 59, 170, 0.2)' }
@@ -1062,7 +1102,14 @@ export default function Home() {
                   </div>
                 );
               })}
-            </div>
+              </div>
+            ) : (
+              /* 캘린더 뷰 */
+              <ProjectCalendarView
+                projects={filteredProjects}
+                onProjectClick={handleProjectClick}
+              />
+            )}
           </>
         ) : (
           <PipelineCalendar projectProgresses={projectProgresses} />

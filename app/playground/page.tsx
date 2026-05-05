@@ -8,9 +8,12 @@ import { isAuthenticated } from '@/lib/auth';
 import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
 import PipelineCalendar from '@/components/PipelineCalendar';
+import ModernCalendarView from '@/components/ModernCalendarView';
 import { loadAnalyticsData, getProjectAnalytics, AggregatedAnalytics } from '@/lib/analyticsData';
 
 type TabType = 'monthly' | 'roadmap';
+type RoadmapViewType = 'pipeline' | 'calendar';
+type MonthlyViewType = 'list' | 'calendar';
 
 interface ProjectInsight {
   views: number;
@@ -47,6 +50,9 @@ export default function Playground() {
   const [isMonthlyReportOpen, setIsMonthlyReportOpen] = useState(false);
   const [isAgendaOpen, setIsAgendaOpen] = useState(false);
   const [analyticsData, setAnalyticsData] = useState<Map<string, AggregatedAnalytics>>(new Map());
+  const [roadmapViewType, setRoadmapViewType] = useState<RoadmapViewType>('pipeline');
+  const [monthlyViewType, setMonthlyViewType] = useState<MonthlyViewType>('list');
+  const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   // Development-only access check
   useEffect(() => {
@@ -523,6 +529,104 @@ export default function Playground() {
     return generateMonthlyInsight(filteredProjects);
   }, [filteredProjects, generateMonthlyInsight]);
 
+  // 캘린더용 데이터 생성
+  const calendarData = useMemo(() => {
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+
+    const endDate = new Date(lastDay);
+    endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
+
+    const days: Date[] = [];
+    const current = new Date(startDate);
+
+    while (current <= endDate) {
+      days.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+
+    return { days, startDate, endDate };
+  }, [calendarMonth]);
+
+  // 캘린더 셀 이벤트 계산
+  const calendarEvents = useMemo(() => {
+    const { days, startDate, endDate } = calendarData;
+    const eventsMap = new Map<number, Array<{ project: Project; layer: number }>>();
+
+    days.forEach((day, dayIndex) => {
+      eventsMap.set(dayIndex, []);
+    });
+
+    // releaseDate가 있는 프로젝트만 캘린더에 표시
+    const projectsWithDate = filteredProjects.filter(p => p.releaseDate);
+
+    projectsWithDate.forEach(project => {
+      if (!project.releaseDate) return;
+
+      // 문자열을 Date로 변환
+      const releaseDate = new Date(project.releaseDate);
+      releaseDate.setHours(0, 0, 0, 0);
+
+      // 캘린더 범위 밖이면 제외
+      if (releaseDate < startDate || releaseDate > endDate) return;
+
+      // 해당 날짜 찾기
+      const dayIndex = days.findIndex(d => {
+        const compareDate = new Date(d);
+        compareDate.setHours(0, 0, 0, 0);
+        return compareDate.getTime() === releaseDate.getTime();
+      });
+
+      if (dayIndex !== -1) {
+        eventsMap.get(dayIndex)?.push({
+          project,
+          layer: 0
+        });
+      }
+    });
+
+    // 각 주별로 레이어 계산
+    const rows = Math.ceil(days.length / 7);
+    for (let row = 0; row < rows; row++) {
+      const weekStart = row * 7;
+      const weekEnd = Math.min(weekStart + 7, days.length);
+
+      const weekEvents: Array<{ project: Project; dayIndex: number; layer: number }> = [];
+      for (let i = weekStart; i < weekEnd; i++) {
+        const events = eventsMap.get(i) || [];
+        events.forEach(event => {
+          weekEvents.push({ ...event, dayIndex: i });
+        });
+      }
+
+      // 레이어 할당
+      weekEvents.sort((a, b) => {
+        const aDate = new Date(a.project.releaseDate!).getTime();
+        const bDate = new Date(b.project.releaseDate!).getTime();
+        return aDate - bDate;
+      });
+
+      weekEvents.forEach((event, index) => {
+        event.layer = index;
+        const dayEvents = eventsMap.get(event.dayIndex);
+        if (dayEvents) {
+          const eventIndex = dayEvents.findIndex(e => e.project.id === event.project.id);
+          if (eventIndex !== -1) {
+            dayEvents[eventIndex].layer = index;
+          }
+        }
+      });
+    }
+
+    return eventsMap;
+  }, [filteredProjects, calendarData]);
+
   // 프로젝트 클릭 핸들러
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
@@ -533,6 +637,59 @@ export default function Playground() {
   const closeInsight = () => {
     setIsInsightOpen(false);
     setTimeout(() => setSelectedProject(null), 300);
+  };
+
+  // 캘린더 월 이동
+  const goToPrevMonth = () => {
+    setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1));
+  };
+
+  const goToNextMonth = () => {
+    setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1));
+  };
+
+  const goToToday = () => {
+    setCalendarMonth(new Date());
+  };
+
+  // 오늘 날짜인지 확인
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  };
+
+  // 현재 월인지 확인
+  const isCurrentMonth = (date: Date) => {
+    return date.getMonth() === calendarMonth.getMonth();
+  };
+
+  // 프로젝트 상태별 색상
+  const getProjectStatusColor = (project: Project) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const releaseDate = project.releaseDate ? new Date(project.releaseDate) : null;
+    releaseDate?.setHours(0, 0, 0, 0);
+
+    const actualStatus = getActualStatus(project);
+    const isReleased = releaseDate && releaseDate <= today;
+
+    if (isReleased || actualStatus === 'release') {
+      return {
+        bg: 'rgba(0, 188, 125, 0.08)',
+        border: '#00BC7D',
+        text: '#00875A',
+        hover: 'rgba(0, 188, 125, 0.12)'
+      };
+    } else {
+      return {
+        bg: 'rgba(255, 157, 0, 0.08)',
+        border: '#FF9D00',
+        text: '#CC7A00',
+        hover: 'rgba(255, 157, 0, 0.12)'
+      };
+    }
   };
 
   if (loading) {
@@ -772,8 +929,9 @@ export default function Playground() {
               )}
             </div>
 
-            {/* 월별 필터 버튼 */}
-            <div className="mb-4">
+            {/* 뷰 전환 버튼 + 월별 필터 버튼 */}
+            <div className="mb-4 flex items-center justify-between flex-wrap gap-4">
+              {/* 좌측: 월별 필터 */}
               <div className="flex flex-wrap items-center gap-2">
                 {monthlyData.map((data) => (
                   <button
@@ -797,6 +955,40 @@ export default function Playground() {
                   }`}
                 >
                   전체
+                </button>
+              </div>
+
+              {/* 우측: 뷰 전환 버튼 */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setMonthlyViewType('list')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    monthlyViewType === 'list'
+                      ? 'bg-white text-[#313131] shadow-sm'
+                      : 'text-gray-600 hover:text-[#313131]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <span>리스트</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setMonthlyViewType('calendar')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    monthlyViewType === 'calendar'
+                      ? 'bg-white text-[#313131] shadow-sm'
+                      : 'text-gray-600 hover:text-[#313131]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>캘린더</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -985,8 +1177,10 @@ export default function Playground() {
               </div>
             )}
 
-            {/* Content - 클릭 가능한 카드 그리드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Content - 리스트 뷰 또는 캘린더 뷰 */}
+            {monthlyViewType === 'list' ? (
+              /* 리스트 뷰 - 클릭 가능한 카드 그리드 */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map((project) => {
                 const categoryLabel = project.category === 'uiux' ? 'UI/UX' : 'CONTENTS';
                 const categoryStyle = project.category === 'uiux'
@@ -1001,7 +1195,8 @@ export default function Playground() {
                   : { backgroundColor: 'rgba(136, 136, 136, 0.08)', color: '#888888', borderColor: 'rgba(136, 136, 136, 0.2)' };
 
                 const actualStatus = getActualStatus(project);
-                const statusStyle = actualStatus === 'release'
+                const isCompleted = actualStatus === 'release';
+                const statusStyle = isCompleted
                   ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D', borderColor: 'rgba(0, 188, 125, 0.2)' }
                   : { backgroundColor: 'rgba(255, 157, 0, 0.08)', color: '#FF9D00', borderColor: 'rgba(255, 157, 0, 0.2)' };
 
@@ -1017,14 +1212,20 @@ export default function Playground() {
                     onClick={() => handleProjectClick(project)}
                     className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
                   >
-                    {/* 상단: 릴리즈 예정일 (모든 상태에서 동일한 스타일) */}
+                    {/* 상단: 릴리즈 예정일 */}
                     {project.releaseDate && (
                       <div className="mb-3">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 font-medium">
+                        <div
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium"
+                          style={isCompleted ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D' } : { backgroundColor: '#F5F5F5', color: '#666666' }}
+                        >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <span className="text-xs">릴리즈: {formatReleaseDate(project.releaseDate)}</span>
+                          <span className="text-xs">
+                            {isCompleted ? '릴리즈 완료: ' : '릴리즈: '}
+                            {formatReleaseDate(project.releaseDate)}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -1032,7 +1233,9 @@ export default function Playground() {
                     {/* 제목 + 뱃지들 */}
                     <div className="mb-4">
                       <div className="flex items-start justify-between gap-2 mb-3">
-                        <h3 className="text-lg font-bold text-gray-900 leading-snug flex-1">{project.title}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 leading-snug flex-1">
+                          {project.title}
+                        </h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <span
@@ -1071,10 +1274,290 @@ export default function Playground() {
                   </div>
                 );
               })}
-            </div>
+              </div>
+            ) : (
+              /* 캘린더 뷰 */
+              <div className="space-y-6">
+                {/* 캘린더 헤더 */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-[#313131] mb-1">
+                      {calendarMonth.getFullYear()}년 {calendarMonth.getMonth() + 1}월
+                    </h2>
+                    <p className="text-sm text-gray-600">프로젝트 릴리즈 캘린더</p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={goToToday}
+                      className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      오늘
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={goToPrevMonth}
+                        className="w-9 h-9 flex items-center justify-center bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={goToNextMonth}
+                        className="w-9 h-9 flex items-center justify-center bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 캘린더 */}
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm" style={{ overflow: 'visible' }}>
+                  {/* 요일 헤더 */}
+                  <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                    {['일', '월', '화', '수', '목', '금', '토'].map((day, idx) => (
+                      <div
+                        key={day}
+                        className={`py-3 text-center text-sm font-semibold ${
+                          idx === 0 ? 'text-red-600' : idx === 6 ? 'text-blue-600' : 'text-gray-700'
+                        }`}
+                      >
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* 날짜 그리드 */}
+                  <div className="grid grid-cols-7" style={{ overflow: 'visible' }}>
+                    {calendarData.days.map((date, dayIndex) => {
+                      const isCurrentDate = isToday(date);
+                      const isInMonth = isCurrentMonth(date);
+                      const events = calendarEvents.get(dayIndex) || [];
+                      const maxLayer = events.length > 0 ? Math.max(...events.map(e => e.layer)) : -1;
+                      const isTopRow = dayIndex < 7;
+
+                      return (
+                        <div
+                          key={dayIndex}
+                          className={`min-h-[140px] border-r border-b border-gray-100 ${
+                            !isInMonth ? 'bg-gray-50/50' : 'bg-white'
+                          } ${dayIndex % 7 === 6 ? 'border-r-0' : ''} flex flex-col relative`}
+                          style={{ position: 'relative', overflow: 'visible' }}
+                        >
+                          {/* 날짜 숫자 */}
+                          <div className="absolute top-1.5 right-2 z-10">
+                            <span
+                              className={`inline-flex items-center justify-center font-medium ${
+                                isCurrentDate
+                                  ? 'w-5 h-5 rounded-full bg-[#313131] text-white text-[10px] font-semibold'
+                                  : !isInMonth
+                                  ? 'text-gray-300 text-[11px]'
+                                  : dayIndex % 7 === 0
+                                  ? 'text-red-400 text-[11px]'
+                                  : dayIndex % 7 === 6
+                                  ? 'text-blue-400 text-[11px]'
+                                  : 'text-gray-400 text-[11px]'
+                              }`}
+                            >
+                              {date.getDate()}
+                            </span>
+                          </div>
+
+                          {/* 일정 바 영역 */}
+                          <div className="pt-8 px-0 pb-2 flex-1 flex flex-col gap-2" style={{ overflow: 'visible' }}>
+                            {Array.from({ length: maxLayer + 1 }, (_, layer) => {
+                              const eventInLayer = events.find(e => e.layer === layer);
+
+                              if (!eventInLayer) {
+                                return null;
+                              }
+
+                              const colors = getProjectStatusColor(eventInLayer.project);
+
+                              return (
+                                <div
+                                  key={layer}
+                                  className="relative group cursor-pointer"
+                                  style={{
+                                    height: '24px',
+                                    position: 'relative',
+                                    overflow: 'visible'
+                                  }}
+                                  onClick={() => handleProjectClick(eventInLayer.project)}
+                                >
+                                  {/* 일정 바 */}
+                                  <div
+                                    className="h-full flex items-center text-[11px] font-medium truncate transition-all px-2 rounded"
+                                    style={{
+                                      backgroundColor: colors.bg,
+                                      borderLeft: `3px solid ${colors.border}`,
+                                      color: colors.text,
+                                      marginLeft: '2px',
+                                      marginRight: '2px',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = colors.hover;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = colors.bg;
+                                    }}
+                                  >
+                                    <span className="truncate leading-tight font-semibold">
+                                      {eventInLayer.project.title}
+                                    </span>
+                                  </div>
+
+                                  {/* 호버 툴팁 */}
+                                  <div
+                                    className="hidden group-hover:block absolute z-[9999] pointer-events-none"
+                                    style={{
+                                      left: '50%',
+                                      ...(isTopRow
+                                        ? {
+                                            top: '100%',
+                                            transform: 'translateX(-50%)',
+                                            marginTop: '10px',
+                                          }
+                                        : {
+                                            bottom: '100%',
+                                            transform: 'translateX(-50%)',
+                                            marginBottom: '10px',
+                                          }),
+                                    }}
+                                  >
+                                    <div
+                                      className="bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200"
+                                      style={{
+                                        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
+                                        minWidth: '220px',
+                                        maxWidth: '320px',
+                                      }}
+                                    >
+                                      <div className="px-4 py-3">
+                                        <div
+                                          className="font-bold text-[14px] text-gray-900 mb-2"
+                                          style={{ whiteSpace: 'nowrap' }}
+                                        >
+                                          {eventInLayer.project.title}
+                                        </div>
+
+                                        {eventInLayer.project.description && (
+                                          <div className="text-gray-600 text-[12px] mb-2.5">
+                                            {eventInLayer.project.description}
+                                          </div>
+                                        )}
+
+                                        <div className="border-t border-gray-200 mb-2.5" />
+
+                                        <div className="flex items-center gap-1.5 text-gray-500 text-[11px]">
+                                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                          </svg>
+                                          <span>
+                                            릴리즈: {new Date(eventInLayer.project.releaseDate!).toLocaleDateString('ko-KR', {
+                                              year: 'numeric',
+                                              month: 'short',
+                                              day: 'numeric'
+                                            })}
+                                          </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-1.5 text-gray-500 text-[11px] mt-2">
+                                          <span>
+                                            {eventInLayer.project.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {/* 화살표 */}
+                                      <div
+                                        className="absolute left-1/2 -translate-x-1/2"
+                                        style={{
+                                          ...(isTopRow
+                                            ? {
+                                                bottom: '100%',
+                                                borderLeft: '7px solid transparent',
+                                                borderRight: '7px solid transparent',
+                                                borderBottom: '7px solid rgba(255, 255, 255, 0.95)',
+                                                filter: 'drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.05))',
+                                              }
+                                            : {
+                                                top: '100%',
+                                                borderLeft: '7px solid transparent',
+                                                borderRight: '7px solid transparent',
+                                                borderTop: '7px solid rgba(255, 255, 255, 0.95)',
+                                                filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05))',
+                                              }),
+                                          width: 0,
+                                          height: 0,
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 범례 */}
+                <div className="flex flex-wrap items-center gap-4 px-4 py-3 bg-white rounded-lg border border-gray-200">
+                  <span className="text-xs font-semibold text-gray-600">상태:</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#00BC7D]" />
+                    <span className="text-xs text-gray-700">릴리즈 완료</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#FF9D00]" />
+                    <span className="text-xs text-gray-700">릴리즈 예정</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         ) : (
-          <PipelineCalendar projectProgresses={projectProgresses} />
+          <>
+            {/* 뷰 전환 버튼 */}
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setRoadmapViewType('pipeline')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    roadmapViewType === 'pipeline'
+                      ? 'bg-[#313131] text-white shadow-sm'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  파이프라인 뷰
+                </button>
+                <button
+                  onClick={() => setRoadmapViewType('calendar')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    roadmapViewType === 'calendar'
+                      ? 'bg-[#313131] text-white shadow-sm'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  캘린더 뷰
+                </button>
+              </div>
+            </div>
+
+            {/* 뷰 렌더링 */}
+            {roadmapViewType === 'pipeline' ? (
+              <PipelineCalendar projectProgresses={projectProgresses} />
+            ) : (
+              <ModernCalendarView projectProgresses={projectProgresses} />
+            )}
+          </>
         )}
       </main>
 
