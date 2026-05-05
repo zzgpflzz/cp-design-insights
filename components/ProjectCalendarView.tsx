@@ -37,7 +37,7 @@ export default function ProjectCalendarView({ projects, onProjectClick }: Projec
 
     while (current <= endDate) {
       days.push(new Date(current));
-      current.setDate(current.setDate() + 1);
+      current.setDate(current.getDate() + 1);
     }
 
     return { days, startDate, endDate };
