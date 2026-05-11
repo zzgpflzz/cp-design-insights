@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -13,7 +14,7 @@ interface LinkItem {
 
 interface SectionConfig {
   title: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   bgColor: string;
   items: LinkItem[];
 }
