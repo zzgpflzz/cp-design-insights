@@ -1,4 +1,4 @@
-export type Designer = 'hyeri' | 'ayoung';
+export type Designer = 'hyeri' | 'ayoung' | 'unassigned';
 
 export interface DesignerInfo {
   name: string;
@@ -23,9 +23,16 @@ export const DESIGNERS: Record<Designer, DesignerInfo> = {
     color: 'text-blue-700',
     bgColor: 'bg-blue-50',
   },
+  unassigned: {
+    name: '담당자 배정 중',
+    emoji: '⏳',
+    profileImage: '/images/profile/unassigned.svg',
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-100',
+  },
 };
 
-export type Status = 'release' | 'inprogress';
+export type Status = 'release' | 'inprogress' | 'pending';
 export type Category = 'uiux' | 'contents';
 export type Tier = 's-tier' | 'ab-tier' | 'etc';
 
@@ -45,6 +52,7 @@ export interface Project {
   hasDetail?: boolean; // 상세 페이지 존재 여부
   detailContent?: string; // 상세 설명 (마크다운 지원)
   detailImages?: string[]; // 상세 이미지 URL 배열
+  thumbnailUrl?: string; // 프로젝트 썸네일 이미지 URL
 }
 
 export interface MonthlyData {

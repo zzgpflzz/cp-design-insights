@@ -287,6 +287,7 @@ export default function Playground() {
         monthProjects: 0,
         inProgressCount: projects.filter(p => getActualStatus(p) === 'inprogress').length,
         releaseCount: projects.filter(p => getActualStatus(p) === 'release').length,
+        pendingCount: projects.filter(p => getActualStatus(p) === 'pending').length,
         totalSessions,
         projectsWithData,
       };
@@ -309,6 +310,7 @@ export default function Playground() {
       monthProjects: monthProjects.length,
       inProgressCount: monthProjects.filter(p => getActualStatus(p) === 'inprogress').length,
       releaseCount: monthProjects.filter(p => getActualStatus(p) === 'release').length,
+      pendingCount: monthProjects.filter(p => getActualStatus(p) === 'pending').length,
       totalSessions: monthSessions,
       projectsWithData: monthProjectsWithData,
     };
@@ -682,6 +684,13 @@ export default function Playground() {
         text: '#00875A',
         hover: 'rgba(0, 188, 125, 0.12)'
       };
+    } else if (actualStatus === 'pending') {
+      return {
+        bg: 'rgba(158, 158, 158, 0.08)',
+        border: '#9E9E9E',
+        text: '#757575',
+        hover: 'rgba(158, 158, 158, 0.12)'
+      };
     } else {
       return {
         bg: 'rgba(255, 157, 0, 0.08)',
@@ -771,7 +780,7 @@ export default function Playground() {
           <>
             {/* 월별 요약 지표 카드 */}
             {selectedMonth && selectedMonth !== 'all' && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <div className="text-xs text-gray-600 mb-2 font-medium">해당 월 프로젝트</div>
                   <div className="text-3xl font-bold text-[#313131]">{monthlyStats.monthProjects}</div>
@@ -780,6 +789,10 @@ export default function Playground() {
                   <div className="text-xs text-gray-600 mb-2 font-medium">총 세션 수</div>
                   <div className="text-3xl font-bold text-[#00A6FF]">{monthlyStats.totalSessions.toLocaleString()}</div>
                   <div className="text-xs text-gray-500 mt-1">{monthlyStats.projectsWithData}개 프로젝트 데이터</div>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="text-xs text-gray-600 mb-2 font-medium">대기</div>
+                  <div className="text-3xl font-bold text-[#9E9E9E]">{monthlyStats.pendingCount}</div>
                 </div>
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <div className="text-xs text-gray-600 mb-2 font-medium">진행 중</div>
@@ -1067,6 +1080,7 @@ export default function Playground() {
                     <option value="all">Status</option>
                     <option value="release">Release</option>
                     <option value="inprogress">In Progress</option>
+                    <option value="pending">Pending</option>
                   </select>
                 </div>
 
@@ -1085,6 +1099,7 @@ export default function Playground() {
                     <option value="all">Designer</option>
                     <option value="hyeri">🐰 장혜리</option>
                     <option value="ayoung">🐶 김아영</option>
+                    <option value="unassigned">⏳ 담당자 배정 중</option>
                   </select>
                 </div>
               </div>
@@ -1196,8 +1211,11 @@ export default function Playground() {
 
                 const actualStatus = getActualStatus(project);
                 const isCompleted = actualStatus === 'release';
+                const isPending = actualStatus === 'pending';
                 const statusStyle = isCompleted
                   ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D', borderColor: 'rgba(0, 188, 125, 0.2)' }
+                  : isPending
+                  ? { backgroundColor: 'rgba(158, 158, 158, 0.08)', color: '#9E9E9E', borderColor: 'rgba(158, 158, 158, 0.2)' }
                   : { backgroundColor: 'rgba(255, 157, 0, 0.08)', color: '#FF9D00', borderColor: 'rgba(255, 157, 0, 0.2)' };
 
                 // 릴리즈 날짜 포맷팅
@@ -1256,7 +1274,7 @@ export default function Playground() {
                           className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
                           style={statusStyle}
                         >
-                          {actualStatus === 'release' ? 'RELEASE' : 'IN PROGRESS'}
+                          {actualStatus === 'release' ? 'RELEASE' : actualStatus === 'pending' ? 'PENDING' : 'IN PROGRESS'}
                         </span>
                       </div>
                     </div>
@@ -1265,7 +1283,13 @@ export default function Playground() {
 
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-600">
-                        {project.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}
+                        {project.designer === 'unassigned' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-medium">
+                            ⏳ 담당자 배정 중
+                          </span>
+                        ) : (
+                          project.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'
+                        )}
                       </div>
                       <div className="text-sm font-semibold text-[#313131]">
                         자세히 보기 →
@@ -1519,6 +1543,10 @@ export default function Playground() {
                     <div className="w-3 h-3 rounded-full bg-[#FF9D00]" />
                     <span className="text-xs text-gray-700">릴리즈 예정</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#9E9E9E]" />
+                    <span className="text-xs text-gray-700">대기</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -1601,14 +1629,23 @@ export default function Playground() {
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto px-8 py-6 space-y-5">
-              {/* 썸네일 */}
-              {selectedProject.detailImages && selectedProject.detailImages.length > 0 && (
-                <div className="w-full h-56 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+              {/* 프로젝트 썸네일 - thumbnailUrl 우선, 없으면 detailImages[0], 둘 다 없으면 Placeholder */}
+              {(selectedProject.thumbnailUrl || (selectedProject.detailImages && selectedProject.detailImages.length > 0)) ? (
+                <div className="w-full h-48 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
                   <img
-                    src={selectedProject.detailImages[0]}
+                    src={selectedProject.thumbnailUrl || selectedProject.detailImages![0]}
                     alt={selectedProject.title}
                     className="w-full h-full object-cover"
                   />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                  <div className="text-center">
+                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-sm text-gray-400 font-medium">이미지 준비 중</p>
+                  </div>
                 </div>
               )}
 
@@ -1618,6 +1655,50 @@ export default function Playground() {
                 const hasData = getProjectAnalytics(analyticsData, selectedProject.link) !== null;
                 const actualStatus = getActualStatus(selectedProject);
                 const isInProgress = actualStatus === 'inprogress';
+                const isUnassigned = selectedProject.designer === 'unassigned';
+
+                // 담당자 미정인 경우 별도 UI 표시
+                if (isUnassigned) {
+                  return (
+                    <>
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-lg p-8 border border-blue-100">
+                        <div className="flex flex-col items-center gap-3 text-center">
+                          <div className="text-4xl">⏳</div>
+                          <p className="text-base font-semibold text-gray-800">담당자 배정 중</p>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            담당 디자이너가 배정되면<br />
+                            프로젝트 세부 정보와 인사이트가 업데이트됩니다.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* 프로젝트 기본 정보만 표시 */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-semibold text-[#313131] uppercase tracking-wide">Project Info</h4>
+                        <div className="bg-white rounded-lg p-5 border border-gray-100 shadow-sm space-y-3">
+                          {selectedProject.description && (
+                            <div>
+                              <div className="text-[10px] text-gray-500 mb-1 font-medium uppercase tracking-wide">설명</div>
+                              <p className="text-xs text-gray-700 leading-relaxed">{selectedProject.description}</p>
+                            </div>
+                          )}
+
+                          {selectedProject.releaseDate && (
+                            <div>
+                              <div className="text-[10px] text-gray-500 mb-1 font-medium uppercase tracking-wide">릴리즈</div>
+                              <p className="text-xs text-[#313131] font-medium">{selectedProject.releaseDate}</p>
+                            </div>
+                          )}
+
+                          <div>
+                            <div className="text-[10px] text-gray-500 mb-1 font-medium uppercase tracking-wide">담당자</div>
+                            <p className="text-xs text-gray-500">배정 후 업데이트 예정입니다</p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  );
+                }
 
                 return (
                   <>
