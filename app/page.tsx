@@ -1175,21 +1175,27 @@ export default function Playground() {
               {filteredProjects.map((project) => {
                 const categoryLabel = project.category === 'uiux' ? 'UI/UX' : 'CONTENTS';
                 const categoryStyle = project.category === 'uiux'
-                  ? { backgroundColor: 'rgba(248, 59, 170, 0.08)', color: '#F83BAA', borderColor: 'rgba(248, 59, 170, 0.2)' }
-                  : { backgroundColor: 'rgba(0, 166, 255, 0.08)', color: '#00A6FF', borderColor: 'rgba(0, 166, 255, 0.2)' };
+                  ? { backgroundColor: 'rgba(248, 59, 170, 0.1)', color: '#F83BAA' }
+                  : { backgroundColor: 'rgba(0, 166, 255, 0.1)', color: '#00A6FF' };
 
-                const tierLabel = project.tier === 's-tier' ? 'S TIER' : project.tier === 'ab-tier' ? 'A-B TIER' : 'ETC';
+                const tierLabel = project.tier === 's-tier' ? 'S Tier' : project.tier === 'ab-tier' ? 'A~B Tier' : 'ETC';
                 const tierStyle = project.tier === 's-tier'
-                  ? { backgroundColor: 'rgba(87, 180, 0, 0.08)', color: '#57B400', borderColor: 'rgba(87, 180, 0, 0.2)' }
+                  ? { backgroundColor: 'rgba(87, 180, 0, 0.1)', color: '#57B400' }
                   : project.tier === 'ab-tier'
-                  ? { backgroundColor: 'rgba(130, 128, 255, 0.08)', color: '#8280FF', borderColor: 'rgba(130, 128, 255, 0.2)' }
-                  : { backgroundColor: 'rgba(136, 136, 136, 0.08)', color: '#888888', borderColor: 'rgba(136, 136, 136, 0.2)' };
+                  ? { backgroundColor: 'rgba(130, 128, 255, 0.1)', color: '#8280FF' }
+                  : { backgroundColor: 'rgba(136, 136, 136, 0.1)', color: '#888888' };
 
                 const actualStatus = getActualStatus(project);
                 const isCompleted = actualStatus === 'release';
-                const statusStyle = isCompleted
-                  ? { backgroundColor: 'rgba(0, 188, 125, 0.08)', color: '#00BC7D', borderColor: 'rgba(0, 188, 125, 0.2)' }
-                  : { backgroundColor: 'rgba(255, 157, 0, 0.08)', color: '#FF9D00', borderColor: 'rgba(255, 157, 0, 0.2)' };
+                const statusStyle = actualStatus === 'release'
+                  ? { backgroundColor: 'rgba(0, 188, 125, 0.1)', color: '#00BC7D' }
+                  : actualStatus === 'review'
+                  ? { backgroundColor: 'rgba(130, 128, 255, 0.1)', color: '#8280FF' }
+                  : actualStatus === 'pending'
+                  ? { backgroundColor: 'rgba(97, 97, 97, 0.1)', color: '#616161' }
+                  : actualStatus === 'cancelled'
+                  ? { backgroundColor: 'rgba(63, 63, 63, 0.4)', color: '#3f3f3f' }
+                  : { backgroundColor: 'rgba(255, 157, 0, 0.1)', color: '#FF9D00' };
 
                 // 릴리즈 날짜 포맷팅
                 const formatReleaseDate = (dateStr: string) => {
@@ -1230,21 +1236,21 @@ export default function Playground() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <span
-                          className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
+                          className="text-xs px-3.5 py-2.5 rounded-[10px] font-normal"
                           style={categoryStyle}
                         >
                           {categoryLabel}
                         </span>
                         {project.tier && (
                           <span
-                            className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
+                            className="text-xs px-3.5 py-2.5 rounded-[10px] font-normal"
                             style={tierStyle}
                           >
                             {tierLabel}
                           </span>
                         )}
                         <span
-                          className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
+                          className="text-xs px-3.5 py-2.5 rounded-[10px] font-normal"
                           style={statusStyle}
                         >
                           {actualStatus === 'release' ? 'RELEASE'
