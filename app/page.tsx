@@ -702,11 +702,6 @@ export default function Playground() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
-      {/* Development Badge */}
-      <div className="fixed bottom-4 right-4 z-50 bg-yellow-500 text-black px-4 py-2 rounded-full text-xs font-bold shadow-lg">
-        🚧 PLAYGROUND MODE
-      </div>
-
       {/* Awwwards-style GNB */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
