@@ -885,11 +885,11 @@ export default function AdminPage() {
                         onChange={(e) => setStatus(e.target.value as Status)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
                       >
-                        <option value="release">✅ Release</option>
-                        <option value="inprogress">🔄 In Progress</option>
-                        <option value="review">👀 Review</option>
-                        <option value="pending">⏳ Pending</option>
-                        <option value="cancelled">❌ Cancelled</option>
+                        <option value="release">Release</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="review">Review</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
                       </select>
                     </div>
                   </div>
