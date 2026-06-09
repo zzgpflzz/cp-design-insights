@@ -676,19 +676,15 @@ export default function Playground() {
     const isReleased = releaseDate && releaseDate <= today;
 
     if (isReleased || actualStatus === 'release') {
-      return {
-        bg: 'rgba(0, 188, 125, 0.08)',
-        border: '#00BC7D',
-        text: '#00875A',
-        hover: 'rgba(0, 188, 125, 0.12)'
-      };
+      return { bg: 'rgba(0, 188, 125, 0.08)', border: '#00BC7D', text: '#00875A', hover: 'rgba(0, 188, 125, 0.12)' };
+    } else if (actualStatus === 'review') {
+      return { bg: 'rgba(130, 128, 255, 0.08)', border: '#8280FF', text: '#5B57CC', hover: 'rgba(130, 128, 255, 0.12)' };
+    } else if (actualStatus === 'pending') {
+      return { bg: 'rgba(158, 158, 158, 0.08)', border: '#9E9E9E', text: '#757575', hover: 'rgba(158, 158, 158, 0.12)' };
+    } else if (actualStatus === 'cancelled') {
+      return { bg: 'rgba(239, 68, 68, 0.06)', border: '#EF4444', text: '#DC2626', hover: 'rgba(239, 68, 68, 0.10)' };
     } else {
-      return {
-        bg: 'rgba(255, 157, 0, 0.08)',
-        border: '#FF9D00',
-        text: '#CC7A00',
-        hover: 'rgba(255, 157, 0, 0.12)'
-      };
+      return { bg: 'rgba(255, 157, 0, 0.08)', border: '#FF9D00', text: '#CC7A00', hover: 'rgba(255, 157, 0, 0.12)' };
     }
   };
 
@@ -1251,7 +1247,11 @@ export default function Playground() {
                           className="text-xs px-2.5 py-1 rounded-full font-medium border-[0.5px]"
                           style={statusStyle}
                         >
-                          {actualStatus === 'release' ? 'RELEASE' : 'IN PROGRESS'}
+                          {actualStatus === 'release' ? 'RELEASE'
+                            : actualStatus === 'pending' ? 'PENDING'
+                            : actualStatus === 'review' ? 'REVIEW'
+                            : actualStatus === 'cancelled' ? 'CANCELLED'
+                            : 'IN PROGRESS'}
                         </span>
                       </div>
                     </div>

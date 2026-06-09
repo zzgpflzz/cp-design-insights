@@ -32,7 +32,7 @@ export const DESIGNERS: Record<Designer, DesignerInfo> = {
   },
 };
 
-export type Status = 'release' | 'inprogress' | 'pending';
+export type Status = 'release' | 'inprogress' | 'pending' | 'review' | 'cancelled';
 export type Category = 'uiux' | 'contents';
 export type Tier = 's-tier' | 'ab-tier' | 'etc';
 

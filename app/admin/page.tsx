@@ -763,8 +763,12 @@ export default function AdminPage() {
                                 ? 'bg-[#313131] text-white'
                                 : p.status === 'release'
                                 ? 'bg-[#00BC7D]/10 text-[#00875A]'
+                                : p.status === 'review'
+                                ? 'bg-[#8280FF]/10 text-[#5B57CC]'
                                 : p.status === 'pending'
                                 ? 'bg-gray-100 text-gray-500'
+                                : p.status === 'cancelled'
+                                ? 'bg-red-50 text-red-400'
                                 : 'bg-[#FF9D00]/10 text-[#CC7A00]'
                             }`}
                           >
@@ -868,6 +872,7 @@ export default function AdminPage() {
                       >
                         <option value="hyeri">{DESIGNERS.hyeri.emoji} {DESIGNERS.hyeri.name}</option>
                         <option value="ayoung">{DESIGNERS.ayoung.emoji} {DESIGNERS.ayoung.name}</option>
+                        <option value="unassigned">{DESIGNERS.unassigned.emoji} {DESIGNERS.unassigned.name}</option>
                       </select>
                     </div>
 
@@ -880,8 +885,11 @@ export default function AdminPage() {
                         onChange={(e) => setStatus(e.target.value as Status)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
                       >
-                        <option value="release">Release</option>
-                        <option value="inprogress">In Progress</option>
+                        <option value="release">✅ Release</option>
+                        <option value="inprogress">🔄 In Progress</option>
+                        <option value="review">👀 Review</option>
+                        <option value="pending">⏳ Pending</option>
+                        <option value="cancelled">❌ Cancelled</option>
                       </select>
                     </div>
                   </div>
