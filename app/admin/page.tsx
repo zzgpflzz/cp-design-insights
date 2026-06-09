@@ -23,6 +23,7 @@ export default function AdminPage() {
   const [editingRoadmapProject, setEditingRoadmapProject] = useState<RoadmapProject | null>(null);
   const [editingProgress, setEditingProgress] = useState<ProjectProgress | null>(null);
   const [selectedRoadmapProjectId, setSelectedRoadmapProjectId] = useState<string>('');
+  const [calViewMonth, setCalViewMonth] = useState<Date>(new Date());
 
   // Form state
   const [title, setTitle] = useState('');
@@ -171,6 +172,31 @@ export default function AdminPage() {
       currentMonthReleases
     };
   }, [projects]);
+
+  // 캘린더 뷰용 — 현재 calViewMonth 기준으로 날짜 배열 생성
+  const calendarGrid = useMemo(() => {
+    const year = calViewMonth.getFullYear();
+    const month = calViewMonth.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells: (Date | null)[] = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+    return cells;
+  }, [calViewMonth]);
+
+  const projectsByDate = useMemo(() => {
+    const map = new Map<string, Project[]>();
+    projects.forEach((p) => {
+      const key = p.releaseDate || `${p.month}-01`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(p);
+    });
+    return map;
+  }, [projects]);
+
+  const toKey = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   const resetForm = () => {
     setTitle('');
@@ -653,71 +679,123 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* 2단 레이아웃: 프로젝트 리스트 + 수정 폼 */}
+            {/* 2단 레이아웃: 캘린더 뷰 + 수정 폼 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* 좌측: 프로젝트 리스트 */}
+              {/* 좌측: 캘린더 뷰 */}
               <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-[#313131] mb-4">
-                  등록된 프로젝트 ({projects.length})
-                </h2>
-                <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                  {projects.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      등록된 프로젝트가 없습니다.
+                {/* 캘린더 헤더 */}
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-lg font-bold text-[#313131]">
+                    {calViewMonth.getFullYear()}년 {calViewMonth.getMonth() + 1}월
+                    <span className="text-sm font-normal text-gray-400 ml-2">({projects.length}개 프로젝트)</span>
+                  </h2>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setCalViewMonth(new Date(calViewMonth.getFullYear(), calViewMonth.getMonth() - 1))}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      onClick={() => setCalViewMonth(new Date())}
+                      className="px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      오늘
+                    </button>
+                    <button
+                      onClick={() => setCalViewMonth(new Date(calViewMonth.getFullYear(), calViewMonth.getMonth() + 1))}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
+                    >
+                      ›
+                    </button>
+                  </div>
+                </div>
+
+                {/* 요일 헤더 */}
+                <div className="grid grid-cols-7 mb-1">
+                  {['일', '월', '화', '수', '목', '금', '토'].map((d, i) => (
+                    <div
+                      key={d}
+                      className={`text-center text-xs font-semibold py-1.5 ${
+                        i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-gray-400'
+                      }`}
+                    >
+                      {d}
                     </div>
-                  ) : (
-                    projects.map((project) => (
+                  ))}
+                </div>
+
+                {/* 날짜 그리드 */}
+                <div className="grid grid-cols-7 gap-px bg-gray-100 border border-gray-100 rounded-lg overflow-hidden">
+                  {calendarGrid.map((date, idx) => {
+                    if (!date) {
+                      return <div key={`empty-${idx}`} className="bg-white min-h-[72px]" />;
+                    }
+                    const key = toKey(date);
+                    const dayProjects = projectsByDate.get(key) || [];
+                    const isToday = toKey(date) === toKey(new Date());
+                    const isSun = date.getDay() === 0;
+                    const isSat = date.getDay() === 6;
+
+                    return (
                       <div
-                        key={project.id}
-                        onClick={() => handleEdit(project)}
-                        className={`p-4 rounded-lg border transition-all cursor-pointer ${
-                          editingProject?.id === project.id
-                            ? 'bg-[#313131] text-white border-[#313131]'
-                            : 'bg-[#FAFAFA] border-gray-200 hover:border-[#313131]'
-                        }`}
+                        key={key}
+                        className="bg-white min-h-[72px] p-1.5 flex flex-col gap-0.5"
                       >
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className={`font-bold ${editingProject?.id === project.id ? 'text-white' : 'text-[#313131]'}`}>
-                            {project.title}
-                          </h3>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(project.id);
-                            }}
-                            className={`px-2 py-1 text-xs rounded ${
-                              editingProject?.id === project.id
-                                ? 'bg-white/20 text-white hover:bg-white/30'
-                                : 'bg-red-50 text-red-600 hover:bg-red-100'
+                        <div className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-0.5 ${
+                          isToday
+                            ? 'bg-[#313131] text-white'
+                            : isSun
+                            ? 'text-red-400'
+                            : isSat
+                            ? 'text-blue-400'
+                            : 'text-gray-700'
+                        }`}>
+                          {date.getDate()}
+                        </div>
+                        {dayProjects.slice(0, 2).map((p) => (
+                          <div
+                            key={p.id}
+                            onClick={() => handleEdit(p)}
+                            title={p.title}
+                            className={`text-[9px] font-medium px-1 py-0.5 rounded truncate cursor-pointer leading-tight ${
+                              editingProject?.id === p.id
+                                ? 'bg-[#313131] text-white'
+                                : p.status === 'release'
+                                ? 'bg-[#00BC7D]/10 text-[#00875A]'
+                                : p.status === 'pending'
+                                ? 'bg-gray-100 text-gray-500'
+                                : 'bg-[#FF9D00]/10 text-[#CC7A00]'
                             }`}
                           >
-                            삭제
-                          </button>
-                        </div>
-                        <p className={`text-sm mb-2 line-clamp-2 ${editingProject?.id === project.id ? 'text-white/80' : 'text-gray-600'}`}>
-                          {project.description}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            editingProject?.id === project.id
-                              ? 'bg-white/20 text-white'
-                              : project.status === 'release'
-                              ? 'bg-[#00BC7D]/10 text-[#00BC7D]'
-                              : 'bg-[#FF9D00]/10 text-[#FF9D00]'
-                          }`}>
-                            {project.status === 'release' ? 'Release' : 'In Progress'}
-                          </span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            editingProject?.id === project.id
-                              ? 'bg-white/20 text-white'
-                              : 'bg-gray-200 text-gray-700'
-                          }`}>
-                            {formatMonth(project.month)}
-                          </span>
-                        </div>
+                            {p.title}
+                          </div>
+                        ))}
+                        {dayProjects.length > 2 && (
+                          <div className="text-[9px] text-gray-400 font-medium px-1">
+                            +{dayProjects.length - 2}
+                          </div>
+                        )}
                       </div>
-                    ))
-                  )}
+                    );
+                  })}
+                </div>
+
+                {/* 범례 */}
+                <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#00BC7D]/20" />
+                    <span className="text-xs text-gray-500">Release</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#FF9D00]/20" />
+                    <span className="text-xs text-gray-500">In Progress</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-sm bg-gray-100" />
+                    <span className="text-xs text-gray-500">Pending</span>
+                  </div>
+                  <span className="text-xs text-gray-400 ml-auto">클릭하면 수정됩니다</span>
                 </div>
               </div>
 
