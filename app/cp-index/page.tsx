@@ -79,7 +79,7 @@ export default function IndexHub(): React.ReactNode {
         </svg>
       ),
       items: [
-        { title: 'GitHub 레포', url: 'https://github.com', description: '소스코드 및 이슈 트래킹' },
+        { title: '개발 대시보드', url: 'https://jira.workers-hub.com/projects/IPXCP/issues/IPXCP-372?filter=allopenissues', description: '이슈 트래킹 및 개발 현황' },
         { title: '배포 로그', url: '#', description: '최근 배포 히스토리' },
         { title: 'API 문서', url: '#', description: 'REST API 엔드포인트 가이드' },
         { title: '마이그레이션 현황', url: '#', description: 'DB 스키마 변경 이력' },
