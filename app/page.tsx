@@ -1236,21 +1236,21 @@ export default function Playground() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <span
-                          className="text-xs px-3.5 py-2.5 rounded-[10px] font-normal"
+                          className="text-xs px-2.5 py-1 rounded-[6px] font-medium"
                           style={categoryStyle}
                         >
                           {categoryLabel}
                         </span>
                         {project.tier && (
                           <span
-                            className="text-xs px-3.5 py-2.5 rounded-[10px] font-normal"
+                            className="text-xs px-2.5 py-1 rounded-[6px] font-medium"
                             style={tierStyle}
                           >
                             {tierLabel}
                           </span>
                         )}
                         <span
-                          className="text-xs px-3.5 py-2.5 rounded-[10px] font-normal"
+                          className="text-xs px-2.5 py-1 rounded-[6px] font-medium"
                           style={statusStyle}
                         >
                           {actualStatus === 'release' ? 'RELEASE'
