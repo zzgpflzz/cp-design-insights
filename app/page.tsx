@@ -1266,7 +1266,7 @@ export default function Playground() {
 
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-600">
-                        {project.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}
+                        {project.designer === 'hyeri' ? '🐰 장혜리' : project.designer === 'ayoung' ? '🐶 김아영' : '⏳ 담당자 배정 중'}
                       </div>
                       <div className="text-sm font-semibold text-[#313131]">
                         자세히 보기 →
@@ -1469,7 +1469,7 @@ export default function Playground() {
 
                                         <div className="flex items-center gap-1.5 text-gray-500 text-[11px] mt-2">
                                           <span>
-                                            {eventInLayer.project.designer === 'hyeri' ? '🐰 장혜리' : '🐶 김아영'}
+                                            {eventInLayer.project.designer === 'hyeri' ? '🐰 장혜리' : eventInLayer.project.designer === 'ayoung' ? '🐶 김아영' : '⏳ 담당자 배정 중'}
                                           </span>
                                         </div>
                                       </div>
