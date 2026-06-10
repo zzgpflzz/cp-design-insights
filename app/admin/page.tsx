@@ -24,6 +24,7 @@ export default function AdminPage() {
   const [editingProgress, setEditingProgress] = useState<ProjectProgress | null>(null);
   const [selectedRoadmapProjectId, setSelectedRoadmapProjectId] = useState<string>('');
   const [calViewMonth, setCalViewMonth] = useState<Date>(new Date());
+  const [expandedDateKey, setExpandedDateKey] = useState<string | null>(null);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -775,10 +776,43 @@ export default function AdminPage() {
                             {p.title}
                           </div>
                         ))}
-                        {dayProjects.length > 2 && (
-                          <div className="text-[9px] text-gray-400 font-medium px-1">
-                            +{dayProjects.length - 2}
+                        {dayProjects.length > 2 && expandedDateKey !== key && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setExpandedDateKey(key); }}
+                            className="text-[9px] text-gray-400 font-semibold px-1 hover:text-gray-600 transition-colors text-left"
+                          >
+                            +{dayProjects.length - 2} 더 보기
+                          </button>
+                        )}
+                        {expandedDateKey === key && dayProjects.slice(2).map((p) => (
+                          <div
+                            key={p.id}
+                            onClick={() => handleEdit(p)}
+                            title={p.title}
+                            className={`text-[9px] font-medium px-1 py-0.5 rounded truncate cursor-pointer leading-tight ${
+                              editingProject?.id === p.id
+                                ? 'bg-[#313131] text-white'
+                                : p.status === 'release'
+                                ? 'bg-[#00BC7D]/10 text-[#00875A]'
+                                : p.status === 'pending'
+                                ? 'bg-gray-100 text-gray-500'
+                                : p.status === 'review'
+                                ? 'bg-[#8280FF]/10 text-[#5B57CC]'
+                                : p.status === 'cancelled'
+                                ? 'bg-red-50 text-red-400'
+                                : 'bg-[#FF9D00]/10 text-[#CC7A00]'
+                            }`}
+                          >
+                            {p.title}
                           </div>
+                        ))}
+                        {expandedDateKey === key && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setExpandedDateKey(null); }}
+                            className="text-[9px] text-gray-400 font-semibold px-1 hover:text-gray-600 transition-colors text-left"
+                          >
+                            접기
+                          </button>
                         )}
                       </div>
                     );
