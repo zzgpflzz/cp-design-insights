@@ -134,11 +134,14 @@ export default function IndexHub(): React.ReactNode {
 
                 {/* Link List */}
                 <ul className="pb-2">
-                  {section.items.map((item, idx) => (
+                  {section.items.map((item, idx) => {
+                    const isDisabled = item.url === '#';
+                    return (
                     <li key={idx}>
                       <button
-                        onClick={() => handleNavigation(item.url)}
-                        className="w-full text-left px-7 py-4 hover:bg-gray-50 transition-colors group"
+                        onClick={() => !isDisabled && handleNavigation(item.url)}
+                        disabled={isDisabled}
+                        className={`w-full text-left px-7 py-4 transition-colors group ${isDisabled ? 'cursor-not-allowed opacity-35' : 'hover:bg-gray-50'}`}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="min-w-0">
@@ -151,18 +154,21 @@ export default function IndexHub(): React.ReactNode {
                               </div>
                             )}
                           </div>
-                          <svg
-                            className="w-4 h-4 text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          {!isDisabled && (
+                            <svg
+                              className="w-4 h-4 text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          )}
                         </div>
                       </button>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               </div>
             );
