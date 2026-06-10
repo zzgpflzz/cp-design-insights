@@ -44,7 +44,7 @@ export default function IndexHub(): React.ReactNode {
       ),
       items: [
         { title: '디자인 대시보드', url: 'https://cp-design-insights.vercel.app', description: '프로젝트 타임라인 및 로드맵' },
-        { title: 'UI 가이드라인', url: '#', description: '디자인 시스템 및 컴포넌트 가이드' },
+        { title: 'UI 가이드라인', url: '/design-guidelines.html', description: '디자인 시스템 및 컴포넌트 가이드' },
         { title: '피그마 디자인', url: 'https://figma.com', description: '실시간 디자인 파일' },
         { title: '브랜드 에셋', url: '#', description: '로고, 컬러, 타이포그래피' },
         { title: '디자인 아카이브', url: '#', description: '과거 프로젝트 참고 자료' },

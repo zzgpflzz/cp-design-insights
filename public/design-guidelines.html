@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+/* ── Reset ───────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+/* ── Theme Tokens ────────────────────────────────────── */
+:root{
+  --font:"Pretendard","Inter",-apple-system,sans-serif;
+  --mono:"SF Mono","Fira Code","Courier New",monospace;
+  /* brand */
+  --c-green:#6BBD1B; --c-blue:#397AF2; --c-orange:#EE8800;
+  --c-green-d:#4a8c10; --c-blue-d:#1f5ad4;
+  /* status */
+  --s-ok:#1BB400;   --s-ok-bg:rgba(27,180,0,.10);
+  --s-wait:#616161; --s-wait-bg:rgba(97,97,97,.10);
+  --s-rev:#F77911;  --s-rev-bg:rgba(247,121,17,.10);
+  --s-urg:#E5172F;  --s-urg-bg:rgba(229,23,47,.10);
+  --s-wip:#4270ED;  --s-wip-bg:rgba(66,112,237,.10);
+  /* radius */
+  --r1:4px;--r2:8px;--r3:12px;--r4:16px;
+  /* shadows */
+  --sh-sm:0 1px 3px rgba(0,0,0,.06);
+  --sh:0 2px 12px rgba(0,0,0,.08);
+  --sh-lg:0 8px 32px rgba(0,0,0,.12);
+}
+/* Light */
+[data-theme="light"]{
+  --bg:#F6F8FA; --surf:#ffffff; --surf2:#F0F2F4;
+  --t1:#111111; --t2:#616161; --t3:#888888; --t4:#A0A0A0;
+  --bd:#EBEDEE; --bd2:#DCDEE0;
+  --sidebar-bg:#ffffff; --topbar-bg:#ffffff;
+  --code-bg:#F0F2F4; --code-t:#3F3F3F;
+  --hover:rgba(0,0,0,.04);
+  --active-nav:rgba(57,122,242,.08);
+  --active-nav-t:#397AF2;
+  --toggle-bg:#DCDEE0; --toggle-thumb:#fff;
+}
+/* Dark */
+[data-theme="dark"]{
+  --bg:#0d0f14; --surf:#161922; --surf2:#1e2130;
+  --t1:#e8eaf0; --t2:#9ba3b8; --t3:#636b80; --t4:#4a5168;
+  --bd:#252a38; --bd2:#2f3548;
+  --sidebar-bg:#111420; --topbar-bg:#111420;
+  --code-bg:#0a0c10; --code-t:#a8b0c8;
+  --hover:rgba(255,255,255,.05);
+  --active-nav:rgba(57,122,242,.15);
+  --active-nav-t:#6b9fff;
+  --toggle-bg:#397AF2; --toggle-thumb:#fff;
+  --c-blue:#6b9fff;
+}
+/* ── Base ────────────────────────────────────────────── */
+html,body{height:100%;}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;display:flex;flex-direction:column;}
+/* ── Topbar ──────────────────────────────────────────── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:52px;background:var(--topbar-bg);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 20px 0 0;gap:0;
+}
+.topbar-brand{
+  width:220px;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+  padding:0 20px;height:100%;border-right:1px solid var(--bd);
+}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--c-blue);flex-shrink:0;}
+.brand-name{font-size:15px;font-weight:700;color:var(--t1);}
+.brand-ver{font-size:11px;color:var(--t3);margin-left:4px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.topbar-label{font-size:12px;color:var(--t3);}
+/* Dark mode toggle */
+.toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.toggle{
+  width:36px;height:20px;border-radius:10px;background:var(--toggle-bg);
+  position:relative;transition:background .2s;cursor:pointer;border:none;
+  flex-shrink:0;
+}
+.toggle::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:16px;height:16px;border-radius:50%;background:var(--toggle-thumb);
+  transition:transform .2s;
+}
+[data-theme="dark"] .toggle::after{transform:translateX(16px);}
+.toggle-icon{font-size:14px;}
+/* ── Layout ──────────────────────────────────────────── */
+.layout{display:flex;margin-top:52px;min-height:calc(100vh - 52px);}
+/* ── Sidebar ─────────────────────────────────────────── */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--sidebar-bg);border-right:1px solid var(--bd);
+  position:fixed;top:52px;left:0;bottom:0;
+  overflow-y:auto;padding:16px 0 40px;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+.nav-group{margin-bottom:4px;}
+.nav-group-label{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--t4);padding:12px 20px 4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 20px;font-size:13px;color:var(--t2);
+  cursor:pointer;border-radius:0;transition:background .1s,color .1s;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:var(--hover);color:var(--t1);}
+.nav-item.active{background:var(--active-nav);color:var(--active-nav-t);font-weight:600;}#page-logo .logo-light{display:block;}
+#page-logo .logo-dark{display:none;}
+[data-theme="dark"] #page-logo .logo-light{display:none;}
+[data-theme="dark"] #page-logo .logo-dark{display:block;}
+/* 다크모드 가로형 로고 컨테이너 */
+#page-logo .hlogo-dark{position:relative;display:none;}
+[data-theme="dark"] #page-logo .hlogo-dark{display:block;}
+/* ── Content ─────────────────────────────────────────── */
+.content{margin-left:260px;flex:1;padding:40px 48px 80px;max-width:960px;}
+/* ── Page ────────────────────────────────────────────── */
+.page{display:none;}
+.page.active{display:block;}
+.page-title{font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px;}
+.page-desc{font-size:14px;color:var(--t2);margin-bottom:32px;line-height:1.6;}
+/* ── Section card ────────────────────────────────────── */
+.sc{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r3);padding:28px;margin-bottom:20px;}
+.sc-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding-bottom:14px;margin-bottom:20px;border-bottom:1px solid var(--bd);}
+/* ── Code ────────────────────────────────────────────── */
+.code{
+  background:var(--code-bg);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:14px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.75;
+  color:var(--code-t);overflow-x:auto;white-space:pre;margin-top:12px;
+}
+.ck{color:#4270ED;} /* prop */
+.cv{color:#1BB400;} /* value */
+.cc{color:var(--t4);} /* comment */
+.ct{color:#E5172F;} /* tag */
+.ca{color:#F77911;} /* attr */
+/* ── Table ───────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{background:var(--surf2);padding:9px 12px;text-align:left;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--bd);color:var(--t1);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl code{font-family:var(--mono);font-size:11px;background:var(--surf2);padding:2px 6px;border-radius:3px;color:var(--t2);}
+/* ── Palette ─────────────────────────────────────────── */
+.palette{display:flex;border-radius:var(--r2);overflow:hidden;border:1px solid var(--bd);}
+.swatch{flex:1;display:flex;flex-direction:column;}
+.sw-color{height:44px;}
+.sw-info{padding:7px 6px;background:var(--surf);border-top:1px solid var(--bd);}
+.sw-step{font-size:10px;font-weight:700;color:var(--t3);display:block;}
+.sw-hex{font-size:10px;font-family:var(--mono);color:var(--t2);display:block;margin-top:1px;}
+.sw-note{font-size:9px;color:var(--t4);display:block;margin-top:2px;line-height:1.3;}
+/* ── Typo rows ───────────────────────────────────────── */
+.typo-row{display:flex;align-items:baseline;gap:20px;padding:12px 0;border-bottom:1px solid var(--bd);}
+.typo-row:last-child{border-bottom:none;}
+.typo-lbl{font-size:11px;color:var(--t4);width:100px;flex-shrink:0;font-weight:600;}
+.typo-meta{font-size:10px;color:var(--t4);min-width:200px;flex-shrink:0;font-family:var(--mono);}
+/* ── Badges ──────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:var(--r1);font-size:12px;font-weight:400;line-height:normal;white-space:nowrap;}
+.b-ok{color:var(--s-ok);background:var(--s-ok-bg);}
+.b-wait{color:var(--s-wait);background:var(--s-wait-bg);}
+.b-rev{color:var(--s-rev);background:var(--s-rev-bg);}
+.b-urg{color:var(--s-urg);background:var(--s-urg-bg);}
+.b-wip{color:var(--s-wip);background:var(--s-wip-bg);}
+/* ── Buttons ─────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:6px;font-family:var(--font);cursor:pointer;font-weight:500;line-height:1;transition:filter .15s,opacity .15s;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+/* variants */
+.btn-primary{background:var(--c-blue);color:#fff;}
+.btn-primary:hover:not(:disabled){filter:brightness(1.08);}
+.btn-secondary{background:var(--surf2);color:#616161;border:1px solid var(--bd2);}
+.btn-secondary:hover:not(:disabled){background:var(--bd);}
+[data-theme="dark"] .btn-secondary{color:#a0a0a0;}
+.btn-ghost{background:transparent;color:var(--c-blue);border:1px solid var(--c-blue);}
+.btn-ghost:hover:not(:disabled){background:var(--active-nav);}
+.btn-danger{background:transparent;color:var(--s-urg);border:1px solid var(--s-urg);}
+.btn-danger:hover:not(:disabled){background:color-mix(in srgb,var(--s-urg) 8%,transparent);}
+.btn-success{background:transparent;color:var(--s-ok);border:1px solid var(--s-ok);}
+.btn-success:hover:not(:disabled){background:color-mix(in srgb,var(--s-ok) 8%,transparent);}
+/* sizes */
+.btn-sm{font-size:12px;padding:8px 12px;}
+.btn-md{font-size:13px;padding:10px 18px;}
+.btn-lg{font-size:15px;padding:12px 24px;}
+/* ── Inputs ──────────────────────────────────────────── */
+.inp-wrap{display:flex;flex-direction:column;gap:5px;}
+.inp-label{font-size:12px;font-weight:600;color:var(--t2);}
+.inp-hint{font-size:11px;color:var(--t3);}
+.inp-err{font-size:11px;color:var(--s-urg);}
+.inp{
+  width:100%;height:38px;padding:0 12px;border-radius:var(--r2);
+  border:1px solid var(--bd2);background:var(--surf);color:var(--t1);
+  font-family:var(--font);font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.inp::placeholder{color:var(--t4);}
+.inp:focus{border-color:var(--c-blue);box-shadow:0 0 0 3px rgba(57,122,242,.12);}
+.inp.inp-error{border-color:var(--s-urg);}
+.inp.inp-error:focus{box-shadow:0 0 0 3px rgba(229,23,47,.12);}
+.inp:disabled{background:var(--surf2);color:var(--t3);cursor:not-allowed;}
+textarea.inp{height:80px;padding:10px 12px;resize:vertical;}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+/* ── Cards ───────────────────────────────────────────── */
+.card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r3);padding:20px;}
+.card-label{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px;}
+.card-stat{font-size:28px;font-weight:700;color:var(--t1);line-height:1.2;}
+.card-sub{font-size:12px;color:var(--t3);margin-top:4px;}
+/* ── Demo grid ───────────────────────────────────────── */
+.demo-grid{display:grid;gap:16px;}
+.cols-3{grid-template-columns:repeat(3,1fr);}
+.cols-2{grid-template-columns:repeat(2,1fr);}
+.preview{background:var(--surf2);border-radius:var(--r2);border:1px solid var(--bd);padding:20px;margin-top:12px;}
+/* ── Stepper ─────────────────────────────────────────── */
+.stepper{display:flex;align-items:flex-start;gap:0;}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
+.step:not(:last-child)::after{content:'';position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:var(--bd2);}
+.step:not(:last-child).step-done::after{background:var(--c-blue);}
+.step-circle{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;border:2px solid var(--bd2);background:var(--surf);
+  color:var(--t3);z-index:1;position:relative;
+}
+.step-done .step-circle{background:var(--c-blue);border-color:var(--c-blue);color:#fff;}
+.step-active .step-circle{background:var(--surf);border-color:var(--c-blue);color:var(--c-blue);}
+.step-label{font-size:11px;color:var(--t3);margin-top:8px;text-align:center;}
+.step-active .step-label{color:var(--c-blue);font-weight:600;}
+.step-done .step-label{color:var(--t2);}
+/* ── Chart ───────────────────────────────────────────── */
+.chart-wrap{position:relative;}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px;padding:0 4px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:opacity .2s;}
+.bar:hover{opacity:.8;}
+.bar-val{font-size:10px;color:var(--t3);font-weight:600;}
+.bar-lbl{font-size:10px;color:var(--t3);margin-top:4px;}
+.chart-legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+/* Line chart SVG */
+.line-chart-area{overflow:hidden;border-radius:var(--r2);}
+/* ── Key color swatches ──────────────────────────────── */
+.key-swatches{display:flex;gap:12px;}
+.ks{display:flex;flex-direction:column;gap:6px;}
+.ks-block{width:52px;height:52px;border-radius:var(--r2);}
+.ks-name{font-size:11px;font-weight:600;color:var(--t2);}
+.ks-hex{font-size:10px;font-family:var(--mono);color:var(--t3);}
+/* ── Info box ────────────────────────────────────────── */
+.info-box{background:var(--active-nav);border:1px solid rgba(57,122,242,.2);border-radius:var(--r2);padding:12px 16px;font-size:13px;color:var(--t1);line-height:1.6;margin-bottom:12px;}
+.info-box strong{color:var(--c-blue);}
+/* ── Download cards ──────────────────────────────────── */
+.dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.dl-card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r3);padding:24px;display:flex;flex-direction:column;gap:12px;}
+.dl-icon{font-size:28px;}
+.dl-title{font-size:15px;font-weight:700;color:var(--t1);}
+.dl-desc{font-size:12px;color:var(--t2);line-height:1.6;flex:1;}
+.dl-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--surf2);border:1px solid var(--bd2);border-radius:var(--r2);font-size:12px;font-weight:600;color:var(--t1);cursor:pointer;transition:background .15s;text-decoration:none;font-family:var(--font);}
+.dl-btn:hover{background:var(--bd);}
+/* ── Divider ─────────────────────────────────────────── */
+.div{height:1px;background:var(--bd);margin:20px 0;}
+/* ── Tag ─────────────────────────────────────────── */
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:var(--r1);font-size:11px;background:var(--surf2);color:var(--t2);border:1px solid var(--bd);margin-right:4px;}
+/* ── Spacing row ─────────────────────────────────────── */
+.sp-row{display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--bd);}
+.sp-row:last-child{border-bottom:none;}
+.sp-bar{background:var(--c-blue);height:12px;border-radius:2px;opacity:.7;}
+.sp-val{font-size:12px;font-family:var(--mono);color:var(--t2);width:40px;}
+.sp-use{font-size:12px;color:var(--t3);}
+/* ── Logo ────────────────────────────────────────────── */
+.logo-basic-text{color:var(--t1);font-family:var(--font);}
+/* topbar brand wider for long name */
+.topbar-brand{width:260px;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Design System</span>
+    <span class="brand-ver">v1.0</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-label" id="theme-label">Light</span>
+    <button class="toggle" id="theme-toggle" aria-label="다크 모드 전환"></button>
+    <span class="toggle-icon">🌙</span>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-group">
+    <div class="nav-group-label">Getting Started</div>
+    <button class="nav-item active" data-page="overview">Overview</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Foundations</div>
+    <button class="nav-item" data-page="logo">Logo</button>
+    <button class="nav-item" data-page="colors">Colors</button>
+    <button class="nav-item" data-page="typography">Typography</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Components</div>
+    <button class="nav-item" data-page="buttons">Buttons</button>
+    <button class="nav-item" data-page="inputs">Inputs</button>
+    <button class="nav-item" data-page="cards">Cards</button>
+    <button class="nav-item" data-page="tables">Tables</button>
+    <button class="nav-item" data-page="status">Status</button>
+    <button class="nav-item" data-page="stepper">Stepper</button>
+    <button class="nav-item" data-page="charts">Charts</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Reference</div>
+    <button class="nav-item" data-page="downloads">Downloads</button>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<main class="content">
+
+<!-- ══ OVERVIEW ══ -->
+<div class="page active" id="page-overview">
+  <p class="page-title">Design System</p>
+  <p class="page-desc">사내 HTML 산출물의 시각 통일을 위한 디자인 가이드입니다.<br>웹 대시보드(타입 A)와 1920×1080 보고문서(타입 B) 두 가지 타입을 지원합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">용도별 타입 선택</p>
+    <table class="tbl">
+      <thead><tr><th>타입</th><th>용도</th><th>파일 형태</th><th>결정 기준</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="badge b-wip">타입 A</span></td>
+          <td>웹사이트 빌드, 대시보드, 내부 툴</td>
+          <td>HTML (반응형)</td>
+          <td>화면에서 스크롤하며 보는 산출물</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-ok" style="background:rgba(107,189,27,.1);color:#4a8c10;">타입 B</span></td>
+          <td>보고문서, 임원 보고, PDF 출력</td>
+          <td>HTML 1920×1080 고정</td>
+          <td>한 페이지 출력·인쇄하는 산출물</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">공통 원칙</p>
+    <div class="info-box"><strong>폰트:</strong> Pretendard 기본. 굵기는 Regular(400) · SemiBold(600) · Bold(700) 세 가지만 사용.</div>
+    <div class="info-box"><strong>텍스트 컬러:</strong> Gray 500(#A0A0A0) 이상 또는 배경 대비 3:1 이상만 허용.</div>
+    <div class="info-box"><strong>컬러 원칙:</strong> 키 컬러와 상태 컬러는 의미 단위로만 사용. 장식 목적 금지.</div>
+  </div>
+</div>
+
+<!-- ══ LOGO ══ -->
+<div class="page" id="page-logo">
+  <p class="page-title">Logo</p>
+  <p class="page-desc">회사 CI 로고 사용 가이드입니다. 보고문서나 대시보드 HTML 페이지에 로고를 삽입할 때 이 가이드를 참고하세요.<br>Basic Logo(기본형)와 Horizontal Logo(가로형) 두 가지 레이아웃, 각각 Box ver / Lined ver을 지원합니다.</p>
+
+  <!-- Basic Logo -->
+  <div class="sc">
+    <p class="sc-title">Basic Logo</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+
+      <!-- LOGO -->
+      <div style="padding:28px 24px 28px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);">
+        <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px;">LOGO</p>
+        <img class="logo-light" src="https://www.figma.com/api/mcp/asset/e53a592c-cc46-4940-8628-096576da488e"
+             alt="회사 CI 기본 로고" width="94" height="57" style="image-rendering:auto;">
+        <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/55dc24d2-bd4d-4bab-bfae-3255d7048df8"
+             alt="회사 CI 기본 로고 (다크)" width="94" height="57" style="image-rendering:auto;">
+      </div>
+
+      <!-- Clear Space -->
+      <div style="padding:28px 24px 28px;border-bottom:1px solid var(--bd);">
+        <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px;">Clear Space</p>
+        <img class="logo-light" src="https://www.figma.com/api/mcp/asset/656ab54d-3dd0-4370-8c40-5244a3afc28e"
+             alt="회사 CI 기본 로고 Clear Space" width="126" height="89" style="image-rendering:auto;">
+        <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/5696e72a-5053-4ae7-9a0e-0a117b2b8485"
+             alt="회사 CI 기본 로고 Clear Space (다크)" width="126" height="89" style="image-rendering:auto;">
+        <p style="font-size:11px;color:var(--t3);margin-top:12px;">로고 주위 최소 여백 = 로고 높이의 <strong>1/4</strong> 이상</p>
+      </div>
+
+      <!-- Box ver -->
+      <div style="padding:28px 24px 28px;border-right:1px solid var(--bd);">
+        <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px;">Box ver</p>
+        <img class="logo-light" src="https://www.figma.com/api/mcp/asset/655a487e-f017-4100-9c22-45f17b77714e"
+             alt="회사 CI 기본 로고 Box ver" width="126" height="88" style="image-rendering:auto;">
+        <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/103deee8-4114-4340-8925-06e2812702ab"
+             alt="회사 CI 기본 로고 Box ver (다크)" width="126" height="88" style="image-rendering:auto;">
+      </div>
+
+      <!-- Lined ver -->
+      <div style="padding:28px 24px 28px;">
+        <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px;">Lined ver</p>
+        <img class="logo-light" src="https://www.figma.com/api/mcp/asset/e04a8f00-4fcb-4fc7-a3cb-e97c11f5ec77"
+             alt="회사 CI 기본 로고 Lined ver" width="127" height="90" style="image-rendering:auto;">
+        <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/672b4e39-51ec-4360-8afc-504d352fdc7f"
+             alt="회사 CI 기본 로고 Lined ver (다크)" width="127" height="90" style="image-rendering:auto;">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Horizontal Logo -->
+  <div class="sc">
+    <p class="sc-title">Horizontal Logo</p>
+    <div style="display:grid;grid-template-columns:1fr;gap:0;">
+
+      <!-- LOGO -->
+      <div style="padding:24px;border-bottom:1px solid var(--bd);">
+        <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;">LOGO</p>
+        <img class="logo-light" src="https://www.figma.com/api/mcp/asset/bed69cbf-a2e6-4238-a937-9ab0ae6e39c9"
+             alt="회사 CI 가로형 로고" width="262" height="14" style="image-rendering:auto;">
+        <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/21b784aa-776b-471a-b85c-91c0ff03a083"
+             alt="회사 CI 가로형 로고 (다크)" width="262" height="14" style="image-rendering:auto;">
+        <p style="font-size:11px;color:var(--t3);margin-top:12px;">가로 배치가 필요한 경우 Horizontal 로고를 사용합니다.</p>
+      </div>
+
+      <!-- Clear Space -->
+      <div style="padding:24px;border-bottom:1px solid var(--bd);">
+        <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;">Clear Space</p>
+        <img class="logo-light" src="https://www.figma.com/api/mcp/asset/c1faa9c8-d30c-4592-8260-e4b49e48fcba"
+             alt="회사 CI 가로형 로고 Clear Space" width="291" height="43" style="image-rendering:auto;">
+        <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/0dfa919d-7489-4ca1-9e3f-d4686b2876c9"
+             alt="회사 CI 가로형 로고 Clear Space (다크)" width="292" height="43" style="image-rendering:auto;">
+      </div>
+
+      <!-- Box ver + Lined ver -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+        <div style="padding:24px;border-right:1px solid var(--bd);">
+          <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;">Box ver</p>
+          <img class="logo-light" src="https://www.figma.com/api/mcp/asset/087674ce-e9fe-446b-9824-833bc1bc3e66"
+               alt="회사 CI 가로형 Box ver" width="291" height="42" style="image-rendering:auto;">
+          <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/52f29f19-48e9-4723-87ad-0e1ac83fcea0"
+               alt="회사 CI 가로형 Box ver (다크)" width="291" height="43" style="image-rendering:auto;">
+        </div>
+        <div style="padding:24px;">
+          <p style="font-size:11px;color:var(--t4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;">Lined ver</p>
+          <img class="logo-light" src="https://www.figma.com/api/mcp/asset/afbfb110-f829-47b2-a162-9df19cf1bf1f"
+               alt="회사 CI 가로형 Lined ver" width="293" height="44" style="image-rendering:auto;">
+          <img class="logo-dark" src="https://www.figma.com/api/mcp/asset/8b0aa13d-3deb-4d37-87ec-5071f8b4f821"
+               alt="회사 CI 가로형 Lined ver (다크)" width="293" height="44" style="image-rendering:auto;">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HTML 삽입 방법 -->
+  <div class="sc">
+    <p class="sc-title">보고문서 / 대시보드 삽입 방법</p>
+    <div class="info-box">로고 이미지 파일은 사내 공유 폴더 또는 CDN에 업로드 후 아래 코드를 참고해 삽입하세요.</div>
+
+    <p style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;">Basic Logo — 상단 헤더 좌측 배치 예시 (웹 대시보드)</p>
+    <div class="code"><span class="ct">&lt;header</span> <span class="ca">style</span>="display:flex;align-items:center;gap:16px;padding:20px 40px;border-bottom:1px solid #EBEDEE;"<span class="ct">&gt;</span>
+  <span class="ct">&lt;img</span> <span class="ca">src</span>="./assets/logo.png" <span class="ca">alt</span>="회사 로고"
+       <span class="ca">style</span>="height:40px;width:auto;" <span class="ct">/&gt;</span>
+  <span class="ct">&lt;span</span> <span class="ca">style</span>="font-size:16px;font-weight:700;color:#111;"<span class="ct">&gt;</span>페이지 제목<span class="ct">&lt;/span&gt;</span>
+<span class="ct">&lt;/header&gt;</span></div>
+
+    <p style="font-size:12px;font-weight:600;color:var(--t2);margin:16px 0 6px;">Horizontal Logo — 1920×1080 보고문서 좌상단 배치 예시</p>
+    <div class="code"><span class="cc">/* 보고문서 좌상단 고정 */</span>
+<span class="ct">&lt;div</span> <span class="ca">style</span>="position:absolute;top:40px;left:108px;"<span class="ct">&gt;</span>
+  <span class="ct">&lt;img</span> <span class="ca">src</span>="./assets/logo-horizontal.png" <span class="ca">alt</span>="회사 로고"
+       <span class="ca">style</span>="height:22px;width:auto;" <span class="ct">/&gt;</span>
+<span class="ct">&lt;/div&gt;</span></div>
+  </div>
+
+  <!-- 사용 규칙 -->
+  <div class="sc">
+    <p class="sc-title">사용 규칙</p>
+    <table class="tbl">
+      <thead><tr><th>항목</th><th>규칙</th></tr></thead>
+      <tbody>
+        <tr><td>최소 크기</td><td>Basic: 높이 <code>40px</code> 이상 / Horizontal: 높이 <code>20px</code> 이상</td></tr>
+        <tr><td>Clear Space</td><td>로고 주위 최소 여백 = 로고 높이의 <code>1/4</code> 이상 확보</td></tr>
+        <tr><td>배경 컬러</td><td>밝은 배경 → 검정 기본형 / 어두운 배경 → 흰색 반전 버전 사용</td></tr>
+        <tr><td>변형 금지</td><td>비율 변형, 회전, 색상 임의 변경, 그림자·외곽선 추가 금지</td></tr>
+        <tr><td>버전 선택</td><td>정사각형 공간 → Basic / 가로 헤더·배너 → Horizontal</td></tr>
+        <tr><td>Box / Lined</td><td>강조 필요 → Box ver / 여백 충분 → Lined ver</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ COLORS ══ -->
+<div class="page" id="page-colors">
+  <p class="page-title">Colors</p>
+  <p class="page-desc">그레이 스케일, 키 컬러, 상태 컬러로 구성된 시스템입니다. 모든 컬러는 의미를 가지며 장식 목적으로 사용하지 않습니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">Gray Scale — 11단계</p>
+    <div class="palette">
+      <div class="swatch"><div class="sw-color" style="background:#F6F8FA;"></div><div class="sw-info"><span class="sw-step">100</span><span class="sw-hex">#F6F8FA</span><span class="sw-note">페이지 배경</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#F0F2F4;"></div><div class="sw-info"><span class="sw-step">150</span><span class="sw-hex">#F0F2F4</span><span class="sw-note">박스·구분선</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#EBEDEE;"></div><div class="sw-info"><span class="sw-step">200</span><span class="sw-hex">#EBEDEE</span><span class="sw-note">경계선</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#DCDEE0;"></div><div class="sw-info"><span class="sw-step">250</span><span class="sw-hex">#DCDEE0</span><span class="sw-note">강한 선</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#C8CACC;"></div><div class="sw-info"><span class="sw-step">300</span><span class="sw-hex">#C8CACC</span><span class="sw-note">—</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#BBBBBB;"></div><div class="sw-info"><span class="sw-step">400</span><span class="sw-hex">#BBBBBB</span><span class="sw-note">—</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#A0A0A0;"></div><div class="sw-info" style="background:#A0A0A0;"><span class="sw-step" style="color:#fff;">500</span><span class="sw-hex" style="color:#fff;">#A0A0A0</span><span class="sw-note" style="color:rgba(255,255,255,.7);">텍스트 최소</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#888888;"></div><div class="sw-info" style="background:#888;"><span class="sw-step" style="color:#fff;">600</span><span class="sw-hex" style="color:#fff;">#888888</span><span class="sw-note" style="color:rgba(255,255,255,.7);">보조</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#616161;"></div><div class="sw-info" style="background:#616161;"><span class="sw-step" style="color:#fff;">700</span><span class="sw-hex" style="color:#fff;">#616161</span><span class="sw-note" style="color:rgba(255,255,255,.7);">설명</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#3F3F3F;"></div><div class="sw-info" style="background:#3F3F3F;"><span class="sw-step" style="color:#fff;">800</span><span class="sw-hex" style="color:#fff;">#3F3F3F</span><span class="sw-note" style="color:rgba(255,255,255,.7);">—</span></div></div>
+      <div class="swatch"><div class="sw-color" style="background:#111111;"></div><div class="sw-info" style="background:#111;"><span class="sw-step" style="color:#fff;">900</span><span class="sw-hex" style="color:#fff;">#111111</span><span class="sw-note" style="color:rgba(255,255,255,.7);">Primary</span></div></div>
+    </div>
+    <p style="font-size:11px;color:var(--t3);margin-top:10px;">* 텍스트는 <strong>500 이상</strong>만. 100–400은 배경·구분선 전용.</p>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Key Colors — 브랜드 포인트 3색</p>
+    <div class="key-swatches" style="margin-bottom:20px;">
+      <div class="ks"><div class="ks-block" style="background:#6BBD1B;"></div><span class="ks-name">Green (Key)</span><span class="ks-hex">#6BBD1B</span></div>
+      <div class="ks"><div class="ks-block" style="background:#397AF2;"></div><span class="ks-name">Blue (Primary)</span><span class="ks-hex">#397AF2</span></div>
+      <div class="ks"><div class="ks-block" style="background:#EE8800;"></div><span class="ks-name">Orange (Accent)</span><span class="ks-hex">#EE8800</span></div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>이름</th><th>Hex</th><th>용도</th><th>사용 예</th></tr></thead>
+      <tbody>
+        <tr><td>Green</td><td><code>#6BBD1B</code></td><td>긍정 액션, 완료</td><td>완료 버튼, 성공 강조</td></tr>
+        <tr><td>Blue</td><td><code>#397AF2</code></td><td>주요 액션, CTA</td><td>Primary 버튼, 링크, 포커스 링</td></tr>
+        <tr><td>Orange</td><td><code>#EE8800</code></td><td>경고, 주의</td><td>Warning 아이콘, 알림 배지</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Status Colors — 5가지 상태</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+      <span class="badge b-ok">정상</span>
+      <span class="badge b-wait">대기</span>
+      <span class="badge b-rev">검토 필요</span>
+      <span class="badge b-urg">긴급</span>
+      <span class="badge b-wip">진행중</span>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>상태</th><th>Text</th><th>Background</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge b-ok">정상</span></td><td><code>#1BB400</code></td><td><code>rgba(27,180,0,.10)</code></td></tr>
+        <tr><td><span class="badge b-wait">대기</span></td><td><code>#616161</code></td><td><code>rgba(97,97,97,.10)</code></td></tr>
+        <tr><td><span class="badge b-rev">검토 필요</span></td><td><code>#F77911</code></td><td><code>rgba(247,121,17,.10)</code></td></tr>
+        <tr><td><span class="badge b-urg">긴급</span></td><td><code>#E5172F</code></td><td><code>rgba(229,23,47,.10)</code></td></tr>
+        <tr><td><span class="badge b-wip">진행중</span></td><td><code>#4270ED</code></td><td><code>rgba(66,112,237,.10)</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ TYPOGRAPHY ══ -->
+<div class="page" id="page-typography">
+  <p class="page-title">Typography</p>
+  <p class="page-desc">Pretendard 서체 기반. 용도에 따라 타입 A(웹/대시보드)와 타입 B(보고문서) 스케일을 분리 적용합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">타입 A — 웹 / 대시보드 스케일</p>
+    <div class="typo-row"><span class="typo-lbl">Heading 1</span><span class="typo-meta">24px · 700 · LH 150%</span><span style="font-size:24px;font-weight:700;line-height:1.5;color:var(--t1);">페이지 대제목</span></div>
+    <div class="typo-row"><span class="typo-lbl">Heading 2</span><span class="typo-meta">20px · 700 · LH 150%</span><span style="font-size:20px;font-weight:700;line-height:1.5;color:var(--t1);">섹션 제목</span></div>
+    <div class="typo-row"><span class="typo-lbl">Body 1</span><span class="typo-meta">16px · 400 · LH 150%</span><span style="font-size:16px;font-weight:400;line-height:1.5;color:var(--t1);">일반 본문, 폼 필드, 디폴트 텍스트</span></div>
+    <div class="typo-row"><span class="typo-lbl">Body 2</span><span class="typo-meta">14px · 400 · LH 150%</span><span style="font-size:14px;font-weight:400;line-height:1.5;color:var(--t1);">보조 본문, 리스트, 설명 텍스트</span></div>
+    <div class="typo-row"><span class="typo-lbl">Sub 1</span><span class="typo-meta">12px · 400 · LH 150%</span><span style="font-size:12px;font-weight:400;line-height:1.5;color:var(--t1);">캡션, 메타 정보, 입력 안내</span></div>
+    <div class="typo-row"><span class="typo-lbl">Sub 2</span><span class="typo-meta">11px · 400 · LH 140%</span><span style="font-size:11px;font-weight:400;line-height:1.4;color:var(--t1);">최소 텍스트, 라벨</span></div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">타입 B — 1920×1080 보고문서 스케일</p>
+    <div class="typo-row"><span class="typo-lbl">Heading 1</span><span class="typo-meta">40px · 700 · LH 145% · LS -0.5%</span><span style="font-size:36px;font-weight:700;line-height:1.45;letter-spacing:-.005em;color:var(--t1);">보고 대제목</span></div>
+    <div class="typo-row"><span class="typo-lbl">Heading 2</span><span class="typo-meta">32px · 700 · LH 150%</span><span style="font-size:28px;font-weight:700;line-height:1.5;color:var(--t1);">섹션 제목</span></div>
+    <div class="typo-row"><span class="typo-lbl">Heading 3</span><span class="typo-meta">24px · 700 · LH 150%</span><span style="font-size:24px;font-weight:700;line-height:1.5;color:var(--t1);">소제목</span></div>
+    <div class="typo-row"><span class="typo-lbl">Body 1</span><span class="typo-meta">20px · 400 · LH 150%</span><span style="font-size:20px;font-weight:400;line-height:1.5;color:var(--t1);">강조 본문</span></div>
+    <div class="typo-row"><span class="typo-lbl">Body 2</span><span class="typo-meta">18px · 400 · LH 150%</span><span style="font-size:18px;font-weight:400;line-height:1.5;color:var(--t1);">일반 본문</span></div>
+    <div class="typo-row"><span class="typo-lbl">Body 3</span><span class="typo-meta">16px · 400 · LH 150%</span><span style="font-size:16px;font-weight:400;line-height:1.5;color:var(--t1);">보조 본문</span></div>
+    <div class="typo-row"><span class="typo-lbl">Sub 1</span><span class="typo-meta">14px · 400 · LH 150%</span><span style="font-size:14px;font-weight:400;line-height:1.5;color:var(--t2);">캡션, 각주</span></div>
+    <div class="typo-row"><span class="typo-lbl">Sub 2</span><span class="typo-meta">12px · 400 · LH 150%</span><span style="font-size:12px;font-weight:400;line-height:1.5;color:var(--t3);">최소 텍스트</span></div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">폰트 가중치 사용 규칙</p>
+    <table class="tbl">
+      <thead><tr><th>Weight</th><th>값</th><th>사용처</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:400;">Regular</td><td><code>400</code></td><td>본문, 설명, 캡션</td></tr>
+        <tr><td style="font-weight:600;">SemiBold</td><td><code>600</code></td><td>테이블 헤더, 라벨, 강조 본문</td></tr>
+        <tr><td style="font-weight:700;">Bold</td><td><code>700</code></td><td>제목(Heading), KPI 숫자, 버튼</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box" style="margin-top:14px;margin-bottom:0;"><strong>원칙:</strong> 위 3가지 외 굵기(100·200·300·500·800·900)는 사용하지 않습니다.</div>
+  </div>
+</div>
+
+<!-- ══ BUTTONS ══ -->
+<div class="page" id="page-buttons">
+  <p class="page-title">Buttons</p>
+  <p class="page-desc">Primary · Secondary · Ghost · Danger 4가지 Variant와 Small · Medium · Large 3가지 Size를 지원합니다. 버튼 컬러는 의미를 기반으로 선택하세요.</p>
+
+  <div class="sc">
+    <p class="sc-title">Variant</p>
+    <div class="preview" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+      <button class="btn btn-primary btn-md">Primary</button>
+      <button class="btn btn-secondary btn-md">Secondary</button>
+      <button class="btn btn-ghost btn-md">Ghost</button>
+      <button class="btn btn-danger btn-md">Danger</button>
+      <button class="btn btn-success btn-md">Success</button>
+    </div>
+    <table class="tbl" style="margin-top:16px;">
+      <thead><tr><th>Variant</th><th>용도</th><th>배경</th><th>텍스트</th></tr></thead>
+      <tbody>
+        <tr><td><button class="btn btn-primary btn-sm">Primary</button></td><td>주요 CTA, 저장, 확인</td><td><code>#397AF2</code></td><td><code>#fff</code></td></tr>
+        <tr><td><button class="btn btn-secondary btn-sm">Secondary</button></td><td>보조 액션, 취소</td><td><code>#F0F2F4</code></td><td><code>#616161</code></td></tr>
+        <tr><td><button class="btn btn-ghost btn-sm">Ghost</button></td><td>경계 강조, 선택적 액션</td><td>transparent</td><td><code>#397AF2</code></td></tr>
+        <tr><td><button class="btn btn-danger btn-sm">Danger</button></td><td>삭제, 비가역적 행동</td><td>transparent</td><td><code>#E5172F</code></td></tr>
+        <tr><td><button class="btn btn-success btn-sm">Success</button></td><td>완료, 승인</td><td>transparent</td><td><code>#1BB400</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Size</p>
+    <div class="preview" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+      <button class="btn btn-primary btn-sm">Small (sm)</button>
+      <button class="btn btn-primary btn-md">Medium (md)</button>
+      <button class="btn btn-primary btn-lg">Large (lg)</button>
+    </div>
+    <table class="tbl" style="margin-top:16px;">
+      <thead><tr><th>Size</th><th>Font</th><th>Padding</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td><code>sm</code></td><td>12px</td><td>6px 12px</td><td>테이블 내 인라인 액션, 태그</td></tr>
+        <tr><td><code>md</code></td><td>13px</td><td>9px 18px</td><td>폼, 대화상자, 일반 UI — 기본값</td></tr>
+        <tr><td><code>lg</code></td><td>15px</td><td>12px 24px</td><td>페이지 메인 CTA, 히어로 영역</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">States</p>
+    <div class="preview" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+      <button class="btn btn-primary btn-md">Normal</button>
+      <button class="btn btn-primary btn-md" disabled>Disabled</button>
+      <button class="btn btn-secondary btn-md" disabled>Disabled</button>
+    </div>
+    <p style="font-size:12px;color:var(--t3);margin-top:10px;">* Disabled 상태는 <code>opacity: 0.4</code>를 적용하며 <code>cursor: not-allowed</code>로 상호작용을 차단합니다.</p>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">CSS 스니펫</p>
+    <div class="code"><span class="ck">.btn</span> {
+  display: <span class="cv">inline-flex</span>;
+  align-items: <span class="cv">center</span>;
+  border: <span class="cv">none</span>;
+  border-radius: <span class="cv">8px</span>;
+  font-family: <span class="cv">"Pretendard", sans-serif</span>;
+  font-weight: <span class="cv">500</span>;
+  cursor: <span class="cv">pointer</span>;
+  transition: <span class="cv">filter .15s, opacity .15s</span>;
+}
+<span class="ck">.btn-primary</span> { background: <span class="cv">#397AF2</span>; color: <span class="cv">#fff</span>; padding: <span class="cv">9px 18px</span>; font-size: <span class="cv">13px</span>; }
+<span class="ck">.btn-primary:hover</span> { filter: <span class="cv">brightness(1.08)</span>; }
+<span class="ck">.btn:disabled</span> { opacity: <span class="cv">.4</span>; cursor: <span class="cv">not-allowed</span>; }</div>
+  </div>
+</div>
+
+<!-- ══ INPUTS ══ -->
+<div class="page" id="page-inputs">
+  <p class="page-title">Inputs</p>
+  <p class="page-desc">텍스트 입력, 셀렉트, 텍스트에어리어 3종. 상태는 Default · Focus · Error · Disabled 4가지입니다. 높이는 38px로 통일합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">Text Input — States</p>
+    <div class="demo-grid cols-2">
+      <div class="inp-wrap">
+        <label class="inp-label">Default</label>
+        <input class="inp" type="text" placeholder="텍스트를 입력하세요">
+        <span class="inp-hint">Sub 1 (12px) 힌트 텍스트</span>
+      </div>
+      <div class="inp-wrap">
+        <label class="inp-label">Focus (클릭해 확인)</label>
+        <input class="inp" type="text" placeholder="포커스 상태">
+      </div>
+      <div class="inp-wrap">
+        <label class="inp-label">Error</label>
+        <input class="inp inp-error" type="text" value="잘못된 입력">
+        <span class="inp-err">입력값을 확인해 주세요.</span>
+      </div>
+      <div class="inp-wrap">
+        <label class="inp-label">Disabled</label>
+        <input class="inp" type="text" placeholder="비활성화" disabled>
+        <span class="inp-hint">수정 불가 상태입니다.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Select & Textarea</p>
+    <div class="demo-grid cols-2">
+      <div class="inp-wrap">
+        <label class="inp-label">Select</label>
+        <select class="inp">
+          <option value="">항목을 선택하세요</option>
+          <option>인사팀</option>
+          <option>기획팀</option>
+          <option>개발팀</option>
+        </select>
+      </div>
+      <div class="inp-wrap">
+        <label class="inp-label">Select — Disabled</label>
+        <select class="inp" disabled>
+          <option>선택 불가</option>
+        </select>
+      </div>
+      <div class="inp-wrap" style="grid-column:1/-1;">
+        <label class="inp-label">Textarea</label>
+        <textarea class="inp" placeholder="상세 내용을 입력하세요…"></textarea>
+        <span class="inp-hint">최대 500자</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Input Spec</p>
+    <table class="tbl">
+      <thead><tr><th>속성</th><th>값</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>높이</td><td><code>38px</code></td><td>버튼 md(36px)와 근접 정렬</td></tr>
+        <tr><td>패딩</td><td><code>0 12px</code></td><td>내부 여백 8px grid 기준</td></tr>
+        <tr><td>Border</td><td><code>1px solid #DCDEE0</code></td><td>Gray 250 — 박스 윤곽 최소</td></tr>
+        <tr><td>Focus ring</td><td><code>0 0 0 3px rgba(57,122,242,.12)</code></td><td>Blue Primary 12% 투명도</td></tr>
+        <tr><td>Border-radius</td><td><code>8px</code></td><td>r-md 토큰</td></tr>
+        <tr><td>Font</td><td>13px / Regular / #111</td><td>Body 2 수준</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ CARDS ══ -->
+<div class="page" id="page-cards">
+  <p class="page-title">Cards</p>
+  <p class="page-desc">KPI 카드, 콘텐츠 카드, 리스트 카드 3종. 배경 #fff · 테두리 1px #EBEDEE · border-radius 12px를 기본으로 합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">KPI Card — 수치 강조형</p>
+    <div class="demo-grid cols-3">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <span class="card-label">월간 완료 건수</span>
+          <span class="badge b-ok">정상</span>
+        </div>
+        <div class="card-stat">1,248</div>
+        <div class="card-sub">전월 대비 +12.4%</div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <span class="card-label">검토 대기</span>
+          <span class="badge b-rev">검토 필요</span>
+        </div>
+        <div class="card-stat">37</div>
+        <div class="card-sub">전월 대비 +5건</div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <span class="card-label">긴급 처리</span>
+          <span class="badge b-urg">긴급</span>
+        </div>
+        <div class="card-stat" style="color:var(--s-urg);">3</div>
+        <div class="card-sub">즉시 확인 필요</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Content Card — 텍스트 정보형</p>
+    <div class="demo-grid cols-2">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;">2026 상반기 채용 계획</div>
+            <div style="font-size:12px;color:var(--t3);">2026-05-27 · 인사팀</div>
+          </div>
+          <span class="badge b-wip">진행중</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.6;">신규 채용 인원 목표 및 직무별 채용 일정 계획서. 각 팀장과 협의 후 최종 확정 예정입니다.</p>
+        <div style="margin-top:14px;display:flex;gap:6px;">
+          <span class="tag">채용</span><span class="tag">2026</span><span class="tag">HR</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;">복리후생 제도 개선안</div>
+            <div style="font-size:12px;color:var(--t3);">2026-05-26 · 이서연</div>
+          </div>
+          <span class="badge b-ok">정상</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.6;">구성원 만족도 조사 결과를 바탕으로 복리후생 항목을 개선한 제안서입니다.</p>
+        <div style="margin-top:14px;display:flex;gap:6px;">
+          <span class="tag">복리후생</span><span class="tag">만족도</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Card Spec</p>
+    <table class="tbl">
+      <thead><tr><th>속성</th><th>값</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>Background</td><td><code>#ffffff</code></td><td>surf 토큰</td></tr>
+        <tr><td>Border</td><td><code>1px solid #EBEDEE</code></td><td>Gray 200</td></tr>
+        <tr><td>Border-radius</td><td><code>12px</code></td><td>r-lg 토큰</td></tr>
+        <tr><td>Padding</td><td><code>20px</code></td><td>내부 여백</td></tr>
+        <tr><td>Shadow</td><td>없음 (border만)</td><td>데이터 중심 UI, 장식 최소화</td></tr>
+        <tr><td>Hover</td><td>선택적 <code>box-shadow var(--sh)</code></td><td>클릭 가능한 카드만</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ TABLES ══ -->
+<div class="page" id="page-tables">
+  <p class="page-title">Tables</p>
+  <p class="page-desc">데이터 테이블의 기본 스타일. 헤더 배경 Gray 100, 행 구분선 Gray 100, 홀짝 음영 없이 선으로만 구분합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">Standard Table</p>
+    <div style="border-radius:var(--r3);overflow:hidden;border:1px solid var(--bd);">
+      <div style="padding:14px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:14px;font-weight:700;color:var(--t1);">문서 목록</span>
+        <button class="btn btn-primary btn-sm">+ 새 문서</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;background:var(--surf);">
+        <thead>
+          <tr style="background:var(--surf2);">
+            <th style="padding:10px 20px;text-align:left;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);">문서명</th>
+            <th style="padding:10px 20px;text-align:left;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);">담당자</th>
+            <th style="padding:10px 20px;text-align:left;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);">상태</th>
+            <th style="padding:10px 20px;text-align:left;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);">수정일</th>
+            <th style="padding:10px 20px;text-align:left;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);">작업</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t1);font-weight:500;">2026 하반기 채용 계획</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t2);">김민준</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);"><span class="badge b-wip">진행중</span></td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t3);">2026-05-27</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);"><button class="btn btn-secondary btn-sm">편집</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t1);font-weight:500;">복리후생 개선안 v2</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t2);">이서연</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);"><span class="badge b-ok">정상</span></td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t3);">2026-05-26</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);"><button class="btn btn-secondary btn-sm">편집</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t1);font-weight:500;">성과 평가 기준 검토</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t2);">박지후</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);"><span class="badge b-wait">대기</span></td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);color:var(--t3);">2026-05-25</td>
+            <td style="padding:10px 20px;border-bottom:1px solid var(--bd);"><button class="btn btn-secondary btn-sm">편집</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 20px;color:var(--t1);font-weight:500;">규정 위반 보고서</td>
+            <td style="padding:10px 20px;color:var(--t2);">최유진</td>
+            <td style="padding:10px 20px;"><span class="badge b-urg">긴급</span></td>
+            <td style="padding:10px 20px;color:var(--t3);">2026-05-24</td>
+            <td style="padding:10px 20px;"><button class="btn btn-danger btn-sm">처리</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Table Spec</p>
+    <table class="tbl">
+      <thead><tr><th>요소</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>헤더 배경</td><td><code>var(--surf2)</code> — Gray 150</td></tr>
+        <tr><td>헤더 폰트</td><td>12px · SemiBold · Gray 700</td></tr>
+        <tr><td>셀 패딩</td><td><code>10px 20px</code></td></tr>
+        <tr><td>행 구분선</td><td><code>1px solid var(--bd)</code> — Gray 200</td></tr>
+        <tr><td>본문 폰트</td><td>13px · Regular · Gray 900</td></tr>
+        <tr><td>Hover</td><td>선택적 <code>background: var(--hover)</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ STATUS ══ -->
+<div class="page" id="page-status">
+  <p class="page-title">Status</p>
+  <p class="page-desc">5가지 상태를 Badge 형태로 표현합니다. 배경은 해당 텍스트 컬러의 10% 불투명도를 적용해 부드럽게 처리합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">Live Preview</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+      <span class="badge b-ok">정상</span>
+      <span class="badge b-wait">대기</span>
+      <span class="badge b-rev">검토 필요</span>
+      <span class="badge b-urg">긴급</span>
+      <span class="badge b-wip">진행중</span>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>상태</th><th>의미</th><th>텍스트</th><th>배경</th><th>CSS 클래스</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge b-ok">정상</span></td><td>정상 처리 완료</td><td><code>#1BB400</code></td><td><code>rgba(27,180,0,.10)</code></td><td><code>.b-ok</code></td></tr>
+        <tr><td><span class="badge b-wait">대기</span></td><td>처리 대기 중</td><td><code>#616161</code></td><td><code>rgba(97,97,97,.10)</code></td><td><code>.b-wait</code></td></tr>
+        <tr><td><span class="badge b-rev">검토 필요</span></td><td>검토 요청</td><td><code>#F77911</code></td><td><code>rgba(247,121,17,.10)</code></td><td><code>.b-rev</code></td></tr>
+        <tr><td><span class="badge b-urg">긴급</span></td><td>즉각 처리 필요</td><td><code>#E5172F</code></td><td><code>rgba(229,23,47,.10)</code></td><td><code>.b-urg</code></td></tr>
+        <tr><td><span class="badge b-wip">진행중</span></td><td>현재 처리 중</td><td><code>#4270ED</code></td><td><code>rgba(66,112,237,.10)</code></td><td><code>.b-wip</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">CSS 스니펫</p>
+    <div class="code"><span class="ck">.badge</span> {
+  display: <span class="cv">inline-flex</span>;
+  align-items: <span class="cv">center</span>;
+  padding: <span class="cv">5px 10px</span>;
+  border-radius: <span class="cv">4px</span>;
+  font-size: <span class="cv">12px</span>;
+  font-weight: <span class="cv">400</span>;
+  line-height: <span class="cv">normal</span>;
+  white-space: <span class="cv">nowrap</span>;
+}
+<span class="ck">.b-ok</span>   { color: <span class="cv">#1BB400</span>; background: <span class="cv">rgba(27,180,0,.10)</span>; }
+<span class="ck">.b-wait</span> { color: <span class="cv">#616161</span>; background: <span class="cv">rgba(97,97,97,.10)</span>; }
+<span class="ck">.b-rev</span>  { color: <span class="cv">#F77911</span>; background: <span class="cv">rgba(247,121,17,.10)</span>; }
+<span class="ck">.b-urg</span>  { color: <span class="cv">#E5172F</span>; background: <span class="cv">rgba(229,23,47,.10)</span>; }
+<span class="ck">.b-wip</span>  { color: <span class="cv">#4270ED</span>; background: <span class="cv">rgba(66,112,237,.10)</span>; }</div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">사용 규칙</p>
+    <table class="tbl">
+      <thead><tr><th>원칙</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>의미 일관성</td><td>동일한 데이터 도메인에서는 항상 같은 상태 컬러를 사용합니다.</td></tr>
+        <tr><td>배치</td><td>테이블 셀, 카드 상단 우측, 리스트 아이템 우측에 배치합니다.</td></tr>
+        <tr><td>혼용 금지</td><td>같은 행·카드에 2개 이상의 Badge를 사용하지 않습니다.</td></tr>
+        <tr><td>커스텀</td><td>위 5가지 외 컬러 조합은 사용하지 않습니다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ STEPPER ══ -->
+<div class="page" id="page-stepper">
+  <p class="page-title">Stepper</p>
+  <p class="page-desc">다단계 프로세스의 진행 상태를 시각화합니다. 완료(Done) · 진행(Active) · 대기(Pending) 3가지 상태를 지원합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">Horizontal Stepper — 4단계 예시</p>
+    <div class="preview" style="padding:32px 24px;">
+      <div class="stepper">
+        <div class="step step-done">
+          <div class="step-circle">✓</div>
+          <div class="step-label">접수<br><span style="color:var(--t4);font-size:10px;">완료</span></div>
+        </div>
+        <div class="step step-done">
+          <div class="step-circle">✓</div>
+          <div class="step-label">검토<br><span style="color:var(--t4);font-size:10px;">완료</span></div>
+        </div>
+        <div class="step step-active">
+          <div class="step-circle">3</div>
+          <div class="step-label">승인<br><span style="color:var(--c-blue);font-size:10px;">진행중</span></div>
+        </div>
+        <div class="step">
+          <div class="step-circle">4</div>
+          <div class="step-label">완료<br><span style="color:var(--t4);font-size:10px;">대기</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">3단계 / 5단계 예시</p>
+    <div class="preview" style="padding:28px 24px;display:flex;flex-direction:column;gap:32px;">
+      <!-- 3단계 -->
+      <div>
+        <p style="font-size:11px;color:var(--t4);margin-bottom:16px;">3-step — 모두 완료</p>
+        <div class="stepper">
+          <div class="step step-done"><div class="step-circle">✓</div><div class="step-label">제출</div></div>
+          <div class="step step-done"><div class="step-circle">✓</div><div class="step-label">검토</div></div>
+          <div class="step step-done"><div class="step-circle">✓</div><div class="step-label">확정</div></div>
+        </div>
+      </div>
+      <!-- 5단계 -->
+      <div>
+        <p style="font-size:11px;color:var(--t4);margin-bottom:16px;">5-step — 2단계 진행중</p>
+        <div class="stepper">
+          <div class="step step-done"><div class="step-circle">✓</div><div class="step-label">작성</div></div>
+          <div class="step step-active"><div class="step-circle">2</div><div class="step-label">검토</div></div>
+          <div class="step"><div class="step-circle">3</div><div class="step-label">승인</div></div>
+          <div class="step"><div class="step-circle">4</div><div class="step-label">공지</div></div>
+          <div class="step"><div class="step-circle">5</div><div class="step-label">완료</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">State Spec</p>
+    <table class="tbl">
+      <thead><tr><th>상태</th><th>Circle</th><th>연결선</th><th>레이블</th></tr></thead>
+      <tbody>
+        <tr><td>Done (완료)</td><td>Blue 채움 + ✓ 아이콘</td><td>Blue (#397AF2)</td><td>Gray 700</td></tr>
+        <tr><td>Active (현재)</td><td>White 배경 + Blue 테두리</td><td>Gray 250 (이전 선은 Blue)</td><td>Blue · SemiBold</td></tr>
+        <tr><td>Pending (대기)</td><td>White 배경 + Gray 250 테두리</td><td>Gray 250</td><td>Gray 500</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">CSS 스니펫</p>
+    <div class="code"><span class="ck">.stepper</span> { display: <span class="cv">flex</span>; align-items: <span class="cv">flex-start</span>; }
+<span class="ck">.step</span> { display: <span class="cv">flex</span>; flex-direction: <span class="cv">column</span>; align-items: <span class="cv">center</span>; flex: <span class="cv">1</span>; position: <span class="cv">relative</span>; }
+
+<span class="cc">/* 연결선 */</span>
+<span class="ck">.step:not(:last-child)::after</span> {
+  content: <span class="cv">''</span>; position: <span class="cv">absolute</span>;
+  top: <span class="cv">16px</span>; left: <span class="cv">calc(50% + 16px)</span>; right: <span class="cv">calc(-50% + 16px)</span>;
+  height: <span class="cv">2px</span>; background: <span class="cv">#DCDEE0</span>;
+}
+<span class="ck">.step-done::after</span> { background: <span class="cv">#397AF2</span>; }
+
+<span class="ck">.step-circle</span> { width: <span class="cv">32px</span>; height: <span class="cv">32px</span>; border-radius: <span class="cv">50%</span>; border: <span class="cv">2px solid #DCDEE0</span>; }
+<span class="ck">.step-done .step-circle</span>   { background: <span class="cv">#397AF2</span>; border-color: <span class="cv">#397AF2</span>; color: <span class="cv">#fff</span>; }
+<span class="ck">.step-active .step-circle</span> { border-color: <span class="cv">#397AF2</span>; color: <span class="cv">#397AF2</span>; }</div>
+  </div>
+</div>
+
+<!-- ══ CHARTS ══ -->
+<div class="page" id="page-charts">
+  <p class="page-title">Charts</p>
+  <p class="page-desc">데이터 시각화는 최대한 단순하게. 막대(Bar)와 선(Line) 차트를 기본으로 하며 Key Color 3색 + 확장 팔레트를 사용합니다.</p>
+
+  <div class="sc">
+    <p class="sc-title">Bar Chart — CSS 기반 예시</p>
+    <div class="preview">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:700;color:var(--t1);">월별 처리 건수</span>
+        <span style="font-size:11px;color:var(--t3);">2026년 상반기</span>
+      </div>
+      <div class="bar-chart" style="border-bottom:2px solid var(--bd);margin-bottom:4px;">
+        <div class="bar-col"><div class="bar" style="height:64%;background:#397AF2;"></div><span class="bar-lbl">1월</span></div>
+        <div class="bar-col"><div class="bar" style="height:78%;background:#397AF2;"></div><span class="bar-lbl">2월</span></div>
+        <div class="bar-col"><div class="bar" style="height:55%;background:#397AF2;"></div><span class="bar-lbl">3월</span></div>
+        <div class="bar-col"><div class="bar" style="height:90%;background:#6BBD1B;"></div><span class="bar-lbl">4월</span></div>
+        <div class="bar-col"><div class="bar" style="height:72%;background:#397AF2;"></div><span class="bar-lbl">5월</span></div>
+        <div class="bar-col"><div class="bar" style="height:48%;background:#EE8800;"></div><span class="bar-lbl">6월</span></div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#397AF2;"></div>일반</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6BBD1B;"></div>최고치</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#EE8800;"></div>주의</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">Line Chart — SVG 기반 예시</p>
+    <div class="preview">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;">
+        <span style="font-size:13px;font-weight:700;color:var(--t1);">신규 등록 추이</span>
+        <span style="font-size:11px;color:var(--t3);">2026 Q1–Q2</span>
+      </div>
+      <svg viewBox="0 0 600 160" width="100%" height="160" style="overflow:visible;">
+        <defs>
+          <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#397AF2" stop-opacity=".15"/>
+            <stop offset="100%" stop-color="#397AF2" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- grid -->
+        <line x1="0" y1="40" x2="600" y2="40" stroke="var(--bd)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="600" y2="80" stroke="var(--bd)" stroke-width="1"/>
+        <line x1="0" y1="120" x2="600" y2="120" stroke="var(--bd)" stroke-width="1"/>
+        <!-- area -->
+        <path d="M0,100 L100,80 L200,60 L300,40 L400,55 L500,30 L600,45 L600,160 L0,160Z" fill="url(#grad1)"/>
+        <!-- line -->
+        <polyline points="0,100 100,80 200,60 300,40 400,55 500,30 600,45" fill="none" stroke="#397AF2" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- dots -->
+        <circle cx="0" cy="100" r="4" fill="#397AF2"/>
+        <circle cx="100" cy="80" r="4" fill="#397AF2"/>
+        <circle cx="200" cy="60" r="4" fill="#397AF2"/>
+        <circle cx="300" cy="40" r="4" fill="#397AF2"/>
+        <circle cx="400" cy="55" r="4" fill="#397AF2"/>
+        <circle cx="500" cy="30" r="4" fill="#6BBD1B"/>
+        <circle cx="600" cy="45" r="4" fill="#397AF2"/>
+        <!-- labels -->
+        <text x="0" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">1월</text>
+        <text x="100" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">2월</text>
+        <text x="200" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">3월</text>
+        <text x="300" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">4월</text>
+        <text x="400" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">5월</text>
+        <text x="500" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">6월</text>
+        <text x="600" y="150" font-size="10" fill="var(--t3)" text-anchor="middle">7월</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="sc">
+    <p class="sc-title">차트 컬러 팔레트</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <div class="ks"><div class="ks-block" style="background:#397AF2;width:40px;height:40px;"></div><span class="ks-name">C-1</span><span class="ks-hex">#397AF2</span></div>
+      <div class="ks"><div class="ks-block" style="background:#6BBD1B;width:40px;height:40px;"></div><span class="ks-name">C-2</span><span class="ks-hex">#6BBD1B</span></div>
+      <div class="ks"><div class="ks-block" style="background:#EE8800;width:40px;height:40px;"></div><span class="ks-name">C-3</span><span class="ks-hex">#EE8800</span></div>
+      <div class="ks"><div class="ks-block" style="background:#A78BFA;width:40px;height:40px;"></div><span class="ks-name">C-4</span><span class="ks-hex">#A78BFA</span></div>
+      <div class="ks"><div class="ks-block" style="background:#F472B6;width:40px;height:40px;"></div><span class="ks-name">C-5</span><span class="ks-hex">#F472B6</span></div>
+    </div>
+    <div class="info-box" style="margin-bottom:0;">4개 이상 시리즈는 C-1 → C-2 → C-3 → C-4 → C-5 순으로. 차트 외 본문에 끌어다 쓰지 않습니다.</div>
+  </div>
+</div>
+
+<!-- ══ DOWNLOADS ══ -->
+<div class="page" id="page-downloads">
+  <p class="page-title">Downloads</p>
+  <p class="page-desc">아래 MD 파일을 다운로드해 AI 워싱(Claude/Codex) 또는 직접 참조 가이드로 사용하세요.</p>
+
+  <div class="dl-grid" id="dl-grid">
+    <div class="dl-card">
+      <div class="dl-icon">📋</div>
+      <div class="dl-title">공통 가이드</div>
+      <div class="dl-desc">컬러 시스템, 상태 뱃지, 키 컬러, CSS 토큰 등 타입 A·B 공통으로 적용되는 전체 규칙을 포함합니다.</div>
+      <button class="dl-btn" onclick="downloadMd('common')">⬇ design-hr-common.md</button>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon">🖥️</div>
+      <div class="dl-title">웹페이지 가이드</div>
+      <div class="dl-desc">타입 A 전용. 반응형 웹 대시보드·내부 툴 제작 시 적용할 타이포그래피, 레이아웃, 컴포넌트 가이드입니다.</div>
+      <button class="dl-btn" onclick="downloadMd('web')">⬇ design-hr-web.md</button>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon">📄</div>
+      <div class="dl-title">보고문서 가이드</div>
+      <div class="dl-desc">타입 B 전용. 1920×1080 HTML 페이지 및 PDF 출력용 타이포그래피, 여백, HTML 기본 설정 가이드입니다.</div>
+      <button class="dl-btn" onclick="downloadMd('report')">⬇ design-hr-report.md</button>
+    </div>
+  </div>
+
+  <div class="sc" style="margin-top:24px;">
+    <p class="sc-title">Logo SVG 다운로드</p>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:16px;">보고문서나 대시보드에 삽입할 회사 CI 로고 SVG 파일을 다운로드하세요. 라이트용(검정)과 다크용(흰색) 두 가지 버전을 제공합니다.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <div style="border:1px solid var(--bd);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;background:var(--surf2);border-bottom:1px solid var(--bd);font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;">Basic Logo — Light (검정)</div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <button class="dl-btn" onclick="downloadSvg('basic_light')">⬇ Logo_Basic.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('box_light')">⬇ Logo_Box_ver.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('lined_light')">⬇ Logo_Lined_ver.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('h_light')">⬇ Logo_Horizontal.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('h_box_light')">⬇ Logo_Horizontal_Box_ver.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('h_lined_light')">⬇ Logo_Horizontal_Lined_ver.svg</button>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--bd);border-radius:10px;overflow:hidden;">
+        <div style="padding:12px 16px;background:var(--surf2);border-bottom:1px solid var(--bd);font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;">Basic Logo — Dark (흰색)</div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <button class="dl-btn" onclick="downloadSvg('basic_dark')">⬇ Logo_Basic_w.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('box_dark')">⬇ Logo_Box_ver_w.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('lined_dark')">⬇ Logo_Lined_ver_w.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('h_dark')">⬇ Logo_Horizontal_w.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('h_box_dark')">⬇ Logo_Horizontal_Box_ver_w.svg</button>
+          <button class="dl-btn" onclick="downloadSvg('h_lined_dark')">⬇ Logo_Horizontal_Lined_ver_w.svg</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sc" style="margin-top:24px;">
+    <p class="sc-title">AI 워싱 사용법</p>
+    <div class="info-box">MD 파일을 다운로드 후 Claude / Codex에 첨부하고 아래 프롬프트를 사용하세요.</div>
+    <div class="code"><span class="cc"># 공통 가이드 사용 시</span>
+"이 페이지를 design-hr-common.md 가이드에 맞춰 워싱해줘."
+
+<span class="cc"># 웹 대시보드 제작 시</span>
+"design-hr-web.md 가이드를 참고해서 이 대시보드를 스타일링해줘."
+
+<span class="cc"># 보고문서 제작 시</span>
+"design-hr-report.md 기준으로 1920x1080 HTML 보고문서 페이지를 만들어줘."</div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+/* ── SVG Logo Download ───────────────────────────── */
+const svgFiles = {
+  basic_light: { name: 'Logo_Basic.svg', content: `<svg width="144" height="87" viewBox="0 0 144 87" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="M1.36 18.91V.34C1.36.13 1.5 0 1.72 0h3.05c.22 0 .36.13.36.34V15.86h9.92c.22 0 .36.13.36.34v2.7c0 .21-.14.34-.36.34H1.72c-.22 0-.36-.13-.36-.34v-.01Z" fill="#000"/><path d="M22.98 18.91V.34C22.98.13 23.12 0 23.34 0h3.05c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM35.99 18.91V.34C35.99.13 36.13 0 36.35 0h3.22c.2 0 .34.08.45.24L49.21 13.54V.34C49.21.13 49.35 0 49.57 0h2.91c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.19c-.2 0-.34-.08-.45-.24L39.62 5.69v13.22c0 .21-.14.34-.36.34h-2.91c-.22 0-.36-.13-.36-.34ZM62.15 18.91V.34C62.15.13 62.29 0 62.51 0h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H65.93V7.71h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H62.52c-.22 0-.36-.13-.36-.34h-.01ZM1.36 51.97V33.4c0-.21.14-.34.36-.34h12.52c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H5.14v4.98h7.84c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H5.14v7.26c0 .21-.14.34-.36.34H1.73c-.22 0-.36-.13-.36-.34v-.01ZM21.94 51.97V33.4c0-.21.14-.34.36-.34h6.22c5.69 0 8.15 2.36 8.15 6.71 0 2.36-.95 4.35-3 5.56l3.84 6.56c.14.24.03.41-.26.41h-3.45c-.2 0-.34-.08-.42-.24l-3.31-5.66c-.5.05-1.01.08-1.57.08h-2.8v5.48c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34Zm3.78-15.63v6.87h2.66c2.97 0 4.37-1.02 4.37-3.44s-1.4-3.43-4.37-3.43h-2.66ZM44.42 51.97V33.4c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM57.16 51.97V33.4c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H57.53c-.22 0-.36-.13-.36-.34h-.01ZM79.15 51.97V33.4c0-.21.14-.34.36-.34h3.22c.2 0 .34.08.45.24L92.37 46.6V33.41c0-.21.14-.34.36-.34h2.91c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.19c-.2 0-.34-.08-.45-.24L82.78 38.76v13.22c0 .21-.14.34-.36.34H79.51c-.22 0-.36-.13-.36-.34v-.01ZM105.02 51.97V33.4c0-.21.14-.34.36-.34h6.83c6.83 0 10.39 3.57 10.39 9.62s-3.56 9.57-10.39 9.57h-6.83c-.22 0-.36-.13-.36-.34v-.01Zm3.78-15.57v12.59h3c4.57 0 6.89-2.26 6.89-6.29s-2.32-6.3-6.89-6.3h-3v.01ZM128.97 47.59c-.08-.21.03-.37.25-.42l2.91-.66c.22-.05.36.03.45.24.73 1.68 1.9 2.47 4 2.47s3.34-.6 3.34-2.05-1.26-2.15-3.36-2.86l-1.82-.6c-3.28-1.05-5.27-2.86-5.27-5.61 0-3.15 3-5.4 6.89-5.4 3.45 0 6.02 1.49 7.06 4.69.08.21-.03.37-.25.42l-3.08.73c-.22.05-.36-.03-.45-.24-.67-1.57-1.74-2.15-3.28-2.15-1.79 0-2.97.71-2.97 1.84s1.06 1.78 3.47 2.54l1.46.45c3.73 1.15 5.52 2.81 5.52 5.98s-2.97 5.34-7.25 5.34c-3.84 0-6.53-1.76-7.62-5.09h.01ZM.03 80.66c-.08-.21.06-.37.28-.42l2.91-.66c.22-.05.36.03.45.24.73 1.68 1.9 2.47 4.01 2.47s3.33-.6 3.33-2.05-1.26-2.15-3.36-2.86l-1.82-.6C2.52 76.73.53 74.92.53 72.17c0-3.15 3-5.4 6.89-5.4 3.45 0 6.02 1.49 7.06 4.69.08.21-.03.37-.25.42l-3.08.73c-.22.05-.36-.03-.45-.24C10.03 70.8 8.96 70.22 7.42 70.22c-1.79 0-2.97.71-2.97 1.84s1.06 1.78 3.47 2.54l1.46.45C13.11 76.2 14.9 77.86 14.9 81.03s-2.97 5.34-7.25 5.34C3.81 86.37 1.12 84.61.03 81.28v-.62Z" fill="#000"/><path d="M49.45 77.54V66.47c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v10.44c0 3.78 1.96 5.38 4.54 5.38s4-1.6 4-5.38V66.47c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v11.07c0 6.11-4.31 8.21-8.35 8.21s-8.28-2.1-8.28-8.21h.01ZM71.42 84.99l8.21-18.59c.08-.18.22-.26.42-.26h2.6c.2 0 .34.08.42.26l8.21 18.59c.11.24-.03.39-.28.39H87.47c-.2 0-.34-.08-.42-.24l-1.46-3.59H77.05l-1.46 3.59c-.08.18-.22.26-.42.26H71.7c-.25 0-.39-.16-.28-.41ZM84.25 78.25l-2.94-7.29-2.94 7.29h5.88ZM97.72 85.04V66.47c0-.21.14-.34.36-.34h6.22c5.69 0 8.15 2.36 8.15 6.71 0 2.36-.95 4.35-3 5.56l3.84 6.56c.14.24.03.41-.26.41H109.59c-.2 0-.34-.08-.42-.24l-3.31-5.66c-.5.05-1.01.08-1.57.08h-2.8v5.48c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM101.5 69.41v6.87h2.66c2.97 0 4.37-1.02 4.37-3.44s-1.4-3.43-4.37-3.43h-2.66ZM121.17 85.04V66.47c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H121.54c-.22 0-.36-.13-.36-.34h-.01ZM39.5 81.89c.3-.36.57-.74.82-1.15.88-1.47 1.32-3.19 1.32-5.17s-.44-3.7-1.32-5.17c-.88-1.47-2.09-2.61-3.62-3.43-1.53-.82-3.28-1.22-5.24-1.22s-3.71.41-5.24 1.22c-1.53.82-2.74 1.96-3.62 3.43-.88 1.47-1.32 3.19-1.32 5.17s.44 3.7 1.32 5.17c.88 1.47 2.09 2.61 3.62 3.43 1.53.82 3.28 1.22 5.24 1.22s3.71-.41 5.24-1.22l1.99 2.22c.15.17.32.18.5.04l2.3-1.81c.18-.14.2-.3.04-.47l-2.03-2.27v-.01Zm-8.05.11c-1.28 0-2.4-.27-3.36-.82-.95-.55-1.69-1.31-2.2-2.28-.51-.97-.77-2.07-.77-3.31s.26-2.36.77-3.32c.51-.96 1.25-1.72 2.2-2.27.95-.55 2.07-.82 3.36-.82s2.44.28 3.37.82c.94.55 1.67 1.31 2.19 2.27.51.96.77 2.07.77 3.32s-.26 2.07-.77 3.31c-.03.05-.06.09-.08.14l-2.96-3.31c-.15-.17-.32-.18-.5-.04l-2.3 1.81c-.18.14-.2.3-.04.47l3.13 3.49c-.82.36-1.75.55-2.8.55l-.01-.02Z" fill="#000"/></g><defs><clipPath id="a"><rect width="143.84" height="86.54" fill="#fff"/></clipPath></defs></svg>` },
+  box_light: { name: 'Logo_Box_ver.svg', content: `<svg width="194" height="137" viewBox="0 0 194 137" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M193.5 136.4V0L0 0v136.4h193.5Z" fill="#000"/><path d="M25.51 44.42V25.85c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v15.52H39.2c.22 0 .36.13.36.34v2.7c0 .21-.14.34-.36.34H25.87c-.22 0-.36-.13-.36-.34v-.01ZM47.13 44.42V25.85c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM60.15 44.42V25.85c0-.21.14-.34.36-.34h3.22c.2 0 .34.08.45.24L73.37 39.05V25.86c0-.21.14-.34.36-.34h2.91c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.19c-.2 0-.34-.08-.45-.24L63.78 31.21v13.22c0 .21-.14.34-.36.34h-2.91c-.22 0-.36-.13-.36-.34v-.01ZM86.3 44.42V25.85c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H86.67c-.22 0-.36-.13-.36-.34h-.01ZM25.51 77.48V58.91c0-.21.14-.34.36-.34H38.39c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.1v4.98h7.84c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-7.84v7.26c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34v-.01ZM46.09 77.48V58.91c0-.21.14-.34.36-.34h6.22c5.69 0 8.15 2.36 8.15 6.71 0 2.36-.95 4.35-3 5.56l3.84 6.56c.14.24.03.41-.26.41h-3.45c-.2 0-.34-.08-.42-.24l-3.31-5.66c-.5.05-1.01.08-1.57.08h-2.8v5.48c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34Zm3.78-15.63v6.87h2.66c2.97 0 4.37-1.02 4.37-3.44s-1.4-3.43-4.37-3.43h-2.66ZM68.57 77.48V58.91c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM81.31 77.48V58.91c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H81.68c-.22 0-.36-.13-.36-.34h-.01ZM103.3 77.48V58.91c0-.21.14-.34.36-.34h3.22c.2 0 .34.08.45.24l9.19 13.3V58.92c0-.21.14-.34.36-.34h2.91c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.19c-.2 0-.34-.08-.45-.24L106.93 65.27v13.22c0 .21-.14.34-.36.34h-2.91c-.22 0-.36-.13-.36-.34v-.01ZM129.17 77.48V58.91c0-.21.14-.34.36-.34h6.83c6.83 0 10.39 3.57 10.39 9.62s-3.56 9.57-10.39 9.57h-6.83c-.22 0-.36-.13-.36-.34v-.01Zm3.78-15.57v12.59h3c4.57 0 6.89-2.26 6.89-6.29s-2.32-6.3-6.89-6.3h-3v.01ZM153.12 73.1c-.08-.21.03-.37.25-.42l2.91-.66c.22-.05.36.03.45.24.73 1.68 1.9 2.47 4 2.47s3.34-.6 3.34-2.05-1.26-2.15-3.36-2.86l-1.82-.6c-3.28-1.05-5.27-2.86-5.27-5.61 0-3.15 3-5.4 6.89-5.4 3.45 0 6.02 1.49 7.06 4.69.08.21-.03.37-.25.42l-3.08.73c-.22.05-.36-.03-.45-.24-.67-1.57-1.74-2.15-3.28-2.15-1.79 0-2.97.71-2.97 1.84s1.06 1.78 3.47 2.54l1.46.45c3.73 1.15 5.52 2.81 5.52 5.98s-2.97 5.34-7.25 5.34c-3.84 0-6.53-1.76-7.62-5.09h.01ZM24.18 106.17c-.08-.21.03-.37.25-.42l2.91-.66c.22-.05.36.03.45.24.73 1.68 1.9 2.47 4.01 2.47s3.33-.6 3.33-2.05-1.26-2.15-3.36-2.86l-1.82-.6c-3.28-1.05-5.27-2.86-5.27-5.61 0-3.15 3-5.4 6.89-5.4 3.45 0 6.02 1.49 7.06 4.69.08.21-.03.37-.25.42l-3.08.73c-.22.05-.36-.03-.45-.24-.67-1.57-1.74-2.15-3.28-2.15-1.79 0-2.97.71-2.97 1.84s1.06 1.78 3.47 2.54l1.46.45c3.73 1.15 5.52 2.81 5.52 5.98s-2.97 5.34-7.25 5.34c-3.84 0-6.53-1.76-7.62-5.09h.01ZM73.6 103.05V91.98c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v10.44c0 3.78 1.96 5.38 4.54 5.38s4-1.6 4-5.38V91.98c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v11.07c0 6.11-4.31 8.21-8.35 8.21s-8.28-2.1-8.28-8.21h.01ZM95.57 110.5l8.21-18.59c.08-.18.22-.26.42-.26h2.6c.2 0 .34.08.42.26l8.21 18.59c.11.24-.03.39-.28.39h-3.53c-.2 0-.34-.08-.42-.24l-1.46-3.59h-8.54l-1.46 3.59c-.08.18-.22.26-.42.26h-3.47c-.25 0-.39-.16-.28-.41Zm12.83-6.74-2.94-7.29-2.94 7.29h5.88ZM121.87 110.55V91.98c0-.21.14-.34.36-.34h6.22c5.69 0 8.15 2.36 8.15 6.71 0 2.36-.95 4.35-3 5.56l3.84 6.56c.14.24.03.41-.26.41h-3.45c-.2 0-.34-.08-.42-.24l-3.31-5.66c-.5.05-1.01.08-1.57.08h-2.8v5.48c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34Zm3.78-15.63v6.87h2.66c2.97 0 4.37-1.02 4.37-3.44s-1.4-3.43-4.37-3.43h-2.66ZM145.32 110.55V91.98c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H145.69c-.22 0-.36-.13-.36-.34h-.01ZM63.65 107.4c.3-.36.57-.74.82-1.15.88-1.47 1.32-3.19 1.32-5.17s-.44-3.7-1.32-5.17c-.88-1.47-2.09-2.61-3.62-3.43-1.53-.82-3.28-1.22-5.24-1.22s-3.71.41-5.24 1.22c-1.53.82-2.74 1.96-3.62 3.43-.88 1.47-1.32 3.19-1.32 5.17s.44 3.7 1.32 5.17c.88 1.47 2.09 2.61 3.62 3.43 1.53.82 3.28 1.22 5.24 1.22s3.71-.41 5.24-1.22l1.99 2.22c.15.17.32.18.5.04l2.3-1.81c.18-.14.2-.3.04-.47l-2.03-2.27v-.01Zm-8.05.11c-1.28 0-2.4-.27-3.36-.82-.95-.55-1.69-1.31-2.2-2.28-.51-.97-.77-2.07-.77-3.31s.26-2.36.77-3.32c.51-.96 1.25-1.72 2.2-2.27.95-.55 2.07-.82 3.36-.82s2.44.28 3.37.82c.94.55 1.67 1.31 2.19 2.27.51.96.77 2.07.77 3.32s-.26 2.07-.77 3.31c-.03.05-.06.09-.08.14l-2.96-3.31c-.15-.17-.32-.18-.5-.04l-2.3 1.81c-.18.14-.2.3-.04.47l3.13 3.49c-.82.36-1.75.55-2.8.55l-.01-.02Z" fill="#fff"/></svg>` },
+  lined_light: { name: 'Logo_Lined_ver.svg', content: `<svg width="196" height="139" viewBox="0 0 196 139" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M194.5 137.4V1L1 1v136.4h193.5Z" stroke="#231F20" stroke-width="2" stroke-miterlimit="10"/><path d="M26.51 45.42V26.85c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v15.52H40.2c.22 0 .36.13.36.34v2.7c0 .21-.14.34-.36.34H26.87c-.22 0-.36-.13-.36-.34v-.01ZM48.13 45.42V26.85c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM61.15 45.42V26.85c0-.21.14-.34.36-.34h3.22c.2 0 .34.08.45.24L74.37 40.05V26.86c0-.21.14-.34.36-.34h2.91c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.19c-.2 0-.34-.08-.45-.24L64.78 32.21v13.22c0 .21-.14.34-.36.34h-2.91c-.22 0-.36-.13-.36-.34v-.01ZM87.3 45.42V26.85c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H87.67c-.22 0-.36-.13-.36-.34h-.01ZM26.51 78.48V59.91c0-.21.14-.34.36-.34H39.39c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.1v4.98h7.84c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-7.84v7.26c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34v-.01ZM47.09 78.48V59.91c0-.21.14-.34.36-.34h6.22c5.69 0 8.15 2.36 8.15 6.71 0 2.36-.95 4.35-3 5.56l3.84 6.56c.14.24.03.41-.26.41h-3.45c-.2 0-.34-.08-.42-.24l-3.31-5.66c-.5.05-1.01.08-1.57.08h-2.8v5.48c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34Zm3.78-15.63v6.87h2.66c2.97 0 4.37-1.02 4.37-3.44s-1.4-3.43-4.37-3.43h-2.66ZM69.57 78.48V59.91c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34ZM82.31 78.48V59.91c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H82.68c-.22 0-.36-.13-.36-.34h-.01ZM104.3 78.48V59.91c0-.21.14-.34.36-.34h3.22c.2 0 .34.08.45.24l9.19 13.3V59.92c0-.21.14-.34.36-.34h2.91c.22 0 .36.13.36.34v18.57c0 .21-.14.34-.36.34h-3.19c-.2 0-.34-.08-.45-.24L107.93 65.27v13.22c0 .21-.14.34-.36.34h-2.91c-.22 0-.36-.13-.36-.34v-.01ZM130.17 78.48V59.91c0-.21.14-.34.36-.34h6.83c6.83 0 10.39 3.57 10.39 9.62s-3.56 9.57-10.39 9.57h-6.83c-.22 0-.36-.13-.36-.34v-.01Zm3.78-15.57v12.59h3c4.57 0 6.89-2.26 6.89-6.29s-2.32-6.3-6.89-6.3h-3v.01ZM154.12 74.1c-.08-.21.03-.37.25-.42l2.91-.66c.22-.05.36.03.45.24.73 1.68 1.9 2.47 4 2.47s3.34-.6 3.34-2.05-1.26-2.15-3.36-2.86l-1.82-.6c-3.28-1.05-5.27-2.86-5.27-5.61 0-3.15 3-5.4 6.89-5.4 3.45 0 6.02 1.49 7.06 4.69.08.21-.03.37-.25.42l-3.08.73c-.22.05-.36-.03-.45-.24-.67-1.57-1.74-2.15-3.28-2.15-1.79 0-2.97.71-2.97 1.84s1.06 1.78 3.47 2.54l1.46.45c3.73 1.15 5.52 2.81 5.52 5.98s-2.97 5.34-7.25 5.34c-3.84 0-6.53-1.76-7.62-5.09h.01ZM25.18 107.17c-.08-.21.03-.37.25-.42l2.91-.66c.22-.05.36.03.45.24.73 1.68 1.9 2.47 4.01 2.47s3.33-.6 3.33-2.05-1.26-2.15-3.36-2.86l-1.82-.6c-3.28-1.05-5.27-2.86-5.27-5.61 0-3.15 3-5.4 6.89-5.4 3.45 0 6.02 1.49 7.06 4.69.08.21-.03.37-.25.42l-3.08.73c-.22.05-.36-.03-.45-.24-.67-1.57-1.74-2.15-3.28-2.15-1.79 0-2.97.71-2.97 1.84s1.06 1.78 3.47 2.54l1.46.45c3.73 1.15 5.52 2.81 5.52 5.98s-2.97 5.34-7.25 5.34c-3.84 0-6.53-1.76-7.62-5.09h.01ZM74.6 104.05V92.98c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v10.44c0 3.78 1.96 5.38 4.54 5.38s4-1.6 4-5.38V92.98c0-.21.14-.34.36-.34h3.05c.22 0 .36.13.36.34v11.07c0 6.11-4.31 8.21-8.35 8.21s-8.28-2.1-8.28-8.21h.01ZM96.57 111.5l8.21-18.59c.08-.18.22-.26.42-.26h2.6c.2 0 .34.08.42.26l8.21 18.59c.11.24-.03.39-.28.39h-3.53c-.2 0-.34-.08-.42-.24l-1.46-3.59h-8.54l-1.46 3.59c-.08.18-.22.26-.42.26h-3.47c-.25 0-.39-.16-.28-.41Zm12.83-6.74-2.94-7.29-2.94 7.29h5.88ZM122.87 111.55V92.98c0-.21.14-.34.36-.34h6.22c5.69 0 8.15 2.36 8.15 6.71 0 2.36-.95 4.35-3 5.56l3.84 6.56c.14.24.03.41-.26.41h-3.45c-.2 0-.34-.08-.42-.24l-3.31-5.66c-.5.05-1.01.08-1.57.08h-2.8v5.48c0 .21-.14.34-.36.34h-3.05c-.22 0-.36-.13-.36-.34Zm3.78-15.63v6.87h2.66c2.97 0 4.37-1.02 4.37-3.44s-1.4-3.43-4.37-3.43h-2.66ZM146.32 111.55V92.98c0-.21.14-.34.36-.34h13c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34h-9.58v4.38h8.65c.22 0 .36.13.36.34v2.6c0 .21-.14.34-.36.34h-8.65v4.93h9.92c.22 0 .36.13.36.34v2.65c0 .21-.14.34-.36.34H146.69c-.22 0-.36-.13-.36-.34h-.01ZM64.65 108.4c.3-.36.57-.74.82-1.15.88-1.47 1.32-3.19 1.32-5.17s-.44-3.7-1.32-5.17c-.88-1.47-2.09-2.61-3.62-3.43-1.53-.82-3.28-1.22-5.24-1.22s-3.71.41-5.24 1.22c-1.53.82-2.74 1.96-3.62 3.43-.88 1.47-1.32 3.19-1.32 5.17s.44 3.7 1.32 5.17c.88 1.47 2.09 2.61 3.62 3.43 1.53.82 3.28 1.22 5.24 1.22s3.71-.41 5.24-1.22l1.99 2.22c.15.17.32.18.5.04l2.3-1.81c.18-.14.2-.3.04-.47l-2.03-2.27v-.01Zm-8.05.11c-1.28 0-2.4-.27-3.36-.82-.95-.55-1.69-1.31-2.2-2.28-.51-.97-.77-2.07-.77-3.31s.26-2.36.77-3.32c.51-.96 1.25-1.72 2.2-2.27.95-.55 2.07-.82 3.36-.82s2.44.28 3.37.82c.94.55 1.67 1.31 2.19 2.27.51.96.77 2.07.77 3.32s-.26 2.07-.77 3.31c-.03.05-.06.09-.08.14l-2.96-3.31c-.15-.17-.32-.18-.5-.04l-2.3 1.81c-.18.14-.2.3-.04.47l3.13 3.49c-.82.36-1.75.55-2.8.55l-.01-.02Z" fill="#000"/></svg>` },
+  h_light: { name: 'Logo_Horizontal.svg', content: `<svg width="403" height="22" viewBox="0 0 403 22" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="M0 19.96V.73C0 .51.14.38.38.38H3.54c.23 0 .38.14.38.35v16.08H14.19c.23 0 .38.14.38.35v2.8c0 .22-.15.33-.38.33H.38C.15 20.31 0 20.17 0 19.96ZM22.39 19.96V.73c0-.22.14-.35.38-.35h3.16c.23 0 .38.14.38.35v19.23c0 .22-.15.33-.38.33h-3.16c-.23 0-.38-.13-.38-.33ZM35.87 19.96V.73c0-.22.14-.35.38-.35h3.34c.2 0 .35.08.46.26L49.56 14.4V.73c0-.22.15-.35.38-.35h3.02c.23 0 .38.14.38.35v19.23c0 .22-.15.33-.38.33h-3.31c-.2 0-.35-.08-.46-.23L39.65 6.27v13.69c0 .22-.15.33-.38.33h-3.02c-.23 0-.38-.13-.38-.33ZM62.95 19.96V.73c0-.22.14-.35.38-.35h13.46c.23 0 .38.14.38.35v2.74c0 .22-.15.35-.38.35H66.87v4.53h8.96c.23 0 .38.14.38.35v2.69c0 .22-.15.33-.38.33h-8.96v5.11h10.27c.23 0 .38.14.38.35v2.74c0 .22-.15.32-.38.32H63.33c-.23 0-.38-.13-.38-.32v.02ZM96.22 19.96V.73c0-.22.15-.35.38-.35h12.97c.23 0 .38.14.38.35v2.74c0 .22-.15.35-.38.35h-9.43v5.16h8.12c.23 0 .38.14.38.35v2.74c0 .22-.15.34-.38.34h-8.12v7.53c0 .22-.15.32-.38.32h-3.16c-.23 0-.38-.13-.38-.32v.02ZM117.52 19.96V.73c0-.22.15-.35.38-.35h6.44c5.89 0 8.44 2.44 8.44 6.95 0 2.44-.99 4.51-3.1 5.76l3.97 6.79c.15.24.03.43-.29.43h-3.57c-.2 0-.35-.08-.43-.23l-3.42-5.87c-.52.05-1.04.08-1.62.08h-2.9v5.68c0 .22-.15.34-.37.34h-3.16c-.23 0-.38-.13-.38-.33Zm3.92-16.18v7.11h2.76c3.07 0 4.56-1.06 4.56-3.56s-1.45-3.55-4.56-3.55h-2.76ZM140.81 19.96V.73c0-.22.15-.35.38-.35h3.16c.23 0 .38.14.38.35v19.23c0 .22-.15.33-.38.33h-3.16c-.23 0-.38-.13-.38-.33ZM154 19.96V.73c0-.22.15-.35.38-.35h13.46c.23 0 .38.14.38.35v2.74c0 .22-.15.35-.38.35h-9.92v4.53h8.96c.23 0 .38.14.38.35v2.69c0 .22-.15.33-.38.33h-8.96v5.11h10.27c.23 0 .38.14.38.35v2.74c0 .22-.15.32-.38.32h-13.81c-.23 0-.38-.13-.38-.32v.02ZM176.77 19.96V.73c0-.22.14-.35.38-.35h3.34c.2 0 .35.08.46.26L190.46 14.4V.73c0-.22.15-.35.38-.35h3.02c.23 0 .38.14.38.35v19.23c0 .22-.15.33-.38.33h-3.31c-.2 0-.35-.08-.46-.23L180.55 6.27v13.69c0 .22-.15.33-.38.33h-3.02c-.23 0-.38-.13-.38-.33ZM203.56 19.96V.73c0-.22.14-.35.38-.35h7.08c7.08 0 10.76 3.7 10.76 9.98s-3.68 9.99-10.76 9.99h-7.08c-.23 0-.38-.14-.38-.35v-.01Zm3.92-16.13v13.04h3.1c4.73 0 7.14-2.34 7.14-6.52s-2.41-6.52-7.14-6.52h-3.1v.01ZM228.36 15.42c-.09-.22.03-.38.26-.43l3.02-.68c.23-.05.38.03.46.24.75 1.74 1.97 2.55 4.15 2.55s3.44-.62 3.44-1.5c0-1.5-1.31-2.23-3.48-2.96l-1.89-.62c-3.39-1.09-5.45-2.96-5.45-5.81C228.88 3.45 231.98 1.11 236 1.11c3.57 0 6.24 1.55 7.31 4.86.09.22-.03.38-.26.44l-3.19.76c-.23.05-.38-.03-.46-.25-.7-1.63-1.8-2.23-3.39-2.23-1.86 0-3.07.73-3.07 1.9s1.1 1.81 3.6 2.6l1.51.46c3.86 1.19 5.71 2.91 5.71 6.19s-3.07 6.32-7.51 6.32c-3.97 0-6.76-1.82-7.89-5.41l-.02-.01ZM262.51 15.42c-.09-.22.03-.38.26-.43l3.02-.68c.23-.05.38.03.46.24.75 1.74 1.97 2.55 4.15 2.55s3.44-.62 3.44-1.5c0-1.5-1.31-2.23-3.48-2.96l-1.89-.62c-3.39-1.09-5.45-2.96-5.45-5.81 0-3.26 3.1-5.6 7.13-5.6 3.57 0 6.24 1.55 7.31 4.86.09.22-.03.38-.26.44l-3.19.76c-.23.05-.38-.03-.46-.25-.7-1.63-1.8-2.23-3.39-2.23-1.86 0-3.07.73-3.07 1.9s1.1 1.81 3.6 2.6l1.51.46c3.86 1.19 5.71 2.91 5.71 6.19s-3.07 6.32-7.51 6.32c-3.97 0-6.76-1.82-7.89-5.41l-.02-.01ZM313.69 12.19V.73c0-.22.14-.35.38-.35h3.16c.23 0 .38.14.38.35v10.81c0 3.91 2.03 5.57 4.7 5.57s4.06-1.66 4.06-5.57V.73c0-.22.15-.35.38-.35h3.16c.23 0 .38.14.38.35v11.46c0 6.33-4.47 8.5-8.64 8.5s-8.61-2.17-8.61-8.5h.01ZM336.44 19.9l8.5-19.25c.09-.19.24-.27.43-.27h2.7c.2 0 .35.08.43.27l8.5 19.25c.12.25-.03.41-.27.41h-3.66c-.2 0-.35-.08-.43-.22l-1.51-3.72h-8.85l-1.51 3.72c-.09.19-.24.27-.43.27h-3.6c-.26 0-.41-.16-.43-.41h.04Zm13.28-6.98-3.05-7.55-3.05 7.55h6.09v.01ZM363.67 19.96V.73c0-.22.14-.35.38-.35h6.44c5.89 0 8.44 2.44 8.44 6.95 0 2.44-.99 4.51-3.1 5.76l3.97 6.79c.15.24.03.43-.29.43h-3.57c-.2 0-.35-.08-.43-.23l-3.42-5.87c-.52.05-1.04.08-1.62.08h-2.9v5.68c0 .22-.15.34-.37.34h-3.16c-.23 0-.38-.13-.38-.33Zm3.92-16.18v7.11h2.76c3.07 0 4.56-1.06 4.56-3.56s-1.45-3.55-4.56-3.55h-2.76ZM387.96 19.96V.73c0-.22.15-.35.38-.35h13.46c.23 0 .38.14.38.35v2.74c0 .22-.15.35-.38.35h-9.92v4.53h8.96c.23 0 .38.14.38.35v2.69c0 .22-.15.33-.38.33h-8.96v5.11h10.27c.23 0 .38.14.38.35v2.74c0 .22-.15.32-.38.32h-13.81c-.23 0-.38-.13-.38-.32v.02ZM303.38 16.7c.31-.37.59-.76.85-1.19.91-1.52 1.37-3.3 1.37-5.35s-.46-3.83-1.37-5.35c-.91-1.52-2.16-2.7-3.75-3.55C298.89.91 297.08.49 295.05.49s-3.84.42-5.43 1.27c-1.59.85-2.84 2.03-3.75 3.55-.91 1.52-1.37 3.3-1.37 5.35s.46 3.83 1.37 5.35c.91 1.52 2.16 2.7 3.75 3.55 1.59.85 3.4 1.27 5.43 1.27s3.84-.42 5.43-1.27l2.06 2.3c.16.18.33.19.52.04l2.38-1.87c.19-.15.2-.31.05-.49l-2.11-2.35.01.01Zm-8.33.11c-1.33 0-2.49-.28-3.48-.85-.99-.57-1.75-1.36-2.28-2.36-.53-1-.8-2.15-.8-3.43s.27-2.43.8-3.43c.53-1 1.29-1.79 2.28-2.36.99-.57 2.15-.85 3.48-.85s2.51.29 3.49.85c.98.57 1.74 1.36 2.28 2.36.53 1 .8 2.14.8 3.43s-.27 2.43-.8 3.43c-.03.05-.06.09-.09.14l-3.07-3.42c-.16-.18-.33-.19-.52-.04l-2.38 1.87c-.19.15-.2.31-.05.49l3.24 3.62c-.85.37-1.81.56-2.99.56l.01-.02Z" fill="#000"/></g><defs><clipPath id="a"><rect width="402.52" height="21.51" fill="#fff"/></clipPath></defs></svg>` },
+  h_box_light: { name: 'Logo_Horizontal_Box_ver.svg', content: `<svg width="448" height="66" viewBox="0 0 448 66" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_529_413)"><path d="M447.87 65.29V0L0.00012207 0V65.29L447.87 65.29Z" fill="black"/><path d="M22.6802 42.2602V23.0302C22.6802 22.8102 22.8202 22.6802 23.0602 22.6802H26.2202C26.4502 22.6802 26.6002 22.8202 26.6002 23.0302V39.1102H36.8702C37.1002 39.1102 37.2502 39.2502 37.2502 39.4602V42.2602C37.2502 42.4802 37.1002 42.6102 36.8702 42.6102H23.0602C22.8302 42.6102 22.6802 42.4702 22.6802 42.2602Z" fill="white"/><path d="M45.0703 42.2602V23.0302C45.0703 22.8102 45.2103 22.6802 45.4503 22.6802H48.6103C48.8403 22.6802 48.9903 22.8202 48.9903 23.0302V42.2602C48.9903 42.4802 48.8403 42.6102 48.6103 42.6102H45.4503C45.2203 42.6102 45.0703 42.4702 45.0703 42.2602Z" fill="white"/><path d="M58.54 42.2602V23.0302C58.54 22.8102 58.68 22.6802 58.92 22.6802H62.26C62.46 22.6802 62.61 22.7602 62.72 22.9302L72.23 36.7002V23.0402C72.23 22.8202 72.38 22.6902 72.61 22.6902H75.63C75.86 22.6902 76.01 22.8302 76.01 23.0402V42.2702C76.01 42.4902 75.86 42.6202 75.63 42.6202H72.32C72.12 42.6202 71.97 42.5402 71.86 42.3802L62.32 28.5802V42.2702C62.32 42.4902 62.17 42.6202 61.94 42.6202H58.92C58.69 42.6202 58.54 42.4802 58.54 42.2702V42.2602Z" fill="white"/><path d="M85.6201 42.2602V23.0302C85.6201 22.8102 85.7601 22.6802 86.0001 22.6802H99.4601C99.6901 22.6802 99.8401 22.8202 99.8401 23.0302V25.7702C99.8401 25.9902 99.6901 26.1202 99.4601 26.1202H89.5401V30.6502H98.5001C98.7301 30.6502 98.8801 30.7902 98.8801 31.0002V33.6902C98.8801 33.9102 98.7301 34.0402 98.5001 34.0402H89.5401V39.1502H99.8101C100.04 39.1502 100.19 39.2902 100.19 39.5002V42.2402C100.19 42.4602 100.04 42.5902 99.8101 42.5902H86.0001C85.7701 42.5902 85.6201 42.4502 85.6201 42.2402V42.2602Z" fill="white"/><path d="M118.9 42.2597V23.0297C118.9 22.8097 119.05 22.6797 119.28 22.6797H132.25C132.48 22.6797 132.63 22.8197 132.63 23.0297V25.7697C132.63 25.9897 132.48 26.1197 132.25 26.1197H122.82V31.2797H130.94C131.17 31.2797 131.32 31.4197 131.32 31.6297V34.3697C131.32 34.5897 131.17 34.7197 130.94 34.7197H122.82V42.2397C122.82 42.4597 122.67 42.5897 122.44 42.5897H119.28C119.05 42.5897 118.9 42.4497 118.9 42.2397V42.2597Z" fill="white"/><path d="M140.2 42.2597V23.0297C140.2 22.8097 140.35 22.6797 140.58 22.6797H147.02C152.91 22.6797 155.46 25.1197 155.46 29.6297C155.46 32.0697 154.47 34.1397 152.36 35.3897L156.33 42.1797C156.48 42.4197 156.36 42.6097 156.07 42.6097H152.5C152.3 42.6097 152.15 42.5297 152.06 42.3697L148.64 36.4997C148.12 36.5497 147.6 36.5797 147.02 36.5797H144.12V42.2597C144.12 42.4797 143.97 42.6097 143.74 42.6097H140.58C140.35 42.6097 140.2 42.4697 140.2 42.2597ZM144.12 26.0697V33.1797H146.88C149.95 33.1797 151.41 32.1197 151.41 29.6197C151.41 27.1197 149.96 26.0597 146.88 26.0597H144.12V26.0697Z" fill="white"/><path d="M163.49 42.2597V23.0297C163.49 22.8097 163.64 22.6797 163.87 22.6797H167.03C167.26 22.6797 167.41 22.8197 167.41 23.0297V42.2597C167.41 42.4797 167.26 42.6097 167.03 42.6097H163.87C163.64 42.6097 163.49 42.4697 163.49 42.2597Z" fill="white"/><path d="M176.68 42.2597V23.0297C176.68 22.8097 176.83 22.6797 177.06 22.6797H190.52C190.75 22.6797 190.9 22.8197 190.9 23.0297V25.7697C190.9 25.9897 190.75 26.1197 190.52 26.1197H180.6V30.6497H189.56C189.79 30.6497 189.94 30.7897 189.94 30.9997V33.6897C189.94 33.9097 189.79 34.0397 189.56 34.0397H180.6V39.1497H190.87C191.1 39.1497 191.25 39.2897 191.25 39.4997V42.2397C191.25 42.4597 191.1 42.5897 190.87 42.5897H177.06C176.83 42.5897 176.68 42.4497 176.68 42.2397V42.2597Z" fill="white"/><path d="M199.44 42.2597V23.0297C199.44 22.8097 199.58 22.6797 199.82 22.6797H203.16C203.36 22.6797 203.51 22.7597 203.62 22.9297L213.13 36.6997V23.0397C213.13 22.8197 213.28 22.6897 213.51 22.6897H216.53C216.76 22.6897 216.91 22.8297 216.91 23.0397V42.2697C216.91 42.4897 216.76 42.6197 216.53 42.6197H213.22C213.02 42.6197 212.87 42.5397 212.76 42.3797L203.22 28.5797V42.2697C203.22 42.4897 203.07 42.6197 202.84 42.6197H199.82C199.59 42.6197 199.44 42.4797 199.44 42.2697V42.2597Z" fill="white"/><path d="M226.24 42.2597V23.0297C226.24 22.8097 226.38 22.6797 226.62 22.6797H233.7C240.78 22.6797 244.46 26.3697 244.46 32.6497C244.46 38.9297 240.78 42.6197 233.7 42.6197H226.62C226.39 42.6197 226.24 42.4797 226.24 42.2697V42.2597ZM230.16 26.1297V39.1597H233.26C237.99 39.1597 240.4 36.8197 240.4 32.6397C240.4 28.4597 237.99 26.1197 233.26 26.1197H230.16V26.1297Z" fill="white"/><path d="M251.04 37.7198C250.95 37.4998 251.07 37.3398 251.3 37.2898L254.32 36.6098C254.55 36.5598 254.7 36.6398 254.78 36.8498C255.53 38.5898 256.75 39.3998 258.93 39.3998C260.99 39.3998 262.38 38.7798 262.38 37.2798C262.38 35.7798 261.07 35.0498 258.9 34.3198L257.01 33.6998C253.62 32.6098 251.56 30.7398 251.56 27.8898C251.56 24.6298 254.66 22.2998 258.7 22.2998C262.27 22.2998 264.94 23.8498 266.01 27.1598C266.1 27.3798 265.98 27.5398 265.75 27.5998L262.56 28.3598C262.33 28.4098 262.18 28.3298 262.1 28.1098C261.4 26.4798 260.3 25.8798 258.71 25.8798C256.85 25.8798 255.64 26.6098 255.64 27.7798C255.64 29.0298 256.74 29.8398 259.24 30.6298L260.75 31.0898C264.61 32.2798 266.46 33.9998 266.46 37.2798C266.46 40.5598 263.39 42.9798 258.95 42.9798C254.98 42.9798 252.19 41.1598 251.06 37.7098L251.04 37.7198Z" fill="white"/><path d="M285.18 37.7198C285.09 37.4998 285.21 37.3398 285.44 37.2898L288.46 36.6098C288.69 36.5598 288.84 36.6398 288.92 36.8498C289.67 38.5898 290.89 39.3998 293.07 39.3998C295.13 39.3998 296.52 38.7798 296.52 37.2798C296.52 35.7798 295.21 35.0498 293.04 34.3198L291.15 33.6998C287.76 32.6098 285.7 30.7398 285.7 27.8898C285.7 24.6298 288.8 22.2998 292.84 22.2998C296.41 22.2998 299.08 23.8498 300.15 27.1598C300.24 27.3798 300.12 27.5398 299.89 27.5998L296.7 28.3598C296.47 28.4098 296.32 28.3298 296.24 28.1098C295.54 26.4798 294.44 25.8798 292.85 25.8798C290.99 25.8798 289.78 26.6098 289.78 27.7798C289.78 29.0298 290.88 29.8398 293.38 30.6298L294.89 31.0898C298.75 32.2798 300.6 33.9998 300.6 37.2798C300.6 40.5598 297.53 42.9798 293.09 42.9798C289.12 42.9798 286.33 41.1598 285.2 37.7098L285.18 37.7198Z" fill="white"/><path d="M336.36 34.4902V23.0302C336.36 22.8102 336.5 22.6802 336.74 22.6802H339.9C340.13 22.6802 340.28 22.8202 340.28 23.0302V33.8402C340.28 37.7502 342.31 39.4102 344.98 39.4102C347.65 39.4102 349.71 37.7502 349.71 33.8402V23.0302C349.71 22.8102 349.86 22.6802 350.09 22.6802H353.25C353.48 22.6802 353.63 22.8202 353.63 23.0302V34.4902C353.63 40.8202 349.16 42.9902 344.99 42.9902C340.82 42.9902 336.38 40.8202 336.38 34.4902H336.36Z" fill="white"/><path d="M359.12 42.2002L367.62 22.9502C367.71 22.7602 367.85 22.6802 368.06 22.6802H370.76C370.96 22.6802 371.11 22.7602 371.2 22.9502L379.7 42.2002C379.82 42.4502 379.67 42.6102 379.41 42.6102H375.75C375.55 42.6102 375.4 42.5302 375.31 42.3402L373.8 38.6202H364.95L363.44 42.3402C363.35 42.5302 363.21 42.6102 363 42.6102H359.4C359.14 42.6102 358.99 42.4502 359.11 42.2002H359.12ZM372.4 35.2202L369.35 27.6702L366.3 35.2202H372.39H372.4Z" fill="white"/><path d="M386.351 42.2602V23.0302C386.351 22.8102 386.491 22.6802 386.731 22.6802H393.171C399.061 22.6802 401.611 25.1202 401.611 29.6302C401.611 32.0702 400.621 34.1402 398.511 35.3902L402.481 42.1802C402.631 42.4202 402.511 42.6102 402.221 42.6102H398.651C398.451 42.6102 398.301 42.5302 398.211 42.3702L394.791 36.5002C394.271 36.5502 393.751 36.5802 393.171 36.5802H390.271V42.2602C390.271 42.4802 390.121 42.6102 389.891 42.6102H386.731C386.501 42.6102 386.351 42.4702 386.351 42.2602ZM390.271 26.0702V33.1802H393.031C396.101 33.1802 397.561 32.1202 397.561 29.6202C397.561 27.1202 396.111 26.0602 393.031 26.0602H390.271V26.0702Z" fill="white"/><path d="M410.63 42.2602V23.0302C410.63 22.8102 410.78 22.6802 411.01 22.6802H424.47C424.7 22.6802 424.85 22.8202 424.85 23.0302V25.7702C424.85 25.9902 424.7 26.1202 424.47 26.1202H414.55V30.6502H423.51C423.74 30.6502 423.89 30.7902 423.89 31.0002V33.6902C423.89 33.9102 423.74 34.0402 423.51 34.0402H414.55V39.1502H424.82C425.05 39.1502 425.2 39.2902 425.2 39.5002V42.2402C425.2 42.4602 425.05 42.5902 424.82 42.5902H411.01C410.78 42.5902 410.63 42.4502 410.63 42.2402V42.2602Z" fill="white"/><path d="M326.05 39C326.36 38.63 326.64 38.24 326.9 37.81C327.81 36.29 328.27 34.51 328.27 32.46C328.27 30.41 327.81 28.63 326.9 27.11C325.99 25.59 324.74 24.41 323.15 23.56C321.56 22.72 319.75 22.29 317.72 22.29C315.69 22.29 313.88 22.71 312.29 23.56C310.7 24.41 309.45 25.59 308.54 27.11C307.63 28.63 307.17 30.41 307.17 32.46C307.17 34.51 307.63 36.29 308.54 37.81C309.45 39.33 310.7 40.51 312.29 41.36C313.88 42.2 315.69 42.63 317.72 42.63C319.75 42.63 321.56 42.21 323.15 41.36L325.21 43.66C325.37 43.84 325.54 43.85 325.73 43.7L328.11 41.83C328.3 41.68 328.31 41.52 328.16 41.34L326.05 38.99V39ZM317.73 39.1C316.4 39.1 315.24 38.82 314.25 38.25C313.26 37.68 312.5 36.89 311.97 35.89C311.44 34.89 311.17 33.74 311.17 32.46C311.17 31.18 311.44 30.01 311.97 29.02C312.5 28.02 313.26 27.24 314.25 26.67C315.24 26.1 316.4 25.82 317.73 25.82C319.06 25.82 320.24 26.11 321.22 26.67C322.2 27.24 322.95 28.02 323.49 29.02C324.02 30.02 324.29 31.16 324.29 32.46C324.29 33.76 324.02 34.88 323.49 35.89C323.46 35.94 323.43 35.98 323.4 36.03L320.33 32.61C320.17 32.43 320 32.42 319.81 32.57L317.43 34.44C317.24 34.59 317.23 34.75 317.38 34.93L320.62 38.55C319.77 38.92 318.81 39.12 317.72 39.12L317.73 39.1Z" fill="white"/></g><defs><clipPath id="clip0_529_413"><rect width="447.87" height="65.29" fill="white"/></clipPath></defs></svg>` },
+  h_lined_light: { name: 'Logo_Horizontal_Lined_ver.svg', content: `<svg width="450" height="68" viewBox="0 0 450 68" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_529_438)"><path d="M448.87 66.29V1L1.00012 1V66.29L448.87 66.29Z" stroke="#231F20" stroke-width="2" stroke-miterlimit="10"/><path d="M23.6802 43.2602V24.0302C23.6802 23.8102 23.8202 23.6802 24.0602 23.6802H27.2202C27.4502 23.6802 27.6002 23.8202 27.6002 24.0302V40.1102H37.8702C38.1002 40.1102 38.2502 40.2502 38.2502 40.4602V43.2602C38.2502 43.4802 38.1002 43.6102 37.8702 43.6102H24.0602C23.8302 43.6102 23.6802 43.4702 23.6802 43.2602Z" fill="black"/><path d="M46.0703 43.2602V24.0302C46.0703 23.8102 46.2103 23.6802 46.4503 23.6802H49.6103C49.8403 23.6802 49.9903 23.8202 49.9903 24.0302V43.2602C49.9903 43.4802 49.8403 43.6102 49.6103 43.6102H46.4503C46.2203 43.6102 46.0703 43.4702 46.0703 43.2602Z" fill="black"/><path d="M59.54 43.2602V24.0302C59.54 23.8102 59.68 23.6802 59.92 23.6802H63.26C63.46 23.6802 63.61 23.7602 63.72 23.9302L73.23 37.7002V24.0402C73.23 23.8202 73.38 23.6902 73.61 23.6902H76.63C76.86 23.6902 77.01 23.8302 77.01 24.0402V43.2702C77.01 43.4902 76.86 43.6202 76.63 43.6202H73.32C73.12 43.6202 72.97 43.5402 72.86 43.3802L63.32 29.5802V43.2702C63.32 43.4902 63.17 43.6202 62.94 43.6202H59.92C59.69 43.6202 59.54 43.4802 59.54 43.2702V43.2602Z" fill="black"/><path d="M86.6201 43.2602V24.0302C86.6201 23.8102 86.7601 23.6802 87.0001 23.6802H100.46C100.69 23.6802 100.84 23.8202 100.84 24.0302V26.7702C100.84 26.9902 100.69 27.1202 100.46 27.1202H90.5401V31.6502H99.5001C99.7301 31.6502 99.8801 31.7902 99.8801 32.0002V34.6902C99.8801 34.9102 99.7301 35.0402 99.5001 35.0402H90.5401V40.1502H100.81C101.04 40.1502 101.19 40.2902 101.19 40.5002V43.2402C101.19 43.4602 101.04 43.5902 100.81 43.5902H87.0001C86.7701 43.5902 86.6201 43.4502 86.6201 43.2402V43.2602Z" fill="black"/><path d="M119.9 43.2597V24.0297C119.9 23.8097 120.05 23.6797 120.28 23.6797H133.25C133.48 23.6797 133.63 23.8197 133.63 24.0297V26.7697C133.63 26.9897 133.48 27.1197 133.25 27.1197H123.82V32.2797H131.94C132.17 32.2797 132.32 32.4197 132.32 32.6297V35.3697C132.32 35.5897 132.17 35.7197 131.94 35.7197H123.82V43.2397C123.82 43.4597 123.67 43.5897 123.44 43.5897H120.28C120.05 43.5897 119.9 43.4497 119.9 43.2397V43.2597Z" fill="black"/><path d="M141.2 43.2597V24.0297C141.2 23.8097 141.35 23.6797 141.58 23.6797H148.02C153.91 23.6797 156.46 26.1197 156.46 30.6297C156.46 33.0697 155.47 35.1397 153.36 36.3897L157.33 43.1797C157.48 43.4197 157.36 43.6097 157.07 43.6097H153.5C153.3 43.6097 153.15 43.5297 153.06 43.3697L149.64 37.4997C149.12 37.5497 148.6 37.5797 148.02 37.5797H145.12V43.2597C145.12 43.4797 144.97 43.6097 144.74 43.6097H141.58C141.35 43.6097 141.2 43.4697 141.2 43.2597ZM145.12 27.0697V34.1797H147.88C150.95 34.1797 152.41 33.1197 152.41 30.6197C152.41 28.1197 150.96 27.0597 147.88 27.0597H145.12V27.0697Z" fill="black"/><path d="M164.49 43.2597V24.0297C164.49 23.8097 164.64 23.6797 164.87 23.6797H168.03C168.26 23.6797 168.41 23.8197 168.41 24.0297V43.2597C168.41 43.4797 168.26 43.6097 168.03 43.6097H164.87C164.64 43.6097 164.49 43.4697 164.49 43.2597Z" fill="black"/><path d="M177.68 43.2597V24.0297C177.68 23.8097 177.83 23.6797 178.06 23.6797H191.52C191.75 23.6797 191.9 23.8197 191.9 24.0297V26.7697C191.9 26.9897 191.75 27.1197 191.52 27.1197H181.6V31.6497H190.56C190.79 31.6497 190.94 31.7897 190.94 31.9997V34.6897C190.94 34.9097 190.79 35.0397 190.56 35.0397H181.6V40.1497H191.87C192.1 40.1497 192.25 40.2897 192.25 40.4997V43.2397C192.25 43.4597 192.1 43.5897 191.87 43.5897H178.06C177.83 43.5897 177.68 43.4497 177.68 43.2397V43.2597Z" fill="black"/><path d="M200.44 43.2597V24.0297C200.44 23.8097 200.58 23.6797 200.82 23.6797H204.16C204.36 23.6797 204.51 23.7597 204.62 23.9297L214.13 37.6997V24.0397C214.13 23.8197 214.28 23.6897 214.51 23.6897H217.53C217.76 23.6897 217.91 23.8297 217.91 24.0397V43.2697C217.91 43.4897 217.76 43.6197 217.53 43.6197H214.22C214.02 43.6197 213.87 43.5397 213.76 43.3797L204.22 29.5797V43.2697C204.22 43.4897 204.07 43.6197 203.84 43.6197H200.82C200.59 43.6197 200.44 43.4797 200.44 43.2697V43.2597Z" fill="black"/><path d="M227.24 43.2597V24.0297C227.24 23.8097 227.38 23.6797 227.62 23.6797H234.7C241.78 23.6797 245.46 27.3697 245.46 33.6497C245.46 39.9297 241.78 43.6197 234.7 43.6197H227.62C227.39 43.6197 227.24 43.4797 227.24 43.2697V43.2597ZM231.16 27.1297V40.1597H234.26C238.99 40.1597 241.4 37.8197 241.4 33.6397C241.4 29.4597 238.99 27.1197 234.26 27.1197H231.16V27.1297Z" fill="black"/><path d="M252.04 38.7198C251.95 38.4998 252.07 38.3398 252.3 38.2898L255.32 37.6098C255.55 37.5598 255.7 37.6398 255.78 37.8498C256.53 39.5898 257.75 40.3998 259.93 40.3998C261.99 40.3998 263.38 39.7798 263.38 38.2798C263.38 36.7798 262.07 36.0498 259.9 35.3198L258.01 34.6998C254.62 33.6098 252.56 31.7398 252.56 28.8898C252.56 25.6298 255.66 23.2998 259.7 23.2998C263.27 23.2998 265.94 24.8498 267.01 28.1598C267.1 28.3798 266.98 28.5398 266.75 28.5998L263.56 29.3598C263.33 29.4098 263.18 29.3298 263.1 29.1098C262.4 27.4798 261.3 26.8798 259.71 26.8798C257.85 26.8798 256.64 27.6098 256.64 28.7798C256.64 30.0298 257.74 30.8398 260.24 31.6298L261.75 32.0898C265.61 33.2798 267.46 34.9998 267.46 38.2798C267.46 41.5598 264.39 43.9798 259.95 43.9798C255.98 43.9798 253.19 42.1598 252.06 38.7098L252.04 38.7198Z" fill="black"/><path d="M286.18 38.7198C286.09 38.4998 286.21 38.3398 286.44 38.2898L289.46 37.6098C289.69 37.5598 289.84 37.6398 289.92 37.8498C290.67 39.5898 291.89 40.3998 294.07 40.3998C296.13 40.3998 297.52 39.7798 297.52 38.2798C297.52 36.7798 296.21 36.0498 294.04 35.3198L292.15 34.6998C288.76 33.6098 286.7 31.7398 286.7 28.8898C286.7 25.6298 289.8 23.2998 293.84 23.2998C297.41 23.2998 300.08 24.8498 301.15 28.1598C301.24 28.3798 301.12 28.5398 300.89 28.5998L297.7 29.3598C297.47 29.4098 297.32 29.3298 297.24 29.1098C296.54 27.4798 295.44 26.8798 293.85 26.8798C291.99 26.8798 290.78 27.6098 290.78 28.7798C290.78 30.0298 291.88 30.8398 294.38 31.6298L295.89 32.0898C299.75 33.2798 301.6 34.9998 301.6 38.2798C301.6 41.5598 298.53 43.9798 294.09 43.9798C290.12 43.9798 287.33 42.1598 286.2 38.7098L286.18 38.7198Z" fill="black"/><path d="M337.36 35.4902V24.0302C337.36 23.8102 337.5 23.6802 337.74 23.6802H340.9C341.13 23.6802 341.28 23.8202 341.28 24.0302V34.8402C341.28 38.7502 343.31 40.4102 345.98 40.4102C348.65 40.4102 350.71 38.7502 350.71 34.8402V24.0302C350.71 23.8102 350.86 23.6802 351.09 23.6802H354.25C354.48 23.6802 354.63 23.8202 354.63 24.0302V35.4902C354.63 41.8202 350.16 43.9902 345.99 43.9902C341.82 43.9902 337.38 41.8202 337.38 35.4902H337.36Z" fill="black"/><path d="M360.12 43.2002L368.62 23.9502C368.71 23.7602 368.85 23.6802 369.06 23.6802H371.76C371.96 23.6802 372.11 23.7602 372.2 23.9502L380.7 43.2002C380.82 43.4502 380.67 43.6102 380.41 43.6102H376.75C376.55 43.6102 376.4 43.5302 376.31 43.3402L374.8 39.6202H365.95L364.44 43.3402C364.35 43.5302 364.21 43.6102 364 43.6102H360.4C360.14 43.6102 359.99 43.4502 360.11 43.2002H360.12ZM373.4 36.2202L370.35 28.6702L367.3 36.2202H373.39H373.4Z" fill="black"/><path d="M387.351 43.2602V24.0302C387.351 23.8102 387.491 23.6802 387.731 23.6802H394.171C400.061 23.6802 402.611 26.1202 402.611 30.6302C402.611 33.0702 401.621 35.1402 399.511 36.3902L403.481 43.1802C403.631 43.4202 403.511 43.6102 403.221 43.6102H399.651C399.451 43.6102 399.301 43.5302 399.211 43.3702L395.791 37.5002C395.271 37.5502 394.751 37.5802 394.171 37.5802H391.271V43.2602C391.271 43.4802 391.121 43.6102 390.891 43.6102H387.731C387.501 43.6102 387.351 43.4702 387.351 43.2602ZM391.271 27.0702V34.1802H394.031C397.101 34.1802 398.561 33.1202 398.561 30.6202C398.561 28.1202 397.111 27.0602 394.031 27.0602H391.271V27.0702Z" fill="black"/><path d="M411.63 43.2602V24.0302C411.63 23.8102 411.78 23.6802 412.01 23.6802H425.47C425.7 23.6802 425.85 23.8202 425.85 24.0302V26.7702C425.85 26.9902 425.7 27.1202 425.47 27.1202H415.55V31.6502H424.51C424.74 31.6502 424.89 31.7902 424.89 32.0002V34.6902C424.89 34.9102 424.74 35.0402 424.51 35.0402H415.55V40.1502H425.82C426.05 40.1502 426.2 40.2902 426.2 40.5002V43.2402C426.2 43.4602 426.05 43.5902 425.82 43.5902H412.01C411.78 43.5902 411.63 43.4502 411.63 43.2402V43.2602Z" fill="black"/><path d="M327.05 40C327.36 39.63 327.64 39.24 327.9 38.81C328.81 37.29 329.27 35.51 329.27 33.46C329.27 31.41 328.81 29.63 327.9 28.11C326.99 26.59 325.74 25.41 324.15 24.56C322.56 23.72 320.75 23.29 318.72 23.29C316.69 23.29 314.88 23.71 313.29 24.56C311.7 25.41 310.45 26.59 309.54 28.11C308.63 29.63 308.17 31.41 308.17 33.46C308.17 35.51 308.63 37.29 309.54 38.81C310.45 40.33 311.7 41.51 313.29 42.36C314.88 43.2 316.69 43.63 318.72 43.63C320.75 43.63 322.56 43.21 324.15 42.36L326.21 44.66C326.37 44.84 326.54 44.85 326.73 44.7L329.11 42.83C329.3 42.68 329.31 42.52 329.16 42.34L327.05 39.99V40ZM318.73 40.1C317.4 40.1 316.24 39.82 315.25 39.25C314.26 38.68 313.5 37.89 312.97 36.89C312.44 35.89 312.17 34.74 312.17 33.46C312.17 32.18 312.44 31.01 312.97 30.02C313.5 29.02 314.26 28.24 315.25 27.67C316.24 27.1 317.4 26.82 318.73 26.82C320.06 26.82 321.24 27.11 322.22 27.67C323.2 28.24 323.95 29.02 324.49 30.02C325.02 31.02 325.29 32.16 325.29 33.46C325.29 34.76 325.02 35.88 324.49 36.89C324.46 36.94 324.43 36.98 324.4 37.03L321.33 33.61C321.17 33.43 321 33.42 320.81 33.57L318.43 35.44C318.24 35.59 318.23 35.75 318.38 35.93L321.62 39.55C320.77 39.92 319.81 40.12 318.72 40.12L318.73 40.1Z" fill="black"/></g><defs><clipPath id="clip0_529_438"><rect width="449.87" height="67.29" fill="white"/></clipPath></defs></svg>` },
+  basic_dark: { name: 'Logo_Basic_w.svg', content: `<svg width="144" height="87" viewBox="0 0 144 87" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_531_791)"><path d="M1.36035 18.91V0.34C1.36035 0.13 1.50035 0 1.72035 0H4.77035C4.99035 0 5.13035 0.13 5.13035 0.34V15.86H15.0504C15.2704 15.86 15.4104 15.99 15.4104 16.2V18.9C15.4104 19.11 15.2704 19.24 15.0504 19.24H1.72035C1.50035 19.24 1.36035 19.11 1.36035 18.9V18.91Z" fill="white"/><path d="M22.9805 18.91V0.34C22.9805 0.13 23.1205 0 23.3405 0H26.3905C26.6105 0 26.7505 0.13 26.7505 0.34V18.91C26.7505 19.12 26.6105 19.25 26.3905 19.25H23.3405C23.1205 19.25 22.9805 19.12 22.9805 18.91Z" fill="white"/><path d="M35.9902 18.91V0.34C35.9902 0.13 36.1302 0 36.3502 0H39.5702C39.7702 0 39.9102 0.08 40.0202 0.24L49.2102 13.54V0.34C49.2102 0.13 49.3502 0 49.5702 0H52.4802C52.7002 0 52.8402 0.13 52.8402 0.34V18.91C52.8402 19.12 52.7002 19.25 52.4802 19.25H49.2902C49.0902 19.25 48.9502 19.17 48.8402 19.01L39.6202 5.69V18.91C39.6202 19.12 39.4802 19.25 39.2602 19.25H36.3502C36.1302 19.25 35.9902 19.12 35.9902 18.91Z" fill="white"/><path d="M62.1504 18.91V0.34C62.1504 0.13 62.2904 0 62.5104 0H75.5104C75.7304 0 75.8704 0.13 75.8704 0.34V2.99C75.8704 3.2 75.7304 3.33 75.5104 3.33H65.9304V7.71H74.5804C74.8004 7.71 74.9404 7.84 74.9404 8.05V10.65C74.9404 10.86 74.8004 10.99 74.5804 10.99H65.9304V15.92H75.8504C76.0704 15.92 76.2104 16.05 76.2104 16.26V18.91C76.2104 19.12 76.0704 19.25 75.8504 19.25H62.5204C62.3004 19.25 62.1604 19.12 62.1604 18.91H62.1504Z" fill="white"/><path d="M1.36035 51.9701V33.4001C1.36035 33.1901 1.50035 33.0601 1.72035 33.0601H14.2404C14.4604 33.0601 14.6004 33.1901 14.6004 33.4001V36.0501C14.6004 36.2601 14.4604 36.3901 14.2404 36.3901H5.14035V41.3701H12.9804C13.2004 41.3701 13.3404 41.5001 13.3404 41.7101V44.3601C13.3404 44.5701 13.2004 44.7001 12.9804 44.7001H5.14035V51.9601C5.14035 52.1701 5.00035 52.3001 4.78035 52.3001H1.73035C1.51035 52.3001 1.37035 52.1701 1.37035 51.9601L1.36035 51.9701Z" fill="white"/><path d="M21.9404 51.9701V33.4001C21.9404 33.1901 22.0804 33.0601 22.3004 33.0601H28.5204C34.2104 33.0601 36.6704 35.4201 36.6704 39.7701C36.6704 42.1301 35.7204 44.1201 33.6704 45.3301L37.5104 51.8901C37.6504 52.1301 37.5404 52.3101 37.2604 52.3101H33.8104C33.6104 52.3101 33.4704 52.2301 33.3904 52.0701L30.0804 46.4101C29.5804 46.4601 29.0704 46.4901 28.5104 46.4901H25.7104V51.9701C25.7104 52.1801 25.5704 52.3101 25.3504 52.3101H22.3004C22.0804 52.3101 21.9404 52.1801 21.9404 51.9701ZM25.7204 36.3401V43.2101H28.3804C31.3504 43.2101 32.7504 42.1901 32.7504 39.7701C32.7504 37.3501 31.3504 36.3401 28.3804 36.3401H25.7204Z" fill="white"/><path d="M44.4199 51.9701V33.4001C44.4199 33.1901 44.5599 33.0601 44.7799 33.0601H47.8299C48.0499 33.0601 48.1899 33.1901 48.1899 33.4001V51.9701C48.1899 52.1801 48.0499 52.3101 47.8299 52.3101H44.7799C44.5599 52.3101 44.4199 52.1801 44.4199 51.9701Z" fill="white"/><path d="M57.1602 51.9701V33.4001C57.1602 33.1901 57.3002 33.0601 57.5202 33.0601H70.5202C70.7402 33.0601 70.8802 33.1901 70.8802 33.4001V36.0501C70.8802 36.2601 70.7402 36.3901 70.5202 36.3901H60.9402V40.7701H69.5902C69.8102 40.7701 69.9502 40.9001 69.9502 41.1101V43.7101C69.9502 43.9201 69.8102 44.0501 69.5902 44.0501H60.9402V48.9801H70.8602C71.0802 48.9801 71.2202 49.1101 71.2202 49.3201V51.9701C71.2202 52.1801 71.0802 52.3101 70.8602 52.3101H57.5302C57.3102 52.3101 57.1702 52.1801 57.1702 51.9701H57.1602Z" fill="white"/><path d="M79.1504 51.9701V33.4001C79.1504 33.1901 79.2904 33.0601 79.5104 33.0601H82.7304C82.9304 33.0601 83.0704 33.1401 83.1804 33.3001L92.3704 46.6001V33.4101C92.3704 33.2001 92.5104 33.0701 92.7304 33.0701H95.6404C95.8604 33.0701 96.0004 33.2001 96.0004 33.4101V51.9801C96.0004 52.1901 95.8604 52.3201 95.6404 52.3201H92.4504C92.2504 52.3201 92.1104 52.2401 92.0004 52.0801L82.7804 38.7601V51.9801C82.7804 52.1901 82.6404 52.3201 82.4204 52.3201H79.5104C79.2904 52.3201 79.1504 52.1901 79.1504 51.9801V51.9701Z" fill="white"/><path d="M105.02 51.9701V33.4001C105.02 33.1901 105.16 33.0601 105.38 33.0601H112.21C119.04 33.0601 122.6 36.6301 122.6 42.6801C122.6 48.7301 119.04 52.3001 112.21 52.3001H105.38C105.16 52.3001 105.02 52.1701 105.02 51.9601V51.9701ZM108.8 36.4001V48.9901H111.8C116.37 48.9901 118.69 46.7301 118.69 42.7001C118.69 38.6701 116.37 36.4101 111.8 36.4101H108.8V36.4001Z" fill="white"/><path d="M128.97 47.5902C128.89 47.3802 129 47.2202 129.22 47.1702L132.13 46.5102C132.35 46.4602 132.49 46.5402 132.58 46.7502C133.31 48.4302 134.48 49.2202 136.58 49.2202C138.57 49.2202 139.91 48.6202 139.91 47.1702C139.91 45.7202 138.65 45.0202 136.55 44.3102L134.73 43.7102C131.45 42.6602 129.46 40.8502 129.46 38.1002C129.46 34.9502 132.46 32.7002 136.35 32.7002C139.8 32.7002 142.37 34.1902 143.41 37.3902C143.49 37.6002 143.38 37.7602 143.16 37.8102L140.08 38.5402C139.86 38.5902 139.72 38.5102 139.63 38.3002C138.96 36.7302 137.89 36.1502 136.35 36.1502C134.56 36.1502 133.38 36.8602 133.38 37.9902C133.38 39.2002 134.44 39.9802 136.85 40.7402L138.31 41.1902C142.04 42.3402 143.83 44.0002 143.83 47.1702C143.83 50.3402 140.86 52.6802 136.58 52.6802C132.74 52.6802 130.05 50.9202 128.96 47.5902H128.97Z" fill="white"/><path d="M0.0299704 80.66C-0.0500296 80.45 0.0599704 80.29 0.27997 80.24L3.18997 79.58C3.40997 79.53 3.54997 79.61 3.63997 79.82C4.36997 81.5 5.53997 82.29 7.64997 82.29C9.63997 82.29 10.98 81.69 10.98 80.24C10.98 78.79 9.71997 78.09 7.61997 77.38L5.79997 76.78C2.51997 75.73 0.52997 73.92 0.52997 71.17C0.52997 68.02 3.52997 65.77 7.41997 65.77C10.87 65.77 13.44 67.26 14.48 70.46C14.56 70.67 14.45 70.83 14.23 70.88L11.15 71.61C10.93 71.66 10.79 71.58 10.7 71.37C10.03 69.8 8.95997 69.22 7.41997 69.22C5.62997 69.22 4.44997 69.93 4.44997 71.06C4.44997 72.27 5.50997 73.05 7.91997 73.81L9.37997 74.26C13.11 75.41 14.9 77.07 14.9 80.24C14.9 83.41 11.93 85.75 7.64997 85.75C3.80997 85.75 1.11997 83.99 0.0299704 80.66Z" fill="white"/><path d="M49.4497 77.5399V66.4699C49.4497 66.2599 49.5897 66.1299 49.8097 66.1299H52.8597C53.0797 66.1299 53.2197 66.2599 53.2197 66.4699V76.9099C53.2197 80.6899 55.1797 82.2899 57.7597 82.2899C60.3397 82.2899 62.3297 80.6899 62.3297 76.9099V66.4699C62.3297 66.2599 62.4697 66.1299 62.6897 66.1299H65.7397C65.9597 66.1299 66.0997 66.2599 66.0997 66.4699V77.5399C66.0997 83.6499 61.7897 85.7499 57.7497 85.7499C53.7097 85.7499 49.4297 83.6499 49.4297 77.5399H49.4497Z" fill="white"/><path d="M71.4198 84.9901L79.6298 66.4001C79.7098 66.2201 79.8498 66.1401 80.0498 66.1401H82.6498C82.8498 66.1401 82.9898 66.2201 83.0698 66.4001L91.2798 84.9901C91.3898 85.2301 91.2498 85.3801 90.9998 85.3801H87.4698C87.2698 85.3801 87.1298 85.3001 87.0498 85.1201L85.5898 81.5301H77.0498L75.5898 85.1201C75.5098 85.3001 75.3698 85.3801 75.1698 85.3801H71.6998C71.4498 85.3801 71.3098 85.2201 71.4198 84.9901ZM84.2498 78.2501L81.3098 70.9601L78.3698 78.2501H84.2498Z" fill="white"/><path d="M97.7197 85.0399V66.4699C97.7197 66.2599 97.8597 66.1299 98.0797 66.1299H104.3C109.99 66.1299 112.45 68.4899 112.45 72.8399C112.45 75.1999 111.5 77.1899 109.45 78.3999L113.29 84.9599C113.43 85.1999 113.32 85.3799 113.04 85.3799H109.59C109.39 85.3799 109.25 85.2999 109.17 85.1399L105.86 79.4799C105.36 79.5299 104.85 79.5599 104.29 79.5599H101.49V85.0399C101.49 85.2499 101.35 85.3799 101.13 85.3799H98.0797C97.8597 85.3799 97.7197 85.2499 97.7197 85.0399ZM101.5 69.4099V76.2799H104.16C107.13 76.2799 108.53 75.2599 108.53 72.8399C108.53 70.4199 107.13 69.4099 104.16 69.4099H101.5Z" fill="white"/><path d="M121.17 85.0399V66.4699C121.17 66.2599 121.31 66.1299 121.53 66.1299H134.53C134.75 66.1299 134.89 66.2599 134.89 66.4699V69.1199C134.89 69.3299 134.75 69.4599 134.53 69.4599H124.95V73.8399H133.6C133.82 73.8399 133.96 73.9699 133.96 74.1799V76.7799C133.96 76.9899 133.82 77.1199 133.6 77.1199H124.95V82.0499H134.87C135.09 82.0499 135.23 82.1799 135.23 82.3899V85.0399C135.23 85.2499 135.09 85.3799 134.87 85.3799H121.54C121.32 85.3799 121.18 85.2499 121.18 85.0399H121.17Z" fill="white"/><path d="M39.5003 81.89C39.8003 81.53 40.0703 81.15 40.3203 80.74C41.2003 79.27 41.6403 77.55 41.6403 75.57C41.6403 73.59 41.2003 71.87 40.3203 70.4C39.4403 68.93 38.2303 67.79 36.7003 66.97C35.1703 66.15 33.4203 65.75 31.4603 65.75C29.5003 65.75 27.7503 66.16 26.2203 66.97C24.6903 67.79 23.4803 68.93 22.6003 70.4C21.7203 71.87 21.2803 73.59 21.2803 75.57C21.2803 77.55 21.7203 79.27 22.6003 80.74C23.4803 82.21 24.6903 83.35 26.2203 84.17C27.7503 84.99 29.5003 85.39 31.4603 85.39C33.4203 85.39 35.1703 84.98 36.7003 84.17L38.6903 86.39C38.8403 86.56 39.0103 86.57 39.1903 86.43L41.4903 84.62C41.6703 84.48 41.6903 84.32 41.5303 84.15L39.5003 81.88V81.89ZM31.4503 82C30.1703 82 29.0503 81.73 28.0903 81.18C27.1403 80.63 26.4003 79.87 25.8903 78.9C25.3803 77.93 25.1203 76.83 25.1203 75.59C25.1203 74.35 25.3803 73.23 25.8903 72.27C26.4003 71.31 27.1403 70.55 28.0903 70C29.0403 69.45 30.1603 69.18 31.4503 69.18C32.7403 69.18 33.8803 69.46 34.8203 70C35.7603 70.55 36.4903 71.31 37.0103 72.27C37.5203 73.23 37.7803 74.34 37.7803 75.59C37.7803 76.84 37.5203 77.93 37.0103 78.9C36.9803 78.95 36.9503 78.99 36.9303 79.04L33.9703 75.73C33.8203 75.56 33.6503 75.55 33.4703 75.69L31.1703 77.5C30.9903 77.64 30.9703 77.8 31.1303 77.97L34.2603 81.46C33.4403 81.82 32.5103 82.01 31.4603 82.01L31.4503 82Z" fill="white"/></g><defs><clipPath id="clip0_531_791"><rect width="143.84" height="86.54" fill="white"/></clipPath></defs></svg>` },
+  box_dark: { name: 'Logo_Box_ver_w.svg', content: `<svg width="194" height="137" viewBox="0 0 194 137" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M193.5 136.4H0V0H193.5V136.4ZM55.6104 91.2598C53.6504 91.2598 51.9001 91.6705 50.3701 92.4805C48.8402 93.3005 47.63 94.4402 46.75 95.9102C45.87 97.3801 45.4297 99.1001 45.4297 101.08C45.4297 103.06 45.87 104.78 46.75 106.25C47.63 107.72 48.8401 108.86 50.3701 109.68C51.9001 110.5 53.6504 110.9 55.6104 110.9C57.5701 110.9 59.3197 110.49 60.8496 109.68L62.8398 111.9C62.9897 112.07 63.16 112.08 63.3398 111.94L65.6396 110.13C65.8196 109.99 65.8397 109.83 65.6797 109.66L63.6543 107.395C63.9525 107.036 64.221 106.658 64.4697 106.25C65.3497 104.78 65.79 103.06 65.79 101.08C65.79 99.1001 65.3497 97.3802 64.4697 95.9102C63.5897 94.4402 62.3796 93.3005 60.8496 92.4805C59.3197 91.6606 57.5702 91.2598 55.6104 91.2598ZM31.5703 91.2803C27.6804 91.2803 24.6799 93.5299 24.6797 96.6797C24.6797 99.4297 26.6702 101.24 29.9502 102.29L31.7695 102.89C33.8695 103.6 35.1299 104.3 35.1299 105.75C35.1299 107.2 33.7898 107.8 31.7998 107.8C29.69 107.8 28.52 107.01 27.79 105.33C27.7 105.12 27.5598 105.04 27.3398 105.09L24.4297 105.75C24.2099 105.8 24.0998 105.96 24.1797 106.17C25.2697 109.5 27.9599 111.26 31.7998 111.26C36.0798 111.26 39.0498 108.92 39.0498 105.75C39.0498 102.58 37.2602 100.92 33.5303 99.7695L32.0703 99.3203C29.6605 98.5604 28.5998 97.7801 28.5996 96.5703C28.5996 95.4403 29.7803 94.7305 31.5703 94.7305C33.1101 94.7305 34.1796 95.3102 34.8496 96.8799C34.9396 97.0898 35.0799 97.17 35.2998 97.1201L38.3799 96.3896C38.5999 96.3396 38.7099 96.1797 38.6299 95.9697C37.5899 92.77 35.0201 91.2804 31.5703 91.2803ZM73.96 91.6396C73.74 91.6397 73.5996 91.7705 73.5996 91.9805V103.05H73.5801C73.5801 109.16 77.8604 111.26 81.9004 111.26C85.9403 111.26 90.25 109.16 90.25 103.05V91.9805C90.25 91.7705 90.1096 91.6396 89.8896 91.6396H86.8398C86.6199 91.6397 86.4805 91.7705 86.4805 91.9805V102.42C86.4805 106.2 84.4901 107.8 81.9102 107.8C79.3302 107.8 77.3701 106.2 77.3701 102.42V91.9805C77.3701 91.7705 77.2298 91.6396 77.0098 91.6396H73.96ZM104.2 91.6504C104 91.6504 103.86 91.7302 103.78 91.9102L95.5703 110.5C95.4604 110.73 95.5999 110.889 95.8496 110.89H99.3203C99.5201 110.89 99.6603 110.81 99.7402 110.63L101.2 107.04H109.74L111.2 110.63C111.28 110.81 111.42 110.89 111.62 110.89H115.15C115.4 110.889 115.54 110.74 115.43 110.5L107.22 91.9102C107.14 91.7302 107 91.6504 106.8 91.6504H104.2ZM122.23 91.6396C122.01 91.6396 121.87 91.7705 121.87 91.9805V110.55C121.87 110.76 122.01 110.89 122.23 110.89H125.28C125.5 110.89 125.64 110.76 125.64 110.55V105.07H128.44C129 105.07 129.51 105.04 130.01 104.99L133.32 110.65C133.4 110.81 133.54 110.89 133.74 110.89H137.19C137.47 110.889 137.58 110.71 137.44 110.47L133.6 103.91C135.65 102.7 136.6 100.71 136.6 98.3496C136.599 93.9999 134.14 91.6397 128.45 91.6396H122.23ZM145.68 91.6396C145.46 91.6398 145.32 91.7706 145.32 91.9805V110.55H145.33C145.33 110.76 145.47 110.89 145.69 110.89H159.02C159.24 110.89 159.38 110.76 159.38 110.55V107.9C159.38 107.69 159.24 107.56 159.02 107.56H149.1V102.63H157.75C157.97 102.63 158.11 102.5 158.11 102.29V99.6904C158.11 99.4804 157.97 99.3496 157.75 99.3496H149.1V94.9697H158.68C158.9 94.9697 159.04 94.8399 159.04 94.6299V91.9805C159.04 91.7705 158.9 91.6396 158.68 91.6396H145.68ZM55.5996 94.6904C56.8895 94.6904 58.0298 94.9699 58.9697 95.5098C59.9097 96.0598 60.6402 96.8203 61.1602 97.7803C61.67 98.7401 61.9296 99.8499 61.9297 101.1C61.9297 102.35 61.6702 103.44 61.1602 104.41C61.1302 104.46 61.1001 104.5 61.0801 104.55L58.1201 101.24C57.9701 101.07 57.8001 101.06 57.6201 101.2L55.3203 103.01C55.1403 103.15 55.1203 103.31 55.2803 103.48L58.4102 106.97C57.5902 107.33 56.6602 107.519 55.6104 107.52L55.5996 107.51C54.3199 107.51 53.2001 107.24 52.2402 106.69C51.2903 106.14 50.55 105.38 50.04 104.41C49.53 103.44 49.2695 102.34 49.2695 101.1C49.2696 99.8598 49.5302 98.7401 50.04 97.7803C50.55 96.8203 51.2902 96.0598 52.2402 95.5098C53.1901 94.9599 54.3099 94.6905 55.5996 94.6904ZM108.4 103.76H102.52L105.46 96.4697L108.4 103.76ZM128.31 94.9199C131.279 94.9199 132.68 95.9299 132.68 98.3496C132.68 100.77 131.28 101.79 128.31 101.79H125.65V94.9199H128.31ZM160.5 58.21C156.61 58.21 153.61 60.4604 153.61 63.6104C153.611 66.3601 155.6 68.1698 158.88 69.2197L160.7 69.8203C162.8 70.5302 164.059 71.23 164.06 72.6797C164.06 74.1296 162.72 74.7304 160.73 74.7305C158.63 74.7305 157.46 73.9398 156.73 72.2598C156.641 72.0499 156.5 71.9697 156.28 72.0195L153.37 72.6797C153.15 72.7297 153.04 72.8898 153.12 73.0996H153.11C154.2 76.4296 156.89 78.1904 160.73 78.1904C165.01 78.1903 167.98 75.8496 167.98 72.6797C167.98 69.5099 166.19 67.8502 162.46 66.7002L161 66.25C158.59 65.49 157.53 64.71 157.53 63.5C157.53 62.37 158.71 61.6602 160.5 61.6602C162.04 61.6602 163.11 62.2398 163.78 63.8096C163.87 64.0196 164.01 64.0998 164.23 64.0498L167.31 63.3203C167.53 63.2703 167.639 63.1103 167.56 62.9004C166.52 59.7004 163.95 58.21 160.5 58.21ZM103.66 58.5703C103.44 58.5703 103.3 58.7002 103.3 58.9102V77.4902C103.3 77.7001 103.44 77.8301 103.66 77.8301H106.57C106.79 77.83 106.93 77.7 106.93 77.4902V64.2695L116.15 77.5898C116.26 77.7497 116.4 77.83 116.6 77.8301H119.79C120.01 77.8301 120.15 77.7001 120.15 77.4902V58.9199C120.15 58.71 120.01 58.5801 119.79 58.5801H116.88C116.66 58.5801 116.52 58.71 116.52 58.9199V72.1104L107.33 58.8096C107.22 58.6497 107.08 58.5703 106.88 58.5703H103.66ZM46.4502 58.5703C46.2302 58.5703 46.0898 58.7002 46.0898 58.9102V77.4805C46.0901 77.6902 46.2304 77.8203 46.4502 77.8203H49.5C49.7198 77.8203 49.8601 77.6902 49.8604 77.4805V72H52.6602C53.2201 72 53.7305 71.9699 54.2305 71.9199L57.54 77.5801C57.62 77.74 57.76 77.8203 57.96 77.8203H61.4102C61.6899 77.8202 61.7998 77.6402 61.6602 77.4004L57.8203 70.8398C59.87 69.6299 60.8202 67.64 60.8203 65.2803C60.8203 60.9303 58.3599 58.5703 52.6699 58.5703H46.4502ZM68.9297 58.5703C68.7099 58.5704 68.5703 58.7003 68.5703 58.9102V77.4805C68.5705 77.6901 68.71 77.8202 68.9297 77.8203H71.9805C72.2 77.8201 72.3396 77.69 72.3398 77.4805V58.9102C72.3398 58.7003 72.2002 58.5705 71.9805 58.5703H68.9297ZM81.6699 58.5703C81.45 58.5703 81.3096 58.7002 81.3096 58.9102V77.4805H81.3203C81.3205 77.6901 81.46 77.8202 81.6797 77.8203H95.0098C95.2296 77.8203 95.3699 77.6902 95.3701 77.4805V74.8301C95.3701 74.6201 95.2298 74.4902 95.0098 74.4902H85.0898V69.5596H93.7402C93.9601 69.5595 94.0996 69.4297 94.0996 69.2197V66.6201C94.0996 66.4102 93.9601 66.2804 93.7402 66.2803H85.0898V61.9004H94.6699C94.8899 61.9004 95.0303 61.7696 95.0303 61.5596V58.9102C95.0303 58.7002 94.8899 58.5703 94.6699 58.5703H81.6699ZM25.8701 58.5703C25.6501 58.5703 25.5098 58.7002 25.5098 58.9102V77.4805L25.5195 77.4697C25.5195 77.6797 25.6599 77.8095 25.8799 77.8096H28.9297C29.1497 77.8096 29.29 77.6797 29.29 77.4697V70.21H37.1299C37.3498 70.21 37.4902 70.08 37.4902 69.8701V67.2197C37.4901 67.0099 37.3498 66.8799 37.1299 66.8799H29.29V61.9004H38.3896C38.6096 61.9004 38.75 61.7696 38.75 61.5596V58.9102C38.75 58.7002 38.6096 58.5703 38.3896 58.5703H25.8701ZM129.53 58.5703C129.31 58.5703 129.17 58.7002 129.17 58.9102V77.4697C129.17 77.6797 129.31 77.8096 129.53 77.8096H136.36C143.19 77.8094 146.75 74.2401 146.75 68.1904C146.75 62.1405 143.19 58.5704 136.36 58.5703H129.53ZM135.95 61.9199C140.52 61.92 142.84 64.18 142.84 68.21C142.84 72.2399 140.52 74.4999 135.95 74.5H132.95V61.9199H135.95ZM52.5303 61.8604C55.5001 61.8604 56.9004 62.8701 56.9004 65.29C56.9004 67.7099 55.5001 68.7304 52.5303 68.7305H49.8701V61.8604H52.5303ZM60.5098 25.5098C60.29 25.5099 60.1506 25.6399 60.1504 25.8496V44.4297C60.1504 44.6396 60.2899 44.7694 60.5098 44.7695H63.4199C63.6399 44.7695 63.7803 44.6397 63.7803 44.4297V31.21L73 44.5303C73.11 44.6901 73.2503 44.7695 73.4502 44.7695H76.6396C76.8596 44.7695 77 44.6397 77 44.4297V25.8604C77 25.6504 76.8596 25.5195 76.6396 25.5195H73.7305C73.5105 25.5195 73.3701 25.6504 73.3701 25.8604V39.0498L64.1797 25.75C64.0698 25.5902 63.9302 25.5099 63.7305 25.5098H60.5098ZM47.4902 25.5098C47.2704 25.5098 47.1301 25.6398 47.1299 25.8496V44.4199C47.1299 44.6299 47.2702 44.7598 47.4902 44.7598H50.54C50.76 44.7598 50.9004 44.6299 50.9004 44.4199V25.8496C50.9002 25.6399 50.7599 25.5098 50.54 25.5098H47.4902ZM86.6602 25.5098C86.4403 25.5098 86.3 25.6398 86.2998 25.8496V44.4199H86.3096C86.3096 44.6299 86.45 44.7597 86.6699 44.7598H100C100.22 44.7598 100.36 44.6299 100.36 44.4199V41.7695C100.36 41.5598 100.22 41.4297 100 41.4297H90.0801V36.5H98.7305C98.9501 36.4998 99.0898 36.3699 99.0898 36.1602V33.5596C99.0897 33.35 98.95 33.2199 98.7305 33.2197H90.0801V28.8398H99.6602C99.8801 28.8398 100.02 28.71 100.02 28.5V25.8496C100.019 25.6399 99.8799 25.5098 99.6602 25.5098H86.6602ZM25.8701 25.5098C25.6503 25.5098 25.5099 25.6398 25.5098 25.8496V44.4102L25.5166 44.4854C25.5466 44.6506 25.6778 44.75 25.8701 44.75H39.2002C39.42 44.7499 39.5595 44.62 39.5596 44.4102V41.71C39.5596 41.5 39.4201 41.3702 39.2002 41.3701H29.2803V25.8496C29.2801 25.6398 29.1398 25.5098 28.9199 25.5098H25.8701Z" fill="white"/></svg>` },
+  lined_dark: { name: 'Logo_Lined_ver_w.svg', content: `<svg width="196" height="139" viewBox="0 0 196 139" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_531_831)"><path d="M194.5 137.4V1L1 1V137.4H194.5Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/><path d="M26.5107 45.4198V26.8498C26.5107 26.6398 26.6507 26.5098 26.8707 26.5098H29.9207C30.1407 26.5098 30.2807 26.6398 30.2807 26.8498V42.3698H40.2007C40.4207 42.3698 40.5607 42.4998 40.5607 42.7098V45.4098C40.5607 45.6198 40.4207 45.7498 40.2007 45.7498H26.8707C26.6507 45.7498 26.5107 45.6198 26.5107 45.4098V45.4198Z" fill="white"/><path d="M48.1309 45.4198V26.8498C48.1309 26.6398 48.2709 26.5098 48.4909 26.5098H51.5409C51.7609 26.5098 51.9009 26.6398 51.9009 26.8498V45.4198C51.9009 45.6298 51.7609 45.7598 51.5409 45.7598H48.4909C48.2709 45.7598 48.1309 45.6298 48.1309 45.4198Z" fill="white"/><path d="M61.1504 45.4198V26.8498C61.1504 26.6398 61.2904 26.5098 61.5104 26.5098H64.7304C64.9304 26.5098 65.0704 26.5898 65.1804 26.7498L74.3704 40.0498V26.8598C74.3704 26.6498 74.5104 26.5198 74.7304 26.5198H77.6404C77.8604 26.5198 78.0004 26.6498 78.0004 26.8598V45.4298C78.0004 45.6398 77.8604 45.7698 77.6404 45.7698H74.4504C74.2504 45.7698 74.1104 45.6898 74.0004 45.5298L64.7804 32.2098V45.4298C64.7804 45.6398 64.6404 45.7698 64.4204 45.7698H61.5104C61.2904 45.7698 61.1504 45.6398 61.1504 45.4298V45.4198Z" fill="white"/><path d="M87.3008 45.4198V26.8498C87.3008 26.6398 87.4408 26.5098 87.6608 26.5098H100.661C100.881 26.5098 101.021 26.6398 101.021 26.8498V29.4998C101.021 29.7098 100.881 29.8398 100.661 29.8398H91.0808V34.2198H99.7308C99.9508 34.2198 100.091 34.3498 100.091 34.5598V37.1598C100.091 37.3698 99.9508 37.4998 99.7308 37.4998H91.0808V42.4298H101.001C101.221 42.4298 101.361 42.5598 101.361 42.7698V45.4198C101.361 45.6298 101.221 45.7598 101.001 45.7598H87.6708C87.4508 45.7598 87.3108 45.6298 87.3108 45.4198H87.3008Z" fill="white"/><path d="M26.5107 78.4798V59.9098C26.5107 59.6998 26.6507 59.5698 26.8707 59.5698H39.3907C39.6107 59.5698 39.7507 59.6998 39.7507 59.9098V62.5598C39.7507 62.7698 39.6107 62.8998 39.3907 62.8998H30.2907V67.8798H38.1307C38.3507 67.8798 38.4907 68.0098 38.4907 68.2198V70.8698C38.4907 71.0798 38.3507 71.2098 38.1307 71.2098H30.2907V78.4698C30.2907 78.6798 30.1507 78.8098 29.9307 78.8098H26.8807C26.6607 78.8098 26.5207 78.6798 26.5207 78.4698L26.5107 78.4798Z" fill="white"/><path d="M47.0908 78.4798V59.9098C47.0908 59.6998 47.2308 59.5698 47.4508 59.5698H53.6708C59.3608 59.5698 61.8208 61.9298 61.8208 66.2798C61.8208 68.6398 60.8708 70.6298 58.8208 71.8398L62.6608 78.3998C62.8008 78.6398 62.6908 78.8198 62.4108 78.8198H58.9608C58.7608 78.8198 58.6208 78.7398 58.5408 78.5798L55.2308 72.9198C54.7308 72.9698 54.2208 72.9998 53.6608 72.9998H50.8608V78.4798C50.8608 78.6898 50.7208 78.8198 50.5008 78.8198H47.4508C47.2308 78.8198 47.0908 78.6898 47.0908 78.4798ZM50.8708 62.8598V69.7298H53.5308C56.5008 69.7298 57.9008 68.7098 57.9008 66.2898C57.9008 63.8698 56.5008 62.8598 53.5308 62.8598H50.8708Z" fill="white"/><path d="M69.5703 78.4798V59.9098C69.5703 59.6998 69.7103 59.5698 69.9303 59.5698H72.9803C73.2003 59.5698 73.3403 59.6998 73.3403 59.9098V78.4798C73.3403 78.6898 73.2003 78.8198 72.9803 78.8198H69.9303C69.7103 78.8198 69.5703 78.6898 69.5703 78.4798Z" fill="white"/><path d="M82.3105 78.4798V59.9098C82.3105 59.6998 82.4505 59.5698 82.6705 59.5698H95.6705C95.8905 59.5698 96.0305 59.6998 96.0305 59.9098V62.5598C96.0305 62.7698 95.8905 62.8998 95.6705 62.8998H86.0905V67.2798H94.7405C94.9605 67.2798 95.1005 67.4098 95.1005 67.6198V70.2198C95.1005 70.4298 94.9605 70.5598 94.7405 70.5598H86.0905V75.4898H96.0106C96.2306 75.4898 96.3706 75.6198 96.3706 75.8298V78.4798C96.3706 78.6898 96.2306 78.8198 96.0106 78.8198H82.6805C82.4605 78.8198 82.3205 78.6898 82.3205 78.4798H82.3105Z" fill="white"/><path d="M104.301 78.4798V59.9098C104.301 59.6998 104.441 59.5698 104.661 59.5698H107.881C108.081 59.5698 108.221 59.6498 108.331 59.8098L117.521 73.1098V59.9198C117.521 59.7098 117.661 59.5798 117.881 59.5798H120.791C121.011 59.5798 121.151 59.7098 121.151 59.9198V78.4898C121.151 78.6998 121.011 78.8298 120.791 78.8298H117.601C117.401 78.8298 117.261 78.7498 117.151 78.5898L107.931 65.2698V78.4898C107.931 78.6998 107.791 78.8298 107.571 78.8298H104.661C104.441 78.8298 104.301 78.6998 104.301 78.4898V78.4798Z" fill="white"/><path d="M130.17 78.4798V59.9098C130.17 59.6998 130.31 59.5698 130.53 59.5698H137.36C144.19 59.5698 147.75 63.1398 147.75 69.1898C147.75 75.2398 144.19 78.8098 137.36 78.8098H130.53C130.31 78.8098 130.17 78.6798 130.17 78.4698V78.4798ZM133.95 62.9098V75.4998H136.95C141.52 75.4998 143.84 73.2398 143.84 69.2098C143.84 65.1798 141.52 62.9198 136.95 62.9198H133.95V62.9098Z" fill="white"/><path d="M154.121 74.1C154.041 73.89 154.151 73.73 154.371 73.68L157.281 73.02C157.501 72.97 157.641 73.05 157.731 73.26C158.461 74.94 159.631 75.73 161.731 75.73C163.721 75.73 165.061 75.13 165.061 73.68C165.061 72.23 163.801 71.53 161.701 70.82L159.881 70.22C156.601 69.17 154.611 67.36 154.611 64.61C154.611 61.46 157.611 59.21 161.501 59.21C164.951 59.21 167.521 60.7 168.561 63.9C168.641 64.11 168.531 64.27 168.311 64.32L165.231 65.05C165.011 65.1 164.871 65.02 164.781 64.81C164.111 63.24 163.041 62.66 161.501 62.66C159.711 62.66 158.531 63.37 158.531 64.5C158.531 65.71 159.591 66.49 162.001 67.25L163.461 67.7C167.191 68.85 168.981 70.51 168.981 73.68C168.981 76.85 166.011 79.19 161.731 79.19C157.891 79.19 155.201 77.43 154.111 74.1H154.121Z" fill="white"/><path d="M25.1804 107.17C25.1004 106.96 25.2104 106.8 25.4304 106.75L28.3404 106.09C28.5604 106.04 28.7004 106.12 28.7904 106.33C29.5204 108.01 30.6904 108.8 32.8004 108.8C34.7904 108.8 36.1304 108.2 36.1304 106.75C36.1304 105.3 34.8704 104.6 32.7704 103.89L30.9504 103.29C27.6704 102.24 25.6804 100.43 25.6804 97.6798C25.6804 94.5298 28.6804 92.2798 32.5704 92.2798C36.0204 92.2798 38.5904 93.7698 39.6304 96.9698C39.7104 97.1798 39.6004 97.3398 39.3804 97.3898L36.3004 98.1198C36.0804 98.1698 35.9404 98.0898 35.8504 97.8798C35.1804 96.3098 34.1104 95.7298 32.5704 95.7298C30.7804 95.7298 29.6004 96.4398 29.6004 97.5698C29.6004 98.7798 30.6604 99.5598 33.0704 100.32L34.5304 100.77C38.2604 101.92 40.0504 103.58 40.0504 106.75C40.0504 109.92 37.0804 112.26 32.8004 112.26C28.9604 112.26 26.2704 110.5 25.1804 107.17Z" fill="white"/><path d="M74.6001 104.05V92.9797C74.6001 92.7697 74.7401 92.6396 74.9601 92.6396H78.0101C78.2301 92.6396 78.3701 92.7697 78.3701 92.9797V103.42C78.3701 107.2 80.3301 108.8 82.9101 108.8C85.4901 108.8 87.4801 107.2 87.4801 103.42V92.9797C87.4801 92.7697 87.6201 92.6396 87.8401 92.6396H90.8901C91.1101 92.6396 91.2501 92.7697 91.2501 92.9797V104.05C91.2501 110.16 86.9401 112.26 82.9001 112.26C78.8601 112.26 74.5801 110.16 74.5801 104.05H74.6001Z" fill="white"/><path d="M96.5702 111.5L104.78 92.9099C104.86 92.7299 105 92.6499 105.2 92.6499H107.8C108 92.6499 108.14 92.7299 108.22 92.9099L116.43 111.5C116.54 111.74 116.4 111.89 116.15 111.89H112.62C112.42 111.89 112.28 111.81 112.2 111.63L110.74 108.04H102.2L100.74 111.63C100.66 111.81 100.52 111.89 100.32 111.89H96.8502C96.6002 111.89 96.4602 111.73 96.5702 111.5ZM109.4 104.76L106.46 97.4699L103.52 104.76H109.4Z" fill="white"/><path d="M122.87 111.55V92.9797C122.87 92.7697 123.01 92.6396 123.23 92.6396H129.45C135.14 92.6396 137.6 94.9996 137.6 99.3496C137.6 101.71 136.65 103.7 134.6 104.91L138.44 111.47C138.58 111.71 138.47 111.89 138.19 111.89H134.74C134.54 111.89 134.4 111.81 134.32 111.65L131.01 105.99C130.51 106.04 130 106.07 129.44 106.07H126.64V111.55C126.64 111.76 126.5 111.89 126.28 111.89H123.23C123.01 111.89 122.87 111.76 122.87 111.55ZM126.65 95.9196V102.79H129.31C132.28 102.79 133.68 101.77 133.68 99.3496C133.68 96.9296 132.28 95.9196 129.31 95.9196H126.65Z" fill="white"/><path d="M146.32 111.55V92.9797C146.32 92.7697 146.46 92.6396 146.68 92.6396H159.68C159.9 92.6396 160.04 92.7697 160.04 92.9797V95.6296C160.04 95.8396 159.9 95.9697 159.68 95.9697H150.1V100.35H158.75C158.97 100.35 159.11 100.48 159.11 100.69V103.29C159.11 103.5 158.97 103.63 158.75 103.63H150.1V108.56H160.02C160.24 108.56 160.38 108.69 160.38 108.9V111.55C160.38 111.76 160.24 111.89 160.02 111.89H146.69C146.47 111.89 146.33 111.76 146.33 111.55H146.32Z" fill="white"/><path d="M64.6507 108.4C64.9507 108.04 65.2207 107.66 65.4707 107.25C66.3507 105.78 66.7907 104.06 66.7907 102.08C66.7907 100.1 66.3507 98.3798 65.4707 96.9098C64.5907 95.4398 63.3807 94.2998 61.8507 93.4798C60.3207 92.6598 58.5707 92.2598 56.6107 92.2598C54.6507 92.2598 52.9007 92.6698 51.3707 93.4798C49.8407 94.2998 48.6307 95.4398 47.7507 96.9098C46.8707 98.3798 46.4307 100.1 46.4307 102.08C46.4307 104.06 46.8707 105.78 47.7507 107.25C48.6307 108.72 49.8407 109.86 51.3707 110.68C52.9007 111.5 54.6507 111.9 56.6107 111.9C58.5707 111.9 60.3207 111.49 61.8507 110.68L63.8407 112.9C63.9907 113.07 64.1607 113.08 64.3407 112.94L66.6407 111.13C66.8207 110.99 66.8407 110.83 66.6807 110.66L64.6507 108.39V108.4ZM56.6007 108.51C55.3207 108.51 54.2007 108.24 53.2407 107.69C52.2907 107.14 51.5507 106.38 51.0407 105.41C50.5307 104.44 50.2707 103.34 50.2707 102.1C50.2707 100.86 50.5307 99.7398 51.0407 98.7798C51.5507 97.8198 52.2907 97.0598 53.2407 96.5098C54.1907 95.9598 55.3107 95.6898 56.6007 95.6898C57.8907 95.6898 59.0307 95.9698 59.9707 96.5098C60.9107 97.0598 61.6407 97.8198 62.1607 98.7798C62.6707 99.7398 62.9307 100.85 62.9307 102.1C62.9307 103.35 62.6707 104.44 62.1607 105.41C62.1307 105.46 62.1007 105.5 62.0807 105.55L59.1207 102.24C58.9707 102.07 58.8007 102.06 58.6207 102.2L56.3207 104.01C56.1407 104.15 56.1207 104.31 56.2807 104.48L59.4107 107.97C58.5907 108.33 57.6607 108.52 56.6107 108.52L56.6007 108.51Z" fill="white"/></g><defs><clipPath id="clip0_531_831"><rect width="195.5" height="138.4" fill="white"/></clipPath></defs></svg>` },
+  h_dark: { name: 'Logo_Horizontal_w.svg', content: `<svg width="403" height="22" viewBox="0 0 403 22" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_531_692)"><path d="M0 19.9599V0.729883C0 0.509883 0.14 0.379883 0.38 0.379883H3.54C3.77 0.379883 3.92 0.519883 3.92 0.729883V16.8099H14.19C14.42 16.8099 14.57 16.9499 14.57 17.1599V19.9599C14.57 20.1799 14.42 20.3099 14.19 20.3099H0.38C0.15 20.3099 0 20.1699 0 19.9599Z" fill="white"/><path d="M22.3896 19.9599V0.729883C22.3896 0.509883 22.5296 0.379883 22.7696 0.379883H25.9296C26.1596 0.379883 26.3096 0.519883 26.3096 0.729883V19.9599C26.3096 20.1799 26.1596 20.3099 25.9296 20.3099H22.7696C22.5396 20.3099 22.3896 20.1699 22.3896 19.9599Z" fill="white"/><path d="M35.8701 19.9599V0.729883C35.8701 0.509883 36.0101 0.379883 36.2501 0.379883H39.5901C39.7901 0.379883 39.9401 0.459883 40.0501 0.629883L49.5601 14.3999V0.729883C49.5601 0.509883 49.7101 0.379883 49.9401 0.379883H52.9601C53.1901 0.379883 53.3401 0.519883 53.3401 0.729883V19.9599C53.3401 20.1799 53.1901 20.3099 52.9601 20.3099H49.6501C49.4501 20.3099 49.3001 20.2299 49.1901 20.0699L39.6501 6.26988V19.9599C39.6501 20.1799 39.5001 20.3099 39.2701 20.3099H36.2501C36.0201 20.3099 35.8701 20.1699 35.8701 19.9599Z" fill="white"/><path d="M62.9502 19.9599V0.729883C62.9502 0.509883 63.0902 0.379883 63.3302 0.379883H76.7902C77.0202 0.379883 77.1702 0.519883 77.1702 0.729883V3.46988C77.1702 3.68988 77.0202 3.81988 76.7902 3.81988H66.8702V8.34988H75.8302C76.0602 8.34988 76.2102 8.48988 76.2102 8.69988V11.3899C76.2102 11.6099 76.0602 11.7399 75.8302 11.7399H66.8702V16.8499H77.1402C77.3702 16.8499 77.5202 16.9899 77.5202 17.1999V19.9399C77.5202 20.1599 77.3702 20.2899 77.1402 20.2899H63.3302C63.1002 20.2899 62.9502 20.1499 62.9502 19.9399V19.9599Z" fill="white"/><path d="M96.2197 19.9599V0.729883C96.2197 0.509883 96.3697 0.379883 96.5997 0.379883H109.57C109.8 0.379883 109.95 0.519883 109.95 0.729883V3.46988C109.95 3.68988 109.8 3.81988 109.57 3.81988H100.14V8.97988H108.26C108.49 8.97988 108.64 9.11988 108.64 9.32988V12.0699C108.64 12.2899 108.49 12.4199 108.26 12.4199H100.14V19.9399C100.14 20.1599 99.9897 20.2899 99.7597 20.2899H96.5997C96.3697 20.2899 96.2197 20.1499 96.2197 19.9399V19.9599Z" fill="white"/><path d="M117.52 19.9599V0.729883C117.52 0.509883 117.67 0.379883 117.9 0.379883H124.34C130.23 0.379883 132.78 2.81988 132.78 7.32988C132.78 9.76988 131.79 11.8399 129.68 13.0899L133.65 19.8799C133.8 20.1199 133.68 20.3099 133.39 20.3099H129.82C129.62 20.3099 129.47 20.2299 129.38 20.0699L125.96 14.1999C125.44 14.2499 124.92 14.2799 124.34 14.2799H121.44V19.9599C121.44 20.1799 121.29 20.3099 121.06 20.3099H117.9C117.67 20.3099 117.52 20.1699 117.52 19.9599ZM121.44 3.77988V10.8899H124.2C127.27 10.8899 128.73 9.82988 128.73 7.32988C128.73 4.82988 127.28 3.76988 124.2 3.76988H121.44V3.77988Z" fill="white"/><path d="M140.81 19.9599V0.729883C140.81 0.509883 140.96 0.379883 141.19 0.379883H144.35C144.58 0.379883 144.73 0.519883 144.73 0.729883V19.9599C144.73 20.1799 144.58 20.3099 144.35 20.3099H141.19C140.96 20.3099 140.81 20.1699 140.81 19.9599Z" fill="white"/><path d="M154 19.9599V0.729883C154 0.509883 154.15 0.379883 154.38 0.379883H167.84C168.07 0.379883 168.22 0.519883 168.22 0.729883V3.46988C168.22 3.68988 168.07 3.81988 167.84 3.81988H157.92V8.34988H166.88C167.11 8.34988 167.26 8.48988 167.26 8.69988V11.3899C167.26 11.6099 167.11 11.7399 166.88 11.7399H157.92V16.8499H168.19C168.42 16.8499 168.57 16.9899 168.57 17.1999V19.9399C168.57 20.1599 168.42 20.2899 168.19 20.2899H154.38C154.15 20.2899 154 20.1499 154 19.9399V19.9599Z" fill="white"/><path d="M176.77 19.9599V0.729883C176.77 0.509883 176.91 0.379883 177.15 0.379883H180.49C180.69 0.379883 180.84 0.459883 180.95 0.629883L190.46 14.3999V0.729883C190.46 0.509883 190.61 0.379883 190.84 0.379883H193.86C194.09 0.379883 194.24 0.519883 194.24 0.729883V19.9599C194.24 20.1799 194.09 20.3099 193.86 20.3099H190.55C190.35 20.3099 190.2 20.2299 190.09 20.0699L180.55 6.26988V19.9599C180.55 20.1799 180.4 20.3099 180.17 20.3099H177.15C176.92 20.3099 176.77 20.1699 176.77 19.9599Z" fill="white"/><path d="M203.56 19.9599V0.729883C203.56 0.509883 203.7 0.379883 203.94 0.379883H211.02C218.1 0.379883 221.78 4.06988 221.78 10.3499C221.78 16.6299 218.1 20.3199 211.02 20.3199H203.94C203.71 20.3199 203.56 20.1799 203.56 19.9699V19.9599ZM207.48 3.82988V16.8599H210.58C215.31 16.8599 217.72 14.5199 217.72 10.3399C217.72 6.15988 215.31 3.81988 210.58 3.81988H207.48V3.82988Z" fill="white"/><path d="M228.36 15.42C228.27 15.2 228.39 15.04 228.62 14.99L231.64 14.31C231.87 14.26 232.02 14.34 232.1 14.55C232.85 16.29 234.07 17.1 236.25 17.1C238.31 17.1 239.7 16.48 239.7 14.98C239.7 13.48 238.39 12.75 236.22 12.02L234.33 11.4C230.94 10.31 228.88 8.44 228.88 5.59C228.88 2.33 231.98 0 236.02 0C239.59 0 242.26 1.55 243.33 4.86C243.42 5.08 243.3 5.24 243.07 5.3L239.88 6.06C239.65 6.11 239.5 6.03 239.42 5.81C238.72 4.18 237.62 3.58 236.03 3.58C234.17 3.58 232.96 4.31 232.96 5.48C232.96 6.73 234.06 7.54 236.56 8.33L238.07 8.79C241.93 9.98 243.78 11.7 243.78 14.98C243.78 18.26 240.71 20.68 236.27 20.68C232.3 20.68 229.51 18.86 228.38 15.41L228.36 15.42Z" fill="white"/><path d="M262.51 15.42C262.42 15.2 262.54 15.04 262.77 14.99L265.79 14.31C266.02 14.26 266.17 14.34 266.25 14.55C267 16.29 268.22 17.1 270.4 17.1C272.46 17.1 273.85 16.48 273.85 14.98C273.85 13.48 272.54 12.75 270.37 12.02L268.48 11.4C265.09 10.31 263.03 8.44 263.03 5.59C263.03 2.34 266.13 0 270.16 0C273.73 0 276.4 1.55 277.47 4.86C277.56 5.08 277.44 5.24 277.21 5.3L274.02 6.06C273.79 6.11 273.64 6.03 273.56 5.81C272.86 4.18 271.76 3.58 270.17 3.58C268.31 3.58 267.1 4.31 267.1 5.48C267.1 6.73 268.2 7.54 270.7 8.33L272.21 8.79C276.07 9.98 277.92 11.7 277.92 14.98C277.92 18.26 274.85 20.68 270.41 20.68C266.44 20.68 263.65 18.86 262.52 15.41L262.51 15.42Z" fill="white"/><path d="M313.69 12.1899V0.729883C313.69 0.509883 313.83 0.379883 314.07 0.379883H317.23C317.46 0.379883 317.61 0.519883 317.61 0.729883V11.5399C317.61 15.4499 319.64 17.1099 322.31 17.1099C324.98 17.1099 327.04 15.4499 327.04 11.5399V0.729883C327.04 0.509883 327.19 0.379883 327.42 0.379883H330.58C330.81 0.379883 330.96 0.519883 330.96 0.729883V12.1899C330.96 18.5199 326.49 20.6899 322.32 20.6899C318.15 20.6899 313.71 18.5199 313.71 12.1899H313.69Z" fill="white"/><path d="M336.441 19.8999L344.941 0.649883C345.031 0.459883 345.171 0.379883 345.381 0.379883H348.081C348.281 0.379883 348.431 0.459883 348.521 0.649883L357.021 19.8999C357.141 20.1499 356.991 20.3099 356.731 20.3099H353.071C352.871 20.3099 352.721 20.2299 352.631 20.0399L351.121 16.3199H342.271L340.761 20.0399C340.671 20.2299 340.531 20.3099 340.321 20.3099H336.721C336.461 20.3099 336.311 20.1499 336.431 19.8999H336.441ZM349.721 12.9299L346.671 5.37988L343.621 12.9299H349.711H349.721Z" fill="white"/><path d="M363.671 19.9599V0.729883C363.671 0.509883 363.811 0.379883 364.051 0.379883H370.491C376.381 0.379883 378.931 2.81988 378.931 7.32988C378.931 9.76988 377.941 11.8399 375.831 13.0899L379.801 19.8799C379.951 20.1199 379.831 20.3099 379.541 20.3099H375.971C375.771 20.3099 375.621 20.2299 375.531 20.0699L372.111 14.1999C371.591 14.2499 371.071 14.2799 370.491 14.2799H367.591V19.9599C367.591 20.1799 367.441 20.3099 367.211 20.3099H364.051C363.821 20.3099 363.671 20.1699 363.671 19.9599ZM367.591 3.77988V10.8899H370.351C373.421 10.8899 374.881 9.82988 374.881 7.32988C374.881 4.82988 373.431 3.76988 370.351 3.76988H367.591V3.77988Z" fill="white"/><path d="M387.961 19.9599V0.729883C387.961 0.509883 388.111 0.379883 388.341 0.379883H401.801C402.031 0.379883 402.181 0.519883 402.181 0.729883V3.46988C402.181 3.68988 402.031 3.81988 401.801 3.81988H391.881V8.34988H400.841C401.071 8.34988 401.221 8.48988 401.221 8.69988V11.3899C401.221 11.6099 401.071 11.7399 400.841 11.7399H391.881V16.8499H402.151C402.381 16.8499 402.531 16.9899 402.531 17.1999V19.9399C402.531 20.1599 402.381 20.2899 402.151 20.2899H388.341C388.111 20.2899 387.961 20.1499 387.961 19.9399V19.9599Z" fill="white"/><path d="M303.38 16.7C303.69 16.33 303.97 15.94 304.23 15.51C305.14 13.99 305.6 12.21 305.6 10.16C305.6 8.11 305.14 6.33 304.23 4.81C303.32 3.29 302.07 2.11 300.48 1.26C298.89 0.42 297.08 0 295.05 0C293.02 0 291.21 0.42 289.62 1.27C288.03 2.12 286.78 3.3 285.87 4.82C284.96 6.34 284.5 8.12 284.5 10.17C284.5 12.22 284.96 14 285.87 15.52C286.78 17.04 288.03 18.22 289.62 19.07C291.21 19.91 293.02 20.34 295.05 20.34C297.08 20.34 298.89 19.92 300.48 19.07L302.54 21.37C302.7 21.55 302.87 21.56 303.06 21.41L305.44 19.54C305.63 19.39 305.64 19.23 305.49 19.05L303.38 16.7ZM295.05 16.81C293.72 16.81 292.56 16.53 291.57 15.96C290.58 15.39 289.82 14.6 289.29 13.6C288.76 12.6 288.49 11.45 288.49 10.17C288.49 8.89 288.76 7.72 289.29 6.73C289.82 5.73 290.58 4.95 291.57 4.38C292.56 3.81 293.72 3.53 295.05 3.53C296.38 3.53 297.56 3.82 298.54 4.38C299.52 4.95 300.27 5.73 300.81 6.73C301.34 7.73 301.61 8.87 301.61 10.17C301.61 11.47 301.34 12.59 300.81 13.6C300.78 13.65 300.75 13.69 300.72 13.74L297.65 10.32C297.49 10.14 297.32 10.13 297.13 10.28L294.75 12.15C294.56 12.3 294.55 12.46 294.7 12.64L297.94 16.26C297.09 16.63 296.13 16.83 295.04 16.83L295.05 16.81Z" fill="white"/></g><defs><clipPath id="clip0_531_692"><rect width="402.52" height="21.51" fill="white"/></clipPath></defs></svg>` },
+  h_box_dark: { name: 'Logo_Horizontal_Box_ver_w.svg', content: `<svg width="448" height="66" viewBox="0 0 448 66" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_531_744)"><path d="M447.87 65.29H0V0H447.87V65.29ZM317.72 22.29C315.69 22.29 313.88 22.7097 312.29 23.5596C310.7 24.4096 309.45 25.5904 308.54 27.1104C307.63 28.6303 307.17 30.41 307.17 32.46C307.17 34.5099 307.63 36.2896 308.54 37.8096C309.45 39.3296 310.7 40.5104 312.29 41.3604C313.88 42.2002 315.69 42.6299 317.72 42.6299C319.75 42.6299 321.56 42.2102 323.149 41.3604L325.21 43.6602C325.37 43.8399 325.54 43.85 325.729 43.7002L328.109 41.8301C328.299 41.6801 328.31 41.5198 328.16 41.3398L326.054 38.9941C326.362 38.6258 326.641 38.2375 326.899 37.8096C327.809 36.2896 328.27 34.5099 328.27 32.46C328.27 30.41 327.809 28.6303 326.899 27.1104C325.989 25.5904 324.739 24.4096 323.149 23.5596C321.56 22.7197 319.75 22.29 317.72 22.29ZM336.739 22.6797C336.5 22.6798 336.359 22.8104 336.359 23.0303V34.4902H336.38C336.38 40.8199 340.819 42.9901 344.989 42.9902C349.159 42.9902 353.63 40.8201 353.63 34.4902V23.0303C353.63 22.8204 353.48 22.6798 353.25 22.6797H350.09C349.86 22.6797 349.71 22.8103 349.71 23.0303V33.8398C349.71 37.7498 347.649 39.4102 344.979 39.4102C342.31 39.4101 340.279 37.7497 340.279 33.8398V23.0303C340.279 22.8203 340.129 22.6797 339.899 22.6797H336.739ZM258.699 22.2998C254.66 22.3 251.56 24.63 251.56 27.8896C251.56 30.7396 253.62 32.6102 257.01 33.7002L258.899 34.3203C261.069 35.0503 262.38 35.7803 262.38 37.2803C262.38 38.7801 260.99 39.4004 258.93 39.4004C256.75 39.4004 255.529 38.5896 254.779 36.8496C254.699 36.64 254.549 36.5604 254.319 36.6104L251.3 37.29C251.07 37.34 250.95 37.4998 251.04 37.7197L251.06 37.71C252.19 41.1598 254.979 42.9803 258.949 42.9805C263.389 42.9805 266.46 40.5602 266.46 37.2803C266.46 34.0003 264.61 32.2798 260.75 31.0898L259.239 30.6299C256.74 29.84 255.64 29.0301 255.64 27.7803C255.64 26.6103 256.85 25.8799 258.71 25.8799C260.3 25.88 261.4 26.4805 262.1 28.1104C262.18 28.3301 262.33 28.4103 262.56 28.3604L265.75 27.5996C265.98 27.5395 266.1 27.38 266.01 27.1602C264.94 23.8502 262.269 22.2998 258.699 22.2998ZM292.84 22.2998C288.8 22.2998 285.699 24.6299 285.699 27.8896C285.699 30.7396 287.76 32.6102 291.149 33.7002L293.04 34.3203C295.21 35.0503 296.52 35.7804 296.52 37.2803C296.519 38.7801 295.129 39.4004 293.069 39.4004C290.89 39.4003 289.67 38.5895 288.92 36.8496C288.84 36.6399 288.69 36.5605 288.46 36.6104L285.439 37.29C285.21 37.3401 285.09 37.4999 285.18 37.7197L285.199 37.71C286.329 41.16 289.12 42.9805 293.09 42.9805C297.53 42.9804 300.599 40.5601 300.6 37.2803C300.6 34.0003 298.75 32.2798 294.89 31.0898L293.38 30.6299C290.88 29.8399 289.779 29.0301 289.779 27.7803C289.779 26.6103 290.99 25.8799 292.85 25.8799C294.44 25.8799 295.539 26.4804 296.239 28.1104C296.319 28.3301 296.47 28.4101 296.699 28.3604L299.89 27.5996C300.12 27.5396 300.239 27.3801 300.149 27.1602C299.079 23.8502 296.41 22.2998 292.84 22.2998ZM58.9199 22.6797C58.6799 22.6797 58.54 22.8103 58.54 23.0303V42.2705C58.5403 42.4802 58.6901 42.6201 58.9199 42.6201H61.9395C62.1693 42.6201 62.3191 42.4902 62.3193 42.2705V28.5801L71.8594 42.3799C71.9693 42.5398 72.1195 42.62 72.3193 42.6201H75.6299C75.8596 42.62 76.0096 42.4902 76.0098 42.2705V23.04C76.0098 22.8301 75.8598 22.6905 75.6299 22.6904H72.6094C72.3796 22.6905 72.2295 22.8201 72.2295 23.04V36.7002L62.7197 22.9297C62.6098 22.7599 62.4596 22.6797 62.2598 22.6797H58.9199ZM199.819 22.6797C199.58 22.6798 199.439 22.8104 199.439 23.0303V42.2705C199.44 42.4801 199.59 42.62 199.819 42.6201H202.84C203.07 42.6201 203.22 42.4902 203.22 42.2705V28.5801L212.76 42.3799C212.87 42.5399 213.02 42.6201 213.22 42.6201H216.529C216.759 42.6201 216.91 42.4902 216.91 42.2705V23.04C216.91 22.83 216.759 22.6904 216.529 22.6904H213.51C213.28 22.6904 213.13 22.82 213.13 23.04V36.7002L203.62 22.9297C203.51 22.7599 203.36 22.6798 203.16 22.6797H199.819ZM226.62 22.6797C226.38 22.6797 226.239 22.8103 226.239 23.0303V42.2705C226.239 42.4802 226.39 42.6201 226.62 42.6201H233.699C240.779 42.6201 244.46 38.9302 244.46 32.6504C244.46 26.3704 240.779 22.6797 233.699 22.6797H226.62ZM23.0596 22.6797C22.8196 22.6797 22.6797 22.8103 22.6797 23.0303V42.2598C22.6797 42.4697 22.8296 42.6103 23.0596 42.6104H36.8701C37.0999 42.6102 37.25 42.4796 37.25 42.2598V39.46C37.25 39.2501 37.0998 39.1105 36.8701 39.1104H26.5996V23.0303C26.5996 22.8203 26.4497 22.6797 26.2197 22.6797H23.0596ZM45.4492 22.6797C45.2095 22.6799 45.0693 22.8104 45.0693 23.0303V42.2598C45.0693 42.4696 45.2195 42.6102 45.4492 42.6104H48.6094C48.8394 42.6104 48.9893 42.4798 48.9893 42.2598V23.0303C48.9893 22.8203 48.8394 22.6797 48.6094 22.6797H45.4492ZM140.58 22.6797C140.35 22.6797 140.199 22.8103 140.199 23.0303V42.2598C140.199 42.4698 140.35 42.6104 140.58 42.6104H143.739C143.969 42.6104 144.12 42.4798 144.12 42.2598V36.5801H147.02C147.6 36.5801 148.12 36.55 148.64 36.5L152.06 42.3701C152.15 42.5301 152.3 42.6104 152.5 42.6104H156.069C156.359 42.6104 156.48 42.4197 156.33 42.1797L152.359 35.3896C154.469 34.1396 155.46 32.0699 155.46 29.6299C155.46 25.12 152.909 22.6797 147.02 22.6797H140.58ZM163.87 22.6797C163.64 22.6797 163.489 22.8103 163.489 23.0303V42.2598C163.489 42.4698 163.64 42.6104 163.87 42.6104H167.029C167.259 42.6104 167.41 42.4798 167.41 42.2598V23.0303C167.41 22.8203 167.259 22.6797 167.029 22.6797H163.87ZM368.06 22.6797C367.85 22.6797 367.71 22.7603 367.62 22.9502L359.12 42.2002H359.109C358.99 42.45 359.14 42.6102 359.399 42.6104H363C363.21 42.6103 363.349 42.5297 363.439 42.3398L364.949 38.6201H373.8L375.31 42.3398C375.4 42.5298 375.55 42.6104 375.75 42.6104H379.41C379.67 42.6102 379.819 42.45 379.699 42.2002L371.199 22.9502C371.109 22.7603 370.96 22.6797 370.76 22.6797H368.06ZM386.729 22.6797C386.49 22.6798 386.35 22.8103 386.35 23.0303V42.2598C386.35 42.4697 386.5 42.6103 386.729 42.6104H389.89C390.12 42.6104 390.27 42.4798 390.27 42.2598V36.5801H393.17C393.75 36.5801 394.27 36.55 394.79 36.5L398.21 42.3701C398.3 42.5299 398.45 42.6103 398.649 42.6104H402.22C402.51 42.6103 402.629 42.4197 402.479 42.1797L398.51 35.3896C400.62 34.1396 401.609 32.0698 401.609 29.6299C401.609 25.12 399.06 22.6797 393.17 22.6797H386.729ZM86 22.6797C85.76 22.6797 85.6201 22.8103 85.6201 23.0303V42.2402L85.627 42.3154C85.6589 42.4828 85.7988 42.5898 86 42.5898H99.8096C100.04 42.5898 100.189 42.4601 100.189 42.2402V39.5C100.189 39.29 100.04 39.1504 99.8096 39.1504H89.54V34.04H98.5C98.7297 34.0399 98.8797 33.9101 98.8799 33.6904V31C98.8799 30.7901 98.7298 30.6505 98.5 30.6504H89.54V26.1201H99.46C99.6896 26.12 99.8396 25.9901 99.8398 25.7705V23.0303C99.8398 22.8204 99.6898 22.6798 99.46 22.6797H86ZM119.279 22.6797C119.05 22.6798 118.899 22.8104 118.899 23.0303V42.2402L118.906 42.3154C118.938 42.4828 119.078 42.5897 119.279 42.5898H122.439C122.669 42.5898 122.819 42.4601 122.819 42.2402V34.7197H130.939C131.169 34.7197 131.319 34.5901 131.319 34.3701V31.6299C131.319 31.42 131.169 31.2803 130.939 31.2803H122.819V26.1201H132.25C132.48 26.12 132.63 25.9901 132.63 25.7705V23.0303C132.63 22.8204 132.48 22.6798 132.25 22.6797H119.279ZM177.06 22.6797C176.83 22.6797 176.68 22.8103 176.68 23.0303V42.2402L176.687 42.3154C176.718 42.4829 176.858 42.5898 177.06 42.5898H190.87C191.1 42.5897 191.25 42.46 191.25 42.2402V39.5C191.25 39.2902 191.1 39.1506 190.87 39.1504H180.6V34.04H189.56C189.789 34.04 189.939 33.9102 189.939 33.6904V31C189.939 30.79 189.79 30.6504 189.56 30.6504H180.6V26.1201H190.52C190.749 26.1201 190.899 25.9902 190.899 25.7705V23.0303C190.899 22.8203 190.75 22.6797 190.52 22.6797H177.06ZM411.01 22.6797C410.78 22.6797 410.63 22.8103 410.63 23.0303V42.2402L410.637 42.3154C410.669 42.4829 410.809 42.5898 411.01 42.5898H424.819C425.049 42.5898 425.2 42.4601 425.2 42.2402V39.5C425.2 39.29 425.049 39.1504 424.819 39.1504H414.55V34.04H423.51C423.74 34.04 423.889 33.9102 423.89 33.6904V31C423.89 30.79 423.74 30.6504 423.51 30.6504H414.55V26.1201H424.47C424.7 26.1201 424.849 25.9902 424.85 25.7705V23.0303C424.85 22.8203 424.7 22.6797 424.47 22.6797H411.01ZM233.26 26.1201C237.99 26.1201 240.399 28.4599 240.399 32.6396C240.399 36.8196 237.99 39.1601 233.26 39.1602H230.16V26.1201H233.26ZM317.729 25.8203C319.059 25.8203 320.24 26.1099 321.22 26.6699C322.2 27.2399 322.949 28.0205 323.489 29.0205C324.019 30.0204 324.29 31.1601 324.29 32.46C324.29 33.7599 324.019 34.8797 323.489 35.8896C323.459 35.9396 323.429 35.9803 323.399 36.0303L320.33 32.6104C320.17 32.4304 320 32.4203 319.81 32.5703L317.43 34.4404C317.24 34.5904 317.23 34.7498 317.38 34.9297L320.62 38.5498C319.77 38.9198 318.81 39.1201 317.72 39.1201L317.729 39.0996C316.4 39.0996 315.24 38.8199 314.25 38.25C313.26 37.68 312.5 36.8896 311.97 35.8896C311.44 34.8897 311.17 33.7398 311.17 32.46C311.17 31.1801 311.44 30.0104 311.97 29.0205C312.5 28.0205 313.26 27.2399 314.25 26.6699C315.24 26.1001 316.4 25.8203 317.729 25.8203ZM372.399 35.2197H366.3L369.35 27.6699L372.399 35.2197ZM146.88 26.0596C149.96 26.0596 151.41 27.1202 151.41 29.6201C151.41 32.12 149.95 33.1796 146.88 33.1797H144.12V26.0596H146.88ZM393.029 26.0596C396.109 26.0596 397.56 27.1201 397.56 29.6201C397.56 32.1201 396.099 33.1797 393.029 33.1797H390.27V26.0596H393.029Z" fill="white"/></g><defs><clipPath id="clip0_531_744"><rect width="447.87" height="65.29" fill="white"/></clipPath></defs></svg>` },
+  h_lined_dark: { name: 'Logo_Horizontal_Lined_ver_w.svg', content: `<svg width="450" height="68" viewBox="0 0 450 68" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_531_767)"><path d="M448.87 66.29V1L1.00012 1V66.29L448.87 66.29Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/><path d="M23.6797 43.2602V24.0302C23.6797 23.8102 23.8197 23.6802 24.0597 23.6802H27.2197C27.4497 23.6802 27.5997 23.8202 27.5997 24.0302V40.1102H37.8697C38.0997 40.1102 38.2497 40.2502 38.2497 40.4602V43.2602C38.2497 43.4802 38.0997 43.6102 37.8697 43.6102H24.0597C23.8297 43.6102 23.6797 43.4702 23.6797 43.2602Z" fill="white"/><path d="M46.0693 43.2602V24.0302C46.0693 23.8102 46.2093 23.6802 46.4493 23.6802H49.6093C49.8393 23.6802 49.9893 23.8202 49.9893 24.0302V43.2602C49.9893 43.4802 49.8393 43.6102 49.6093 43.6102H46.4493C46.2193 43.6102 46.0693 43.4702 46.0693 43.2602Z" fill="white"/><path d="M59.54 43.2602V24.0302C59.54 23.8102 59.68 23.6802 59.92 23.6802H63.26C63.46 23.6802 63.61 23.7602 63.72 23.9302L73.23 37.7002V24.0402C73.23 23.8202 73.38 23.6902 73.61 23.6902H76.63C76.86 23.6902 77.01 23.8302 77.01 24.0402V43.2702C77.01 43.4902 76.86 43.6202 76.63 43.6202H73.32C73.12 43.6202 72.97 43.5402 72.86 43.3802L63.32 29.5802V43.2702C63.32 43.4902 63.17 43.6202 62.94 43.6202H59.92C59.69 43.6202 59.54 43.4802 59.54 43.2702V43.2602Z" fill="white"/><path d="M86.6201 43.2602V24.0302C86.6201 23.8102 86.7601 23.6802 87.0001 23.6802H100.46C100.69 23.6802 100.84 23.8202 100.84 24.0302V26.7702C100.84 26.9902 100.69 27.1202 100.46 27.1202H90.5401V31.6502H99.5001C99.7301 31.6502 99.8801 31.7902 99.8801 32.0002V34.6902C99.8801 34.9102 99.7301 35.0402 99.5001 35.0402H90.5401V40.1502H100.81C101.04 40.1502 101.19 40.2902 101.19 40.5002V43.2402C101.19 43.4602 101.04 43.5902 100.81 43.5902H87.0001C86.7701 43.5902 86.6201 43.4502 86.6201 43.2402V43.2602Z" fill="white"/><path d="M119.899 43.2597V24.0297C119.899 23.8097 120.049 23.6797 120.279 23.6797H133.249C133.479 23.6797 133.629 23.8197 133.629 24.0297V26.7697C133.629 26.9897 133.479 27.1197 133.249 27.1197H123.819V32.2797H131.939C132.169 32.2797 132.319 32.4197 132.319 32.6297V35.3697C132.319 35.5897 132.169 35.7197 131.939 35.7197H123.819V43.2397C123.819 43.4597 123.669 43.5897 123.439 43.5897H120.279C120.049 43.5897 119.899 43.4497 119.899 43.2397V43.2597Z" fill="white"/><path d="M141.199 43.2597V24.0297C141.199 23.8097 141.349 23.6797 141.579 23.6797H148.019C153.909 23.6797 156.459 26.1197 156.459 30.6297C156.459 33.0697 155.469 35.1397 153.359 36.3897L157.329 43.1797C157.479 43.4197 157.359 43.6097 157.069 43.6097H153.499C153.299 43.6097 153.149 43.5297 153.059 43.3697L149.639 37.4997C149.119 37.5497 148.599 37.5797 148.019 37.5797H145.119V43.2597C145.119 43.4797 144.969 43.6097 144.739 43.6097H141.579C141.349 43.6097 141.199 43.4697 141.199 43.2597ZM145.119 27.0697V34.1797H147.879C150.949 34.1797 152.409 33.1197 152.409 30.6197C152.409 28.1197 150.959 27.0597 147.879 27.0597H145.119V27.0697Z" fill="white"/><path d="M164.489 43.2597V24.0297C164.489 23.8097 164.639 23.6797 164.869 23.6797H168.029C168.259 23.6797 168.409 23.8197 168.409 24.0297V43.2597C168.409 43.4797 168.259 43.6097 168.029 43.6097H164.869C164.639 43.6097 164.489 43.4697 164.489 43.2597Z" fill="white"/><path d="M177.68 43.2597V24.0297C177.68 23.8097 177.83 23.6797 178.06 23.6797H191.52C191.75 23.6797 191.9 23.8197 191.9 24.0297V26.7697C191.9 26.9897 191.75 27.1197 191.52 27.1197H181.6V31.6497H190.56C190.79 31.6497 190.94 31.7897 190.94 31.9997V34.6897C190.94 34.9097 190.79 35.0397 190.56 35.0397H181.6V40.1497H191.87C192.1 40.1497 192.25 40.2897 192.25 40.4997V43.2397C192.25 43.4597 192.1 43.5897 191.87 43.5897H178.06C177.83 43.5897 177.68 43.4497 177.68 43.2397V43.2597Z" fill="white"/><path d="M200.439 43.2597V24.0297C200.439 23.8097 200.579 23.6797 200.819 23.6797H204.159C204.359 23.6797 204.509 23.7597 204.619 23.9297L214.129 37.6997V24.0397C214.129 23.8197 214.279 23.6897 214.509 23.6897H217.529C217.759 23.6897 217.909 23.8297 217.909 24.0397V43.2697C217.909 43.4897 217.759 43.6197 217.529 43.6197H214.219C214.019 43.6197 213.869 43.5397 213.759 43.3797L204.219 29.5797V43.2697C204.219 43.4897 204.069 43.6197 203.839 43.6197H200.819C200.589 43.6197 200.439 43.4797 200.439 43.2697V43.2597Z" fill="white"/><path d="M227.239 43.2597V24.0297C227.239 23.8097 227.379 23.6797 227.619 23.6797H234.699C241.779 23.6797 245.459 27.3697 245.459 33.6497C245.459 39.9297 241.779 43.6197 234.699 43.6197H227.619C227.389 43.6197 227.239 43.4797 227.239 43.2697V43.2597ZM231.159 27.1297V40.1597H234.259C238.989 40.1597 241.399 37.8197 241.399 33.6397C241.399 29.4597 238.989 27.1197 234.259 27.1197H231.159V27.1297Z" fill="white"/><path d="M252.04 38.7198C251.95 38.4998 252.07 38.3398 252.3 38.2898L255.32 37.6098C255.55 37.5598 255.7 37.6398 255.78 37.8498C256.53 39.5898 257.75 40.3998 259.93 40.3998C261.99 40.3998 263.38 39.7798 263.38 38.2798C263.38 36.7798 262.07 36.0498 259.9 35.3198L258.01 34.6998C254.62 33.6098 252.56 31.7398 252.56 28.8898C252.56 25.6298 255.66 23.2998 259.7 23.2998C263.27 23.2998 265.94 24.8498 267.01 28.1598C267.1 28.3798 266.98 28.5398 266.75 28.5998L263.56 29.3598C263.33 29.4098 263.18 29.3298 263.1 29.1098C262.4 27.4798 261.3 26.8798 259.71 26.8798C257.85 26.8798 256.64 27.6098 256.64 28.7798C256.64 30.0298 257.74 30.8398 260.24 31.6298L261.75 32.0898C265.61 33.2798 267.46 34.9998 267.46 38.2798C267.46 41.5598 264.39 43.9798 259.95 43.9798C255.98 43.9798 253.19 42.1598 252.06 38.7098L252.04 38.7198Z" fill="white"/><path d="M286.179 38.7198C286.089 38.4998 286.209 38.3398 286.439 38.2898L289.459 37.6098C289.689 37.5598 289.839 37.6398 289.919 37.8498C290.669 39.5898 291.889 40.3998 294.069 40.3998C296.129 40.3998 297.519 39.7798 297.519 38.2798C297.519 36.7798 296.209 36.0498 294.039 35.3198L292.149 34.6998C288.759 33.6098 286.699 31.7398 286.699 28.8898C286.699 25.6298 289.799 23.2998 293.839 23.2998C297.409 23.2998 300.079 24.8498 301.149 28.1598C301.239 28.3798 301.119 28.5398 300.889 28.5998L297.699 29.3598C297.469 29.4098 297.319 29.3298 297.239 29.1098C296.539 27.4798 295.439 26.8798 293.849 26.8798C291.989 26.8798 290.779 27.6098 290.779 28.7798C290.779 30.0298 291.879 30.8398 294.379 31.6298L295.889 32.0898C299.749 33.2798 301.599 34.9998 301.599 38.2798C301.599 41.5598 298.529 43.9798 294.089 43.9798C290.119 43.9798 287.329 42.1598 286.199 38.7098L286.179 38.7198Z" fill="white"/><path d="M337.359 35.4902V24.0302C337.359 23.8102 337.499 23.6802 337.739 23.6802H340.899C341.129 23.6802 341.279 23.8202 341.279 24.0302V34.8402C341.279 38.7502 343.309 40.4102 345.979 40.4102C348.649 40.4102 350.709 38.7502 350.709 34.8402V24.0302C350.709 23.8102 350.859 23.6802 351.089 23.6802H354.249C354.479 23.6802 354.629 23.8202 354.629 24.0302V35.4902C354.629 41.8202 350.159 43.9902 345.989 43.9902C341.819 43.9902 337.379 41.8202 337.379 35.4902H337.359Z" fill="white"/><path d="M360.119 43.2002L368.619 23.9502C368.709 23.7602 368.849 23.6802 369.059 23.6802H371.759C371.959 23.6802 372.109 23.7602 372.199 23.9502L380.699 43.2002C380.819 43.4502 380.669 43.6102 380.409 43.6102H376.749C376.549 43.6102 376.399 43.5302 376.309 43.3402L374.799 39.6202H365.949L364.439 43.3402C364.349 43.5302 364.209 43.6102 363.999 43.6102H360.399C360.139 43.6102 359.989 43.4502 360.109 43.2002H360.119ZM373.399 36.2202L370.349 28.6702L367.299 36.2202H373.389H373.399Z" fill="white"/><path d="M387.35 43.2602V24.0302C387.35 23.8102 387.49 23.6802 387.73 23.6802H394.17C400.06 23.6802 402.61 26.1202 402.61 30.6302C402.61 33.0702 401.62 35.1402 399.51 36.3902L403.48 43.1802C403.63 43.4202 403.51 43.6102 403.22 43.6102H399.65C399.45 43.6102 399.3 43.5302 399.21 43.3702L395.79 37.5002C395.27 37.5502 394.75 37.5802 394.17 37.5802H391.27V43.2602C391.27 43.4802 391.12 43.6102 390.89 43.6102H387.73C387.5 43.6102 387.35 43.4702 387.35 43.2602ZM391.27 27.0702V34.1802H394.03C397.1 34.1802 398.56 33.1202 398.56 30.6202C398.56 28.1202 397.11 27.0602 394.03 27.0602H391.27V27.0702Z" fill="white"/><path d="M411.63 43.2602V24.0302C411.63 23.8102 411.78 23.6802 412.01 23.6802H425.47C425.7 23.6802 425.85 23.8202 425.85 24.0302V26.7702C425.85 26.9902 425.7 27.1202 425.47 27.1202H415.55V31.6502H424.51C424.74 31.6502 424.89 31.7902 424.89 32.0002V34.6902C424.89 34.9102 424.74 35.0402 424.51 35.0402H415.55V40.1502H425.82C426.05 40.1502 426.2 40.2902 426.2 40.5002V43.2402C426.2 43.4602 426.05 43.5902 425.82 43.5902H412.01C411.78 43.5902 411.63 43.4502 411.63 43.2402V43.2602Z" fill="white"/><path d="M327.05 40C327.36 39.63 327.64 39.24 327.9 38.81C328.81 37.29 329.27 35.51 329.27 33.46C329.27 31.41 328.81 29.63 327.9 28.11C326.99 26.59 325.74 25.41 324.15 24.56C322.56 23.72 320.75 23.29 318.72 23.29C316.69 23.29 314.88 23.71 313.29 24.56C311.7 25.41 310.45 26.59 309.54 28.11C308.63 29.63 308.17 31.41 308.17 33.46C308.17 35.51 308.63 37.29 309.54 38.81C310.45 40.33 311.7 41.51 313.29 42.36C314.88 43.2 316.69 43.63 318.72 43.63C320.75 43.63 322.56 43.21 324.15 42.36L326.21 44.66C326.37 44.84 326.54 44.85 326.73 44.7L329.11 42.83C329.3 42.68 329.31 42.52 329.16 42.34L327.05 39.99V40ZM318.73 40.1C317.4 40.1 316.24 39.82 315.25 39.25C314.26 38.68 313.5 37.89 312.97 36.89C312.44 35.89 312.17 34.74 312.17 33.46C312.17 32.18 312.44 31.01 312.97 30.02C313.5 29.02 314.26 28.24 315.25 27.67C316.24 27.1 317.4 26.82 318.73 26.82C320.06 26.82 321.24 27.11 322.22 27.67C323.2 28.24 323.95 29.02 324.49 30.02C325.02 31.02 325.29 32.16 325.29 33.46C325.29 34.76 325.02 35.88 324.49 36.89C324.46 36.94 324.43 36.98 324.4 37.03L321.33 33.61C321.17 33.43 321 33.42 320.81 33.57L318.43 35.44C318.24 35.59 318.23 35.75 318.38 35.93L321.62 39.55C320.77 39.92 319.81 40.12 318.72 40.12L318.73 40.1Z" fill="white"/></g><defs><clipPath id="clip0_531_767"><rect width="449.87" height="67.29" fill="white"/></clipPath></defs></svg>` },
+};
+
+function downloadSvg(key) {
+  const file = svgFiles[key];
+  if (!file || !file.content) return;
+  const blob = new Blob([file.content], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = file.name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── Nav ─────────────────────────────────────────── */
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
+
+/* ── Dark mode ───────────────────────────────────── */
+const toggle = document.getElementById('theme-toggle');
+const label  = document.getElementById('theme-label');
+toggle.addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  label.textContent = isDark ? 'Light' : 'Dark';
+});
+
+/* ── MD Download helpers ─────────────────────────── */
+function downloadMd(type) {
+  const contents = {
+    common: getMdCommon(),
+    web:    getMdWeb(),
+    report: getMdReport()
+  };
+  const names = {
+    common: 'design-hr-common.md',
+    web:    'design-hr-web.md',
+    report: 'design-hr-report.md'
+  };
+  const blob = new Blob([contents[type]], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = names[type];
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function getMdCommon() {
+return `# HR 디자인 가이드 — 공통 (Common)
+
+> 타입 A(웹/대시보드)와 타입 B(보고문서/PDF) 모두에 적용되는 공통 규칙입니다.
+
+---
+
+## 폰트
+
+\`\`\`css
+font-family: "Pretendard", "Inter", -apple-system, sans-serif;
+\`\`\`
+
+- 굵기: Regular(400) · SemiBold(600) · Bold(700) 세 가지만 사용
+- 가독성 기준: Gray 500(#A0A0A0) 이상 또는 배경 대비 3:1 이상 컬러만 텍스트에 허용
+
+---
+
+## Gray Scale
+
+| 단계 | Hex | 용도 |
+|---|---|---|
+| 100 | \`#F6F8FA\` | 페이지 배경 |
+| 150 | \`#F0F2F4\` | 박스 배경, 구분선 |
+| 200 | \`#EBEDEE\` | 경계선 |
+| 250 | \`#DCDEE0\` | 강한 경계 |
+| 300 | \`#C8CACC\` | — |
+| 400 | \`#BBBBBB\` | — |
+| 500 | \`#A0A0A0\` | 텍스트 최소값 |
+| 600 | \`#888888\` | 보조 텍스트 |
+| 700 | \`#616161\` | 설명 텍스트 |
+| 800 | \`#3F3F3F\` | — |
+| 900 | \`#111111\` | Primary Text |
+
+---
+
+## Key Colors
+
+| 이름 | Hex | 용도 |
+|---|---|---|
+| Green | \`#6BBD1B\` | 긍정 액션, 완료 강조 |
+| Blue  | \`#397AF2\` | 주요 액션, CTA, 링크 |
+| Orange | \`#EE8800\` | 경고, 주의 |
+
+---
+
+## Status Badge
+
+\`\`\`css
+.badge { display:inline-flex; align-items:center; padding:5px 10px; border-radius:4px; font-size:12px; }
+.b-ok   { color:#1BB400; background:rgba(27,180,0,.10); }
+.b-wait { color:#616161; background:rgba(97,97,97,.10); }
+.b-rev  { color:#F77911; background:rgba(247,121,17,.10); }
+.b-urg  { color:#E5172F; background:rgba(229,23,47,.10); }
+.b-wip  { color:#4270ED; background:rgba(66,112,237,.10); }
+\`\`\`
+
+---
+
+## CSS 변수
+
+\`\`\`css
+:root {
+  --font-base: "Pretendard", "Inter", -apple-system, sans-serif;
+  --gray-100:#F6F8FA; --gray-150:#F0F2F4; --gray-200:#EBEDEE;
+  --gray-250:#DCDEE0; --gray-300:#C8CACC; --gray-400:#BBBBBB;
+  --gray-500:#A0A0A0; --gray-600:#888888; --gray-700:#616161;
+  --gray-800:#3F3F3F; --gray-900:#111111;
+  --c-green:#6BBD1B; --c-blue:#397AF2; --c-orange:#EE8800;
+  --s-ok:#1BB400;   --s-ok-bg:rgba(27,180,0,.10);
+  --s-wait:#616161; --s-wait-bg:rgba(97,97,97,.10);
+  --s-rev:#F77911;  --s-rev-bg:rgba(247,121,17,.10);
+  --s-urg:#E5172F;  --s-urg-bg:rgba(229,23,47,.10);
+  --s-wip:#4270ED;  --s-wip-bg:rgba(66,112,237,.10);
+}
+\`\`\`
+
+*최종 수정: 2026-05 | 사내 배포용*
+`;
+}
+
+function getMdWeb() {
+return `# HR 디자인 가이드 — 웹페이지 (Type A)
+
+> 반응형 웹 대시보드 및 내부 툴 제작 시 적용합니다.
+
+---
+
+## 타이포그래피
+
+| 스타일 | 크기 | 행간 | 굵기 | 용도 |
+|---|---|---|---|---|
+| Heading 1 | 24px | 150% | 700 | 페이지 대제목 |
+| Heading 2 | 20px | 150% | 700 | 섹션 제목 |
+| Body 1    | 16px | 150% | 400 | 일반 본문 |
+| Body 2    | 14px | 150% | 400 | 보조 본문 |
+| Sub 1     | 12px | 150% | 400 | 캡션, 메타 |
+| Sub 2     | 11px | 140% | 400 | 최소 텍스트 |
+
+\`\`\`css
+.h1    { font-size:24px; font-weight:700; line-height:1.5; color:#111; }
+.h2    { font-size:20px; font-weight:700; line-height:1.5; color:#111; }
+.body1 { font-size:16px; font-weight:400; line-height:1.5; color:#111; }
+.body2 { font-size:14px; font-weight:400; line-height:1.5; color:#111; }
+.sub1  { font-size:12px; font-weight:400; line-height:1.5; color:#616161; }
+.sub2  { font-size:11px; font-weight:400; line-height:1.4; color:#888; }
+\`\`\`
+
+---
+
+## 레이아웃
+
+- 페이지 좌우 패딩: \`24px\` 이상
+- 카드 내부 패딩: \`20px\`
+- 섹션 간 간격: \`24–32px\`
+- 최대 너비 (대시보드): \`1280–1440px\`
+- 최대 너비 (문서형): \`760px\`
+
+---
+
+## 컴포넌트 기본 스펙
+
+### 카드
+\`\`\`css
+.card { background:#fff; border:1px solid #EBEDEE; border-radius:12px; padding:20px; }
+\`\`\`
+
+### 버튼
+\`\`\`css
+.btn-primary { background:#397AF2; color:#fff; border-radius:8px; padding:9px 18px; font-size:13px; }
+\`\`\`
+
+### 인풋
+\`\`\`css
+.inp { height:38px; padding:0 12px; border:1px solid #DCDEE0; border-radius:8px; font-size:13px; }
+.inp:focus { border-color:#397AF2; box-shadow:0 0 0 3px rgba(57,122,242,.12); }
+\`\`\`
+
+*최종 수정: 2026-05 | 사내 배포용*
+`;
+}
+
+function getMdReport() {
+return `# HR 디자인 가이드 — 보고문서 (Type B)
+
+> 1920×1080 HTML 페이지 및 PDF 출력 시 적용합니다.
+
+---
+
+## HTML 기본 설정
+
+\`\`\`html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      width: 1920px; min-height: 1080px;
+      margin: 0 auto; padding: 108px;
+      font-family: "Pretendard", "Inter", sans-serif;
+      background: #fff; color: #111;
+    }
+    @media print {
+      @page { size: 1920px 1080px; margin: 0; }
+      body  { padding: 108px; }
+    }
+  </style>
+</head>
+\`\`\`
+
+---
+
+## 타이포그래피
+
+| 스타일 | 크기 | 행간 | 자간 | 굵기 | 용도 |
+|---|---|---|---|---|---|
+| Heading 1 | 40px | 145% | -0.5% | 700 | 페이지 대제목 |
+| Heading 2 | 32px | 150% | 0% | 700 | 섹션 제목 |
+| Heading 3 | 24px | 150% | 0% | 700 | 소제목 |
+| Body 1    | 20px | 150% | 0% | 400 | 강조 본문 |
+| Body 2    | 18px | 150% | 0% | 400 | 일반 본문 |
+| Body 3    | 16px | 150% | 0% | 400 | 보조 본문 |
+| Sub 1     | 14px | 150% | 0% | 400 | 캡션, 각주 |
+| Sub 2     | 12px | 150% | 0% | 400 | 최소 텍스트 |
+
+\`\`\`css
+h1 { font-size:40px; font-weight:700; line-height:1.45; letter-spacing:-0.005em; }
+h2 { font-size:32px; font-weight:700; line-height:1.5; }
+h3 { font-size:24px; font-weight:700; line-height:1.5; }
+.b1 { font-size:20px; font-weight:400; line-height:1.5; }
+.b2 { font-size:18px; font-weight:400; line-height:1.5; }
+.b3 { font-size:16px; font-weight:400; line-height:1.5; }
+.s1 { font-size:14px; font-weight:400; line-height:1.5; color:#616161; }
+.s2 { font-size:12px; font-weight:400; line-height:1.5; color:#888; }
+\`\`\`
+
+---
+
+## 레이아웃
+
+- 페이지 여백: \`108px\` (상하좌우)
+- 콘텐츠 폭: \`1920px - 216px = 1704px\`
+- 높이: \`1080px\` 한 페이지 기준
+
+*최종 수정: 2026-05 | 사내 배포용*
+`;
+}
+</script>
+</body>
+</html>
