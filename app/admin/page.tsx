@@ -76,7 +76,7 @@ export default function AdminPage() {
     const now = new Date();
     return now.toISOString().split('T')[0]; // YYYY-MM-DD
   });
-  const [uiuxStatus, setUiuxStatus] = useState<'completed' | 'inprogress'>('inprogress');
+  const [uiuxStatus, setUiuxStatus] = useState<'completed' | 'inprogress' | 'planned'>('inprogress');
   const [uiuxDescription, setUiuxDescription] = useState('');
   const [uiuxAsIsImage, setUiuxAsIsImage] = useState('');
   const [uiuxAsIsText, setUiuxAsIsText] = useState('');
