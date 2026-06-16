@@ -315,9 +315,8 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
             {/* Content */}
             <div className="p-6">
               {selectedUpdate.description && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">설명</h3>
-                  <div className="prose prose-sm max-w-none text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="mb-8">
+                  <div className="prose prose-sm max-w-none text-gray-700" style={{ lineHeight: '1.8' }}>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {selectedUpdate.description}
                     </ReactMarkdown>
@@ -326,7 +325,9 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               )}
 
               {/* 링크 버튼들 */}
-              <div className="mb-6 flex flex-wrap gap-3">
+              {(selectedUpdate.previewUrl || selectedUpdate.figmaUrl) && (
+                <div className="mb-8 pb-8 border-b border-gray-200">
+                  <div className="flex flex-wrap gap-4">
                 {selectedUpdate.previewUrl && (
                   <a
                     href={selectedUpdate.previewUrl}
@@ -360,12 +361,14 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     </svg>
                   </a>
                 )}
-              </div>
+                  </div>
+                </div>
+              )}
 
               {/* 피그마 Embed */}
               {selectedUpdate.figmaEmbedUrl && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">Figma 미리보기</h3>
+                <div className="mb-8">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Figma 미리보기</h3>
                   <div className="w-full h-[600px] rounded-lg border border-gray-200 overflow-hidden">
                     <iframe
                       src={selectedUpdate.figmaEmbedUrl}
@@ -380,22 +383,21 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
 
               {/* AS-IS / TO-BE */}
               {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks || selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {(selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks) && (
-                    <div className="bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border-2 border-red-200">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                        <h3 className="text-sm font-bold text-red-700">AS-IS</h3>
+                    <div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <h3 className="text-xs font-bold text-red-600 uppercase tracking-wider">AS-IS</h3>
                       </div>
                       {selectedUpdate.asIsImage && (
                         <img
                           src={selectedUpdate.asIsImage}
                           alt="AS-IS"
-                          className="w-full rounded-lg border-2 border-red-200 mb-3 shadow-sm"
+                          className="w-full rounded-lg mb-4 shadow-sm"
                         />
                       )}
                       {selectedUpdate.asIsText && (
-                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-red-200 shadow-sm mb-3">
+                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap mb-4">
                           {selectedUpdate.asIsText}
                         </div>
                       )}
@@ -407,7 +409,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline bg-white px-3 py-1.5 rounded-lg border border-red-200"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
                             >
                               {link.label}
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,20 +422,19 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     </div>
                   )}
                   {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-5 rounded-xl border-2 border-green-200">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-2 h-2 rounded-full bg-[#00BC7D]"></div>
-                        <h3 className="text-sm font-bold text-[#00BC7D]">TO-BE</h3>
+                    <div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <h3 className="text-xs font-bold text-[#00BC7D] uppercase tracking-wider">TO-BE</h3>
                       </div>
                       {selectedUpdate.toBeImage && (
                         <img
                           src={selectedUpdate.toBeImage}
                           alt="TO-BE"
-                          className="w-full rounded-lg border-2 border-green-200 mb-3 shadow-sm"
+                          className="w-full rounded-lg mb-4 shadow-sm"
                         />
                       )}
                       {selectedUpdate.toBeText && (
-                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-green-200 shadow-sm mb-3">
+                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap mb-4">
                           {selectedUpdate.toBeText}
                         </div>
                       )}
@@ -445,7 +446,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-medium text-[#00BC7D] hover:underline bg-white px-3 py-1.5 rounded-lg border border-green-200"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-[#00BC7D] hover:underline"
                             >
                               {link.label}
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -463,11 +464,11 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               {/* 진행중인 UI */}
               {selectedUpdate.status === 'inprogress' && selectedUpdate.currentImage && (
                 <div>
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">현재 진행중인 UI</h3>
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">현재 진행중인 UI</h3>
                   <img
                     src={selectedUpdate.currentImage}
                     alt="Current UI"
-                    className="w-full rounded-lg border border-gray-200"
+                    className="w-full rounded-lg shadow-sm"
                   />
                 </div>
               )}
