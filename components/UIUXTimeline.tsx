@@ -75,7 +75,8 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     return (
                       <div
                         key={update.id}
-                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#FF9D00] hover:shadow-md transition-all"
+                        onClick={() => handleUpdateClick(update)}
+                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#FF9D00] hover:shadow-md transition-all cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="text-base font-bold text-[#313131] flex-1">{update.title}</h4>
@@ -97,32 +98,20 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                             <span>{designer.emoji}</span>
                             <span>{designer.name}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {update.previewUrl && (
-                              <a
-                                href={update.previewUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-[#FF9D00] hover:underline"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {update.previewLabel || '바로가기'}
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                              </a>
-                            )}
-                            <button
-                              onClick={() => handleUpdateClick(update)}
-                              className="text-[#FF9D00] hover:text-[#e08d00]"
-                              title="상세보기"
+                          {update.previewUrl && (
+                            <a
+                              href={update.previewUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-[#FF9D00] hover:underline"
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              {update.previewLabel || '바로가기'}
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                               </svg>
-                            </button>
-                          </div>
+                            </a>
+                          )}
                         </div>
                       </div>
                     );
@@ -149,7 +138,8 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     return (
                       <div
                         key={update.id}
-                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#00BC7D] hover:shadow-md transition-all"
+                        onClick={() => handleUpdateClick(update)}
+                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#00BC7D] hover:shadow-md transition-all cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="text-base font-bold text-[#313131] flex-1">{update.title}</h4>
@@ -171,32 +161,20 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                             <span>{designer.emoji}</span>
                             <span>{designer.name}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {update.previewUrl && (
-                              <a
-                                href={update.previewUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-[#00BC7D] hover:underline"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {update.previewLabel || '바로가기'}
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                              </a>
-                            )}
-                            <button
-                              onClick={() => handleUpdateClick(update)}
-                              className="text-[#00BC7D] hover:text-[#00a570]"
-                              title="상세보기"
+                          {update.previewUrl && (
+                            <a
+                              href={update.previewUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-[#00BC7D] hover:underline"
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              {update.previewLabel || '바로가기'}
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                               </svg>
-                            </button>
-                          </div>
+                            </a>
+                          )}
                         </div>
                       </div>
                     );
