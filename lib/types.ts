@@ -115,8 +115,11 @@ export interface UIUXUpdate {
 }
 
 // TF 업무
+export type TFName = 'lfsq' | 'ax';
+
 export interface TFTask {
   id: string;
+  tfName: TFName; // TF 이름 (LFSQ 앱구축 TF, AX TF)
   title: string;
   description: string;
   link: string; // 대시보드나 작업 페이지 링크
@@ -125,3 +128,16 @@ export interface TFTask {
   designer: Designer;
   createdAt: Date;
 }
+
+export const TF_NAMES: Record<TFName, { name: string; color: string; bgColor: string }> = {
+  lfsq: {
+    name: 'LFSQ 앱구축 TF',
+    color: '#F83BAA',
+    bgColor: 'rgba(248, 59, 170, 0.1)',
+  },
+  ax: {
+    name: 'AX TF',
+    color: '#00A6FF',
+    bgColor: 'rgba(0, 166, 255, 0.1)',
+  },
+};

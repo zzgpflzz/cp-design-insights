@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
-import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject, UIUXUpdate, TFTask } from '@/lib/types';
+import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject, UIUXUpdate, TFTask, TFName, TF_NAMES } from '@/lib/types';
 
 type AdminTabType = 'insights' | 'uiux' | 'tf';
 
@@ -89,6 +89,7 @@ export default function AdminPage() {
   const [uiuxDesigner, setUiuxDesigner] = useState<Designer>('hyeri');
 
   // TF Task Form state
+  const [tfName, setTfName] = useState<TFName>('lfsq');
   const [tfTitle, setTfTitle] = useState('');
   const [tfDescription, setTfDescription] = useState('');
   const [tfLink, setTfLink] = useState('');
@@ -710,6 +711,7 @@ export default function AdminPage() {
 
   const resetTFForm = () => {
     setEditingTFTask(null);
+    setTfName('lfsq');
     setTfTitle('');
     setTfDescription('');
     setTfLink('');
@@ -724,12 +726,13 @@ export default function AdminPage() {
 
     try {
       const tfData: any = {
+        tfName: tfName,
         title: tfTitle,
         description: tfDescription,
         link: tfLink,
         status: tfStatus,
         designer: tfDesigner,
-        createdAt: new Date(),
+        createdAt: editingTFTask ? editingTFTask.createdAt : new Date(),
       };
 
       if (tfLinkLabel) tfData.linkLabel = tfLinkLabel;
@@ -754,6 +757,7 @@ export default function AdminPage() {
 
   const handleTFEdit = (task: TFTask) => {
     setEditingTFTask(task);
+    setTfName(task.tfName);
     setTfTitle(task.title);
     setTfDescription(task.description);
     setTfLink(task.link);
@@ -1641,7 +1645,20 @@ export default function AdminPage() {
                 {editingTFTask ? '✏️ TF 업무 수정' : '🚀 TF 업무 추가'}
               </h2>
               <form onSubmit={handleTFSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      TF 이름 *
+                    </label>
+                    <select
+                      value={tfName}
+                      onChange={(e) => setTfName(e.target.value as TFName)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    >
+                      <option value="lfsq">LFSQ 앱구축 TF</option>
+                      <option value="ax">AX TF</option>
+                    </select>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       제목 *
@@ -1761,6 +1778,13 @@ export default function AdminPage() {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
+                            style={{
+                              backgroundColor: TF_NAMES[task.tfName].bgColor,
+                              color: TF_NAMES[task.tfName].color
+                            }}>
+                            {TF_NAMES[task.tfName].name}
+                          </span>
                           <h3 className="font-bold text-gray-900">{task.title}</h3>
                           <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
                             style={{

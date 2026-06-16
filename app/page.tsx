@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
-import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer, UIUXUpdate, TFTask } from '@/lib/types';
+import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer, UIUXUpdate, TFTask, TF_NAMES } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
 import PipelineCalendar from '@/components/PipelineCalendar';
 import ModernCalendarView from '@/components/ModernCalendarView';
@@ -1595,7 +1595,7 @@ export default function Playground() {
           </>
         ) : activeTab === 'tf' ? (
           <>
-            {/* TF Tasks */}
+            {/* TF Tasks - 칸반보드 */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-2xl font-bold text-[#313131] mb-6">TF 업무</h2>
 
@@ -1604,55 +1604,150 @@ export default function Playground() {
                   등록된 TF 업무가 없습니다.
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {tfTasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="p-6 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#313131] transition-all"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-bold text-[#313131]">{task.title}</h3>
-                            <span className={`text-xs px-2.5 py-1 rounded-[6px] font-medium`}
-                              style={{
-                                backgroundColor: task.status === 'completed'
-                                  ? 'rgba(0, 188, 125, 0.1)'
-                                  : task.status === 'active'
-                                  ? 'rgba(255, 157, 0, 0.1)'
-                                  : 'rgba(97, 97, 97, 0.1)',
-                                color: task.status === 'completed'
-                                  ? '#00BC7D'
-                                  : task.status === 'active'
-                                  ? '#FF9D00'
-                                  : '#616161'
-                              }}>
-                              {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">{task.description}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* LFSQ 앱구축 TF 컬럼 */}
+                  {(() => {
+                    const lfsqTasks = tfTasks.filter(t => t.tfName === 'lfsq');
+                    const tfInfo = TF_NAMES.lfsq;
+                    return (
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tfInfo.color }} />
+                          <h3 className="text-sm font-bold text-[#313131]">{tfInfo.name}</h3>
+                          <span className="text-xs text-gray-500">({lfsqTasks.length})</span>
                         </div>
-                      </div>
+                        <div className="space-y-3 flex-1">
+                          {lfsqTasks.length === 0 ? (
+                            <div className="text-center py-8 text-gray-400 text-sm bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                              등록된 업무가 없습니다
+                            </div>
+                          ) : (
+                            lfsqTasks.map((task) => (
+                              <div
+                                key={task.id}
+                                className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-all"
+                                style={{ borderColor: 'transparent', ['--hover-border' as any]: tfInfo.color }}
+                                onMouseEnter={(e) => e.currentTarget.style.borderColor = tfInfo.color}
+                                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <h4 className="text-base font-bold text-[#313131] flex-1">{task.title}</h4>
+                                  <span className="text-xs px-2.5 py-1 rounded-[6px] font-medium ml-2"
+                                    style={{
+                                      backgroundColor: task.status === 'completed'
+                                        ? 'rgba(0, 188, 125, 0.1)'
+                                        : task.status === 'active'
+                                        ? 'rgba(255, 157, 0, 0.1)'
+                                        : 'rgba(97, 97, 97, 0.1)',
+                                      color: task.status === 'completed'
+                                        ? '#00BC7D'
+                                        : task.status === 'active'
+                                        ? '#FF9D00'
+                                        : '#616161'
+                                    }}>
+                                    {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
+                                  </span>
+                                </div>
 
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <span>{task.designer === 'hyeri' ? '🐰' : '🐶'}</span>
-                          <span>{task.designer === 'hyeri' ? '장혜리' : '김아영'}</span>
+                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span>{task.designer === 'hyeri' ? '🐰' : '🐶'}</span>
+                                    <span>{task.designer === 'hyeri' ? '장혜리' : '김아영'}</span>
+                                  </div>
+                                  <a
+                                    href={task.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                                    style={{ color: tfInfo.color }}
+                                  >
+                                    {task.linkLabel || '바로가기'}
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                  </a>
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
-                        <a
-                          href={task.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-[#313131] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors text-sm font-medium"
-                        >
-                          {task.linkLabel || '바로가기'}
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        </a>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })()}
+
+                  {/* AX TF 컬럼 */}
+                  {(() => {
+                    const axTasks = tfTasks.filter(t => t.tfName === 'ax');
+                    const tfInfo = TF_NAMES.ax;
+                    return (
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tfInfo.color }} />
+                          <h3 className="text-sm font-bold text-[#313131]">{tfInfo.name}</h3>
+                          <span className="text-xs text-gray-500">({axTasks.length})</span>
+                        </div>
+                        <div className="space-y-3 flex-1">
+                          {axTasks.length === 0 ? (
+                            <div className="text-center py-8 text-gray-400 text-sm bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                              등록된 업무가 없습니다
+                            </div>
+                          ) : (
+                            axTasks.map((task) => (
+                              <div
+                                key={task.id}
+                                className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-all"
+                                style={{ borderColor: 'transparent' }}
+                                onMouseEnter={(e) => e.currentTarget.style.borderColor = tfInfo.color}
+                                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <h4 className="text-base font-bold text-[#313131] flex-1">{task.title}</h4>
+                                  <span className="text-xs px-2.5 py-1 rounded-[6px] font-medium ml-2"
+                                    style={{
+                                      backgroundColor: task.status === 'completed'
+                                        ? 'rgba(0, 188, 125, 0.1)'
+                                        : task.status === 'active'
+                                        ? 'rgba(255, 157, 0, 0.1)'
+                                        : 'rgba(97, 97, 97, 0.1)',
+                                      color: task.status === 'completed'
+                                        ? '#00BC7D'
+                                        : task.status === 'active'
+                                        ? '#FF9D00'
+                                        : '#616161'
+                                    }}>
+                                    {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
+                                  </span>
+                                </div>
+
+                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span>{task.designer === 'hyeri' ? '🐰' : '🐶'}</span>
+                                    <span>{task.designer === 'hyeri' ? '장혜리' : '김아영'}</span>
+                                  </div>
+                                  <a
+                                    href={task.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                                    style={{ color: tfInfo.color }}
+                                  >
+                                    {task.linkLabel || '바로가기'}
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                  </a>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
