@@ -134,7 +134,7 @@ export default function BulkInquiryPage() {
       <main className="max-w-[1920px] mx-auto flex justify-center py-[56px]">
         <div className="w-[780px]">
         {/* Breadcrumb with Tabs */}
-        <div className="flex gap-[12px] items-center text-[15px] mb-[34px]">
+        <div className="flex gap-[12px] items-center text-[18px] mb-[34px]">
           <button
             onClick={() => setActiveTab('partnership')}
             className={activeTab === 'partnership' ? 'font-bold text-[#111]' : 'text-[#a0a0a0]'}
@@ -156,10 +156,10 @@ export default function BulkInquiryPage() {
           <>
             {/* Notice Box */}
             <div className="bg-[#f6f8fa] border border-[#ebedee] rounded-[2px] p-[20px] mb-[40px]">
-              <div className="font-bold text-[15px] text-[#616161] mb-[16px]">
+              <div className="font-bold text-[13px] text-[#616161] mb-[16px]">
                 문의 전 꼭 확인해주세요!
               </div>
-              <ul className="text-[15px] text-[#616161] leading-[1.45] list-disc ml-[22.5px] space-y-[4px]">
+              <ul className="text-[13px] text-[#616161] leading-[1.45] list-disc ml-[22.5px] space-y-[4px]">
                 <li>아래 필수 입력사항을 반드시 입력하여 제출해 주세요.</li>
                 <li>브랜드 미공개 광고문의는 답변드리지 않습니다.</li>
                 <li>모든 등록 건은 담당자가 확인하여 이메일이나 전화로 회신드리오니, 중복 등록에 유의하여 주시기 바랍니다.</li>
@@ -319,10 +319,10 @@ export default function BulkInquiryPage() {
 
             {/* Privacy Notice */}
             <div className="bg-[#f6f8fa] border border-[#ebedee] rounded-[2px] p-[20px] mb-[40px]">
-              <div className="font-bold text-[15px] text-[#616161] mb-[12px]">
+              <div className="font-bold text-[13px] text-[#616161] mb-[12px]">
                 LINE FRIENDS SQUARE는 제휴를 희망하는 기업 및 개인을 대상으로 아래와 같이 개인정보를 수집하고 있습니다.
               </div>
-              <div className="text-[15px] text-[#616161] leading-[1.45]">
+              <div className="text-[13px] text-[#616161] leading-[1.45]">
                 <ol className="list-decimal ml-[22.5px] space-y-[4px]">
                   <li>수집 개인정보 항목 : [필수] 업체명, 이름, 연락처, 이메일 / [선택] 홈페이지</li>
                   <li>개인정보의 수집 및 이용목적 : 제휴신청에 따른 본인확인 및 원활한 의사소통 경로 확보</li>
@@ -340,10 +340,10 @@ export default function BulkInquiryPage() {
           <>
             {/* Notice Box */}
             <div className="bg-[#f6f8fa] border border-[#ebedee] rounded-[2px] p-[20px] mb-[40px]">
-              <div className="font-bold text-[15px] text-[#616161] mb-[16px]">
+              <div className="font-bold text-[13px] text-[#616161] mb-[16px]">
                 문의 전 꼭 확인해주세요!
               </div>
-              <div className="text-[15px] text-[#616161] leading-[1.45] space-y-[12px]">
+              <div className="text-[13px] text-[#616161] leading-[1.45] space-y-[12px]">
                 <div>
                   <p className="font-bold mb-[8px]">[목적]</p>
                   <ul className="list-disc ml-[22.5px] space-y-[4px]">
@@ -525,19 +525,19 @@ export default function BulkInquiryPage() {
                               <div className="absolute top-full left-0 right-0 mt-[4px] bg-white border border-[#dcdee0] rounded-[2px] shadow-lg z-10">
                                 <button
                                   onClick={() => { addOption(product.id, 'KOYA'); toggleOptions(product.id); }}
-                                  className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                                  className="w-full px-[14px] py-[12px] text-left text-[13px] text-[#616161] hover:bg-gray-50"
                                 >
                                   KOYA
                                 </button>
                                 <button
                                   onClick={() => { addOption(product.id, 'CHIMMY'); toggleOptions(product.id); }}
-                                  className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                                  className="w-full px-[14px] py-[12px] text-left text-[13px] text-[#616161] hover:bg-gray-50"
                                 >
                                   CHIMMY
                                 </button>
                                 <button
                                   onClick={() => { addOption(product.id, '단품'); toggleOptions(product.id); }}
-                                  className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                                  className="w-full px-[14px] py-[12px] text-left text-[13px] text-[#616161] hover:bg-gray-50"
                                 >
                                   단품
                                 </button>
@@ -551,7 +551,7 @@ export default function BulkInquiryPage() {
                           <div className="space-y-[8px]">
                             {product.selectedOptions.map((option) => (
                               <div key={option.id} className="flex items-center justify-between bg-white border border-[#ebedee] rounded-[2px] px-[14px] py-[12px]">
-                                <span className="text-[15px] text-[#616161]">{option.name}</span>
+                                <span className="text-[13px] text-[#616161]">{option.name}</span>
                                 <div className="flex items-center gap-[8px]">
                                   <div className="flex items-center border border-[#dcdee0] rounded-[2px] h-[30px]">
                                     <button
@@ -625,10 +625,10 @@ export default function BulkInquiryPage() {
 
             {/* Privacy Notice */}
             <div className="bg-[#f6f8fa] border border-[#ebedee] rounded-[2px] p-[20px] mb-[40px]">
-              <div className="font-bold text-[15px] text-[#616161] mb-[12px]">
+              <div className="font-bold text-[13px] text-[#616161] mb-[12px]">
                 제휴 문의 신청을 위해 아래와 같이 개인정보를 수집 및 이용합니다.
               </div>
-              <ul className="text-[15px] text-[#616161] leading-[1.45] list-disc ml-[22.5px] space-y-[4px]">
+              <ul className="text-[13px] text-[#616161] leading-[1.45] list-disc ml-[22.5px] space-y-[4px]">
                 <li>수집항목 : (기본정보) 회사명, 브랜드명, 홈페이지 주소 (신청 업체의 담당자 정보) 담당자명, 전화번호, 이메일 주소</li>
                 <li>이용목적 : 입점 신청 업체의 상담을 위한 수집, 입점, 상담 관련 민원 사무 처리</li>
                 <li>보유기간 : 입점 거절 시 5일 이내 파기</li>
