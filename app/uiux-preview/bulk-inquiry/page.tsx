@@ -291,10 +291,7 @@ export default function BulkInquiryPage() {
                   <span className="text-[#f83baa]">*</span>
                 </div>
                 <textarea
-                  placeholder="아래 항목을 기준으로 협력 내용을 적어주세요.
-- 제안 배경
-- 세부 제안 내용
-- 제휴 기대 효과"
+                  placeholder="아래 항목을 기준으로 협력 내용을 적어주세요.&#10;- 제안 배경&#10;- 세부 제안 내용&#10;- 제휴 기대 효과"
                   rows={6}
                   className="w-full px-[14px] py-[12px] border border-[#dcdee0] rounded-[2px] text-[15px] placeholder:text-[#a0a0a0] resize-none"
                 />
