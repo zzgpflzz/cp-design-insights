@@ -1625,10 +1625,7 @@ export default function Playground() {
                             lfsqTasks.map((task) => (
                               <div
                                 key={task.id}
-                                className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-all"
-                                style={{ borderColor: 'transparent', ['--hover-border' as any]: tfInfo.color }}
-                                onMouseEnter={(e) => e.currentTarget.style.borderColor = tfInfo.color}
-                                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                                className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#8280FF] hover:shadow-md transition-all"
                               >
                                 <div className="flex items-start justify-between mb-2">
                                   <h4 className="text-base font-bold text-[#313131] flex-1">{task.title}</h4>
@@ -1697,10 +1694,7 @@ export default function Playground() {
                             axTasks.map((task) => (
                               <div
                                 key={task.id}
-                                className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-all"
-                                style={{ borderColor: 'transparent' }}
-                                onMouseEnter={(e) => e.currentTarget.style.borderColor = tfInfo.color}
-                                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                                className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#F83BAA] hover:shadow-md transition-all"
                               >
                                 <div className="flex items-start justify-between mb-2">
                                   <h4 className="text-base font-bold text-[#313131] flex-1">{task.title}</h4>

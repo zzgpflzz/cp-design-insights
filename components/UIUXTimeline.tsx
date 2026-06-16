@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { UIUXUpdate, DESIGNERS } from '@/lib/types';
 
 interface UIUXTimelineProps {
@@ -201,8 +203,12 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
             <div className="p-6">
               {selectedUpdate.description && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold text-gray-700 mb-2">설명</h3>
-                  <p className="text-gray-600">{selectedUpdate.description}</p>
+                  <h3 className="text-sm font-bold text-gray-700 mb-3">설명</h3>
+                  <div className="prose prose-sm max-w-none text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {selectedUpdate.description}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               )}
 
