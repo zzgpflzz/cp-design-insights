@@ -80,12 +80,16 @@ export default function AdminPage() {
   const [uiuxDescription, setUiuxDescription] = useState('');
   const [uiuxAsIsImage, setUiuxAsIsImage] = useState('');
   const [uiuxAsIsText, setUiuxAsIsText] = useState('');
+  const [uiuxAsIsLinks, setUiuxAsIsLinks] = useState<{ url: string; label: string }[]>([]);
   const [uiuxToBeImage, setUiuxToBeImage] = useState('');
   const [uiuxToBeText, setUiuxToBeText] = useState('');
+  const [uiuxToBeLinks, setUiuxToBeLinks] = useState<{ url: string; label: string }[]>([]);
   const [uiuxCurrentImage, setUiuxCurrentImage] = useState('');
   const [uiuxFigmaUrl, setUiuxFigmaUrl] = useState('');
   const [uiuxFigmaEmbedUrl, setUiuxFigmaEmbedUrl] = useState('');
   const [uiuxPreviewUrl, setUiuxPreviewUrl] = useState('');
+  const [uiuxPreviewLabel, setUiuxPreviewLabel] = useState('');
+  const [uiuxPeriod, setUiuxPeriod] = useState('');
   const [uiuxDesigner, setUiuxDesigner] = useState<Designer>('hyeri');
 
   // TF Task Form state
@@ -639,6 +643,30 @@ export default function AdminPage() {
         updateData.previewUrl = null;
       }
 
+      if (uiuxPreviewLabel) {
+        updateData.previewLabel = uiuxPreviewLabel;
+      } else if (editingUIUXUpdate) {
+        updateData.previewLabel = null;
+      }
+
+      if (uiuxPeriod) {
+        updateData.period = uiuxPeriod;
+      } else if (editingUIUXUpdate) {
+        updateData.period = null;
+      }
+
+      if (uiuxAsIsLinks && uiuxAsIsLinks.length > 0) {
+        updateData.asIsLinks = uiuxAsIsLinks;
+      } else if (editingUIUXUpdate) {
+        updateData.asIsLinks = null;
+      }
+
+      if (uiuxToBeLinks && uiuxToBeLinks.length > 0) {
+        updateData.toBeLinks = uiuxToBeLinks;
+      } else if (editingUIUXUpdate) {
+        updateData.toBeLinks = null;
+      }
+
       if (editingUIUXUpdate) {
         await updateDoc(doc(db, 'uiuxUpdates', editingUIUXUpdate.id), updateData);
         alert('UI/UX 업데이트가 수정되었습니다!');
@@ -666,12 +694,16 @@ export default function AdminPage() {
     setUiuxDescription(update.description || '');
     setUiuxAsIsImage(update.asIsImage || '');
     setUiuxAsIsText(update.asIsText || '');
+    setUiuxAsIsLinks(update.asIsLinks || []);
     setUiuxToBeImage(update.toBeImage || '');
     setUiuxToBeText(update.toBeText || '');
+    setUiuxToBeLinks(update.toBeLinks || []);
     setUiuxCurrentImage(update.currentImage || '');
     setUiuxFigmaUrl(update.figmaUrl || '');
     setUiuxFigmaEmbedUrl(update.figmaEmbedUrl || '');
     setUiuxPreviewUrl(update.previewUrl || '');
+    setUiuxPreviewLabel(update.previewLabel || '');
+    setUiuxPeriod(update.period || '');
     setUiuxDesigner(update.designer);
   };
 
@@ -700,12 +732,16 @@ export default function AdminPage() {
     setUiuxDescription('');
     setUiuxAsIsImage('');
     setUiuxAsIsText('');
+    setUiuxAsIsLinks([]);
     setUiuxToBeImage('');
     setUiuxToBeText('');
+    setUiuxToBeLinks([]);
     setUiuxCurrentImage('');
     setUiuxFigmaUrl('');
     setUiuxFigmaEmbedUrl('');
     setUiuxPreviewUrl('');
+    setUiuxPreviewLabel('');
+    setUiuxPeriod('');
     setUiuxDesigner('hyeri');
   };
 
@@ -1469,6 +1505,32 @@ export default function AdminPage() {
                       />
                       <p className="text-xs text-gray-500 mt-1">구현된 페이지 URL (상대 또는 절대 경로)</p>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Preview Label
+                      </label>
+                      <input
+                        type="text"
+                        value={uiuxPreviewLabel}
+                        onChange={(e) => setUiuxPreviewLabel(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="바로가기"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">버튼에 표시될 텍스트 (기본값: 바로가기)</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        기간 (Period)
+                      </label>
+                      <input
+                        type="text"
+                        value={uiuxPeriod}
+                        onChange={(e) => setUiuxPeriod(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="2026년 5-6월"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">기간별 필터링에 사용됩니다</p>
+                    </div>
                   </div>
                 </div>
 
@@ -1492,7 +1554,7 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <label className="block text-sm text-gray-600 mb-1">
-                            텍스트 설명
+                            텍스트 설명 (마크다운 지원)
                           </label>
                           <textarea
                             value={uiuxAsIsText}
@@ -1501,6 +1563,54 @@ export default function AdminPage() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
                             placeholder="AS-IS 상태에 대한 설명을 입력하세요"
                           />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">
+                            페이지 링크
+                          </label>
+                          {uiuxAsIsLinks.map((link, index) => (
+                            <div key={index} className="flex gap-2 mb-2">
+                              <input
+                                type="text"
+                                value={link.label}
+                                onChange={(e) => {
+                                  const newLinks = [...uiuxAsIsLinks];
+                                  newLinks[index].label = e.target.value;
+                                  setUiuxAsIsLinks(newLinks);
+                                }}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                                placeholder="버튼 텍스트 (예: 기존 페이지)"
+                              />
+                              <input
+                                type="url"
+                                value={link.url}
+                                onChange={(e) => {
+                                  const newLinks = [...uiuxAsIsLinks];
+                                  newLinks[index].url = e.target.value;
+                                  setUiuxAsIsLinks(newLinks);
+                                }}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                                placeholder="https://..."
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newLinks = uiuxAsIsLinks.filter((_, i) => i !== index);
+                                  setUiuxAsIsLinks(newLinks);
+                                }}
+                                className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                              >
+                                삭제
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setUiuxAsIsLinks([...uiuxAsIsLinks, { url: '', label: '' }])}
+                            className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                          >
+                            + 링크 추가
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -1521,7 +1631,7 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <label className="block text-sm text-gray-600 mb-1">
-                            텍스트 설명
+                            텍스트 설명 (마크다운 지원)
                           </label>
                           <textarea
                             value={uiuxToBeText}
@@ -1530,6 +1640,54 @@ export default function AdminPage() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
                             placeholder="TO-BE 상태에 대한 설명을 입력하세요"
                           />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">
+                            페이지 링크
+                          </label>
+                          {uiuxToBeLinks.map((link, index) => (
+                            <div key={index} className="flex gap-2 mb-2">
+                              <input
+                                type="text"
+                                value={link.label}
+                                onChange={(e) => {
+                                  const newLinks = [...uiuxToBeLinks];
+                                  newLinks[index].label = e.target.value;
+                                  setUiuxToBeLinks(newLinks);
+                                }}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                                placeholder="버튼 텍스트 (예: 신규 페이지)"
+                              />
+                              <input
+                                type="url"
+                                value={link.url}
+                                onChange={(e) => {
+                                  const newLinks = [...uiuxToBeLinks];
+                                  newLinks[index].url = e.target.value;
+                                  setUiuxToBeLinks(newLinks);
+                                }}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                                placeholder="https://..."
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newLinks = uiuxToBeLinks.filter((_, i) => i !== index);
+                                  setUiuxToBeLinks(newLinks);
+                                }}
+                                className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                              >
+                                삭제
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setUiuxToBeLinks([...uiuxToBeLinks, { url: '', label: '' }])}
+                            className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                          >
+                            + 링크 추가
+                          </button>
                         </div>
                       </div>
                     </div>

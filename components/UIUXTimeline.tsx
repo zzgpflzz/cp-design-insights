@@ -287,29 +287,72 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-[#313131]">{selectedUpdate.title}</h2>
-                <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
-                  <span>{DESIGNERS[selectedUpdate.designer].emoji}</span>
-                  <span>{DESIGNERS[selectedUpdate.designer].name}</span>
-                  <span>•</span>
-                  <span>
-                    {selectedUpdate.status === 'completed'
-                      ? formatDate(selectedUpdate.date)
-                      : `ver. ${selectedUpdate.version || '1'} (진행중)`
-                    }
-                  </span>
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-[#313131]">{selectedUpdate.title}</h2>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
+                    <span>{DESIGNERS[selectedUpdate.designer].emoji}</span>
+                    <span>{DESIGNERS[selectedUpdate.designer].name}</span>
+                    <span>•</span>
+                    <span>
+                      {selectedUpdate.status === 'completed'
+                        ? formatDate(selectedUpdate.date)
+                        : selectedUpdate.status === 'planned'
+                        ? '예정'
+                        : `ver. ${selectedUpdate.version || '1'} (진행중)`
+                      }
+                    </span>
+                  </div>
                 </div>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+
+              {/* 링크 버튼들 */}
+              {(selectedUpdate.previewUrl || selectedUpdate.figmaUrl) && (
+                <div className="flex flex-wrap gap-4 pt-3 border-t border-gray-100">
+                  {selectedUpdate.previewUrl && (
+                    <a
+                      href={selectedUpdate.previewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm font-medium hover:underline"
+                      style={{
+                        color: selectedUpdate.status === 'planned'
+                          ? '#616161'
+                          : selectedUpdate.status === 'inprogress'
+                          ? '#FF9D00'
+                          : '#00BC7D'
+                      }}
+                    >
+                      {selectedUpdate.previewLabel || '바로가기'}
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                  {selectedUpdate.figmaUrl && (
+                    <a
+                      href={selectedUpdate.figmaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-purple-600 hover:underline"
+                    >
+                      Figma에서 보기
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Content */}
@@ -320,47 +363,6 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {selectedUpdate.description}
                     </ReactMarkdown>
-                  </div>
-                </div>
-              )}
-
-              {/* 링크 버튼들 */}
-              {(selectedUpdate.previewUrl || selectedUpdate.figmaUrl) && (
-                <div className="mb-8 pb-8 border-b border-gray-200">
-                  <div className="flex flex-wrap gap-4">
-                {selectedUpdate.previewUrl && (
-                  <a
-                    href={selectedUpdate.previewUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium hover:underline"
-                    style={{
-                      color: selectedUpdate.status === 'planned'
-                        ? '#616161'
-                        : selectedUpdate.status === 'inprogress'
-                        ? '#FF9D00'
-                        : '#00BC7D'
-                    }}
-                  >
-                    {selectedUpdate.previewLabel || '바로가기'}
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                )}
-                {selectedUpdate.figmaUrl && (
-                  <a
-                    href={selectedUpdate.figmaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-purple-600 hover:underline"
-                  >
-                    Figma에서 보기
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                )}
                   </div>
                 </div>
               )}
