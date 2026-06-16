@@ -134,7 +134,7 @@ export default function BulkInquiryPage() {
       <main className="max-w-[1920px] mx-auto flex justify-center py-[56px]">
         <div className="w-[780px]">
         {/* Breadcrumb with Tabs */}
-        <div className="flex gap-[12px] items-center text-[18px] mb-[34px]">
+        <div className="flex gap-[12px] items-center text-[18px] mb-[8px]">
           <button
             onClick={() => setActiveTab('partnership')}
             className={activeTab === 'partnership' ? 'font-bold text-[#111]' : 'text-[#a0a0a0]'}
@@ -170,7 +170,7 @@ export default function BulkInquiryPage() {
             </div>
 
             {/* Form */}
-            <div className="space-y-[40px]">
+            <div className="space-y-[20px]">
               {/* 제휴 카테고리 */}
               <div>
                 <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
@@ -404,7 +404,7 @@ export default function BulkInquiryPage() {
             </div>
 
             {/* Form */}
-            <div className="space-y-[40px]">
+            <div className="space-y-[20px]">
               {/* 담당자명 */}
               <div>
                 <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
