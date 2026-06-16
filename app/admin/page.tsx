@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
-import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject, UIUXUpdate } from '@/lib/types';
+import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject, UIUXUpdate, TFTask } from '@/lib/types';
 
-type AdminTabType = 'insights' | 'project' | 'uiux';
+type AdminTabType = 'insights' | 'uiux' | 'tf';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function AdminPage() {
   const [roadmapProjects, setRoadmapProjects] = useState<RoadmapProject[]>([]);
   const [projectProgresses, setProjectProgresses] = useState<ProjectProgress[]>([]);
   const [uiuxUpdates, setUiuxUpdates] = useState<UIUXUpdate[]>([]);
+  const [tfTasks, setTfTasks] = useState<TFTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -24,6 +25,7 @@ export default function AdminPage() {
   const [editingRoadmapProject, setEditingRoadmapProject] = useState<RoadmapProject | null>(null);
   const [editingProgress, setEditingProgress] = useState<ProjectProgress | null>(null);
   const [editingUIUXUpdate, setEditingUIUXUpdate] = useState<UIUXUpdate | null>(null);
+  const [editingTFTask, setEditingTFTask] = useState<TFTask | null>(null);
   const [selectedRoadmapProjectId, setSelectedRoadmapProjectId] = useState<string>('');
   const [calViewMonth, setCalViewMonth] = useState<Date>(new Date());
   const [expandedDateKey, setExpandedDateKey] = useState<string | null>(null);
@@ -85,6 +87,14 @@ export default function AdminPage() {
   const [uiuxFigmaEmbedUrl, setUiuxFigmaEmbedUrl] = useState('');
   const [uiuxPreviewUrl, setUiuxPreviewUrl] = useState('');
   const [uiuxDesigner, setUiuxDesigner] = useState<Designer>('hyeri');
+
+  // TF Task Form state
+  const [tfTitle, setTfTitle] = useState('');
+  const [tfDescription, setTfDescription] = useState('');
+  const [tfLink, setTfLink] = useState('');
+  const [tfLinkLabel, setTfLinkLabel] = useState('');
+  const [tfStatus, setTfStatus] = useState<'active' | 'completed' | 'planned'>('active');
+  const [tfDesigner, setTfDesigner] = useState<Designer>('hyeri');
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -168,6 +178,21 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchTFTasks = useCallback(async () => {
+    try {
+      const q = query(collection(db, 'tfTasks'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const tasksData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+      })) as TFTask[];
+      setTfTasks(tasksData);
+    } catch (error) {
+      console.error('Error fetching TF tasks:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push('/');
@@ -180,12 +205,13 @@ export default function AdminPage() {
         fetchAgendas(),
         fetchRoadmapProjects(),
         fetchProjectProgresses(),
-        fetchUIUXUpdates()
+        fetchUIUXUpdates(),
+        fetchTFTasks()
       ]);
     };
 
     initializeData();
-  }, [router, fetchProjects, fetchAgendas, fetchRoadmapProjects, fetchProjectProgresses, fetchUIUXUpdates]);
+  }, [router, fetchProjects, fetchAgendas, fetchRoadmapProjects, fetchProjectProgresses, fetchUIUXUpdates, fetchTFTasks]);
 
   // 대시보드 요약 지표
   const dashboardStats = useMemo(() => {
@@ -632,6 +658,76 @@ export default function AdminPage() {
     setUiuxDesigner('hyeri');
   };
 
+  const resetTFForm = () => {
+    setEditingTFTask(null);
+    setTfTitle('');
+    setTfDescription('');
+    setTfLink('');
+    setTfLinkLabel('');
+    setTfStatus('active');
+    setTfDesigner('hyeri');
+  };
+
+  const handleTFSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const tfData: any = {
+        title: tfTitle,
+        description: tfDescription,
+        link: tfLink,
+        status: tfStatus,
+        designer: tfDesigner,
+        createdAt: new Date(),
+      };
+
+      if (tfLinkLabel) tfData.linkLabel = tfLinkLabel;
+
+      if (editingTFTask) {
+        await updateDoc(doc(db, 'tfTasks', editingTFTask.id), tfData);
+        alert('TF 업무가 수정되었습니다!');
+      } else {
+        await addDoc(collection(db, 'tfTasks'), tfData);
+        alert('TF 업무가 추가되었습니다!');
+      }
+
+      resetTFForm();
+      fetchTFTasks();
+    } catch (error) {
+      console.error('Error adding/updating TF task:', error);
+      alert('TF 업무 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleTFEdit = (task: TFTask) => {
+    setEditingTFTask(task);
+    setTfTitle(task.title);
+    setTfDescription(task.description);
+    setTfLink(task.link);
+    setTfLinkLabel(task.linkLabel || '');
+    setTfStatus(task.status);
+    setTfDesigner(task.designer);
+  };
+
+  const handleTFDelete = async (id: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+      await deleteDoc(doc(db, 'tfTasks', id));
+      alert('TF 업무가 삭제되었습니다.');
+      fetchTFTasks();
+      if (editingTFTask?.id === id) {
+        resetTFForm();
+      }
+    } catch (error) {
+      console.error('Error deleting TF task:', error);
+      alert('TF 업무 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   const formatMonth = useCallback((month: string) => {
     const [year, monthNum] = month.split('-');
     return `${year}년 ${parseInt(monthNum)}월`;
@@ -676,14 +772,14 @@ export default function AdminPage() {
                   UI/UX Updates
                 </button>
                 <button
-                  onClick={() => setAdminTab('project')}
+                  onClick={() => setAdminTab('tf')}
                   className={`text-sm font-medium transition-colors ${
-                    adminTab === 'project'
+                    adminTab === 'tf'
                       ? 'text-[#313131]'
                       : 'text-gray-400 hover:text-[#313131]'
                   }`}
                 >
-                  Pipeline Projects
+                  TF
                 </button>
               </nav>
             </div>
@@ -1486,8 +1582,189 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Pipeline Projects Tab */}
-        {adminTab === 'project' && (
+        {/* TF Tab */}
+        {adminTab === 'tf' && (
+          <div className="space-y-8">
+            {/* TF Task Form */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-[#313131] mb-6">
+                {editingTFTask ? '✏️ TF 업무 수정' : '🚀 TF 업무 추가'}
+              </h2>
+              <form onSubmit={handleTFSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      제목 *
+                    </label>
+                    <input
+                      type="text"
+                      value={tfTitle}
+                      onChange={(e) => setTfTitle(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                      placeholder="예: Q2 대량구매 대시보드"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      상태 *
+                    </label>
+                    <select
+                      value={tfStatus}
+                      onChange={(e) => setTfStatus(e.target.value as 'active' | 'completed' | 'planned')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    >
+                      <option value="active">진행중</option>
+                      <option value="completed">완료</option>
+                      <option value="planned">예정</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    설명 *
+                  </label>
+                  <textarea
+                    value={tfDescription}
+                    onChange={(e) => setTfDescription(e.target.value)}
+                    required
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    placeholder="TF 업무 내용을 설명하세요"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      링크 (대시보드 또는 페이지 URL) *
+                    </label>
+                    <input
+                      type="url"
+                      value={tfLink}
+                      onChange={(e) => setTfLink(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      링크 버튼 텍스트 (기본값: "바로가기")
+                    </label>
+                    <input
+                      type="text"
+                      value={tfLinkLabel}
+                      onChange={(e) => setTfLinkLabel(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                      placeholder="예: 대시보드 보기, 리포트 보기"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    담당 디자이너 *
+                  </label>
+                  <select
+                    value={tfDesigner}
+                    onChange={(e) => setTfDesigner(e.target.value as Designer)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                  >
+                    <option value="hyeri">🐰 장혜리</option>
+                    <option value="ayoung">🐶 김아영</option>
+                  </select>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 bg-[#313131] text-white py-2.5 px-4 rounded-lg hover:bg-[#1a1a1a] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+                  >
+                    {isSubmitting ? '저장 중...' : editingTFTask ? '수정하기' : '추가하기'}
+                  </button>
+                  {editingTFTask && (
+                    <button
+                      type="button"
+                      onClick={resetTFForm}
+                      className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                    >
+                      취소
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* TF Tasks List */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-[#313131] mb-6">📋 등록된 TF 업무</h2>
+              <div className="space-y-3">
+                {tfTasks.map((task) => {
+                  const designer = DESIGNERS[task.designer];
+                  return (
+                    <div
+                      key={task.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#313131] transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-bold text-gray-900">{task.title}</h3>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            task.status === 'completed'
+                              ? 'bg-green-100 text-green-700'
+                              : task.status === 'active'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                          <span>{designer.emoji} {designer.name}</span>
+                          <span>•</span>
+                          <a
+                            href={task.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {task.linkLabel || '바로가기'} →
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleTFEdit(task)}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleTFDelete(task.id)}
+                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {tfTasks.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    등록된 TF 업무가 없습니다.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pipeline Projects Tab - Hidden */}
+        {false && adminTab === 'insights' && (
           <div className="space-y-8">
             {/* 로드맵 프로젝트 등록 */}
             <div className="bg-white rounded-xl border border-gray-200 p-8">

@@ -113,3 +113,15 @@ export interface UIUXUpdate {
   designer: Designer;
   createdAt: Date;
 }
+
+// TF 업무
+export interface TFTask {
+  id: string;
+  title: string;
+  description: string;
+  link: string; // 대시보드나 작업 페이지 링크
+  linkLabel?: string; // 링크 버튼에 표시될 텍스트 (기본값: "바로가기")
+  status: 'active' | 'completed' | 'planned'; // 진행중, 완료, 예정
+  designer: Designer;
+  createdAt: Date;
+}
