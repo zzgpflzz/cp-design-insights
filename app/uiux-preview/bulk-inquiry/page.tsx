@@ -40,7 +40,7 @@ export default function BulkInquiryPage() {
   const [activeTab, setActiveTab] = useState<TabType>('bulk');
   const [products, setProducts] = useState<Product[]>([]);
   const [productUrl, setProductUrl] = useState('');
-  const [taxInvoice, setTaxInvoice] = useState<'yes' | 'no'>('yes');
+  const [taxInvoice, setTaxInvoice] = useState<'yes' | 'no'>('no');
   const [agreed, setAgreed] = useState(true);
 
   const addProduct = () => {
@@ -459,11 +459,13 @@ export default function BulkInquiryPage() {
 
               {/* 구매 희망 제품 */}
               <div>
-                <div className="text-[14px] font-bold mb-[12px]">
-                  구매 희망 제품 (중복선택 가능)
-                </div>
-                <div className="text-[14px] text-[#a0a0a0] mb-[12px]">
-                  대량구매는 최소 100개부터 주문 가능하며, 20개 단위로 추가할 수 있습니다.
+                <div className="flex items-center gap-[8px] mb-[12px]">
+                  <div className="text-[14px] font-bold">
+                    구매 희망 제품 (중복선택 가능)
+                  </div>
+                  <div className="text-[14px] text-[#a0a0a0]">
+                    대량구매는 최소 100개부터 주문 가능하며, 20개 단위로 추가할 수 있습니다.
+                  </div>
                 </div>
                 <div className="flex gap-[8px] mb-[16px]">
                   <input
@@ -587,12 +589,14 @@ export default function BulkInquiryPage() {
 
               {/* 세금계산서 발행 여부 */}
               <div>
-                <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
-                  <span>세금계산서 발행 여부</span>
-                  <span className="text-[#f83baa]">*</span>
-                </div>
-                <div className="text-[14px] text-[#a0a0a0] mb-[12px]">
-                  발행시에는 제휴제안으로 ~
+                <div className="flex items-center gap-[8px] mb-[12px]">
+                  <div className="flex gap-[2px] items-center text-[14px] font-bold">
+                    <span>세금계산서 발행 여부</span>
+                    <span className="text-[#f83baa]">*</span>
+                  </div>
+                  <div className="text-[14px] text-[#a0a0a0]">
+                    세금계산서 발행시에는 제휴제안으로 문의 바랍니다.
+                  </div>
                 </div>
                 <div className="flex gap-[24px] items-center">
                   <label className="flex gap-[6px] items-center cursor-pointer">
