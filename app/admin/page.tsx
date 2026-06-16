@@ -574,19 +574,69 @@ export default function AdminPage() {
         date: uiuxDate,
         status: uiuxStatus,
         designer: uiuxDesigner,
-        createdAt: new Date(),
+        createdAt: editingUIUXUpdate ? editingUIUXUpdate.createdAt : new Date(),
       };
 
-      if (uiuxVersion) updateData.version = uiuxVersion;
-      if (uiuxDescription) updateData.description = uiuxDescription;
-      if (uiuxAsIsImage) updateData.asIsImage = uiuxAsIsImage;
-      if (uiuxAsIsText) updateData.asIsText = uiuxAsIsText;
-      if (uiuxToBeImage) updateData.toBeImage = uiuxToBeImage;
-      if (uiuxToBeText) updateData.toBeText = uiuxToBeText;
-      if (uiuxCurrentImage) updateData.currentImage = uiuxCurrentImage;
-      if (uiuxFigmaUrl) updateData.figmaUrl = uiuxFigmaUrl;
-      if (uiuxFigmaEmbedUrl) updateData.figmaEmbedUrl = uiuxFigmaEmbedUrl;
-      if (uiuxPreviewUrl) updateData.previewUrl = uiuxPreviewUrl;
+      // 필수 필드가 아닌 것들은 값이 있을 때만 추가, 없으면 명시적으로 삭제
+      if (uiuxVersion) {
+        updateData.version = uiuxVersion;
+      } else if (editingUIUXUpdate) {
+        updateData.version = null;
+      }
+
+      if (uiuxDescription) {
+        updateData.description = uiuxDescription;
+      } else if (editingUIUXUpdate) {
+        updateData.description = null;
+      }
+
+      if (uiuxAsIsImage) {
+        updateData.asIsImage = uiuxAsIsImage;
+      } else if (editingUIUXUpdate) {
+        updateData.asIsImage = null;
+      }
+
+      if (uiuxAsIsText) {
+        updateData.asIsText = uiuxAsIsText;
+      } else if (editingUIUXUpdate) {
+        updateData.asIsText = null;
+      }
+
+      if (uiuxToBeImage) {
+        updateData.toBeImage = uiuxToBeImage;
+      } else if (editingUIUXUpdate) {
+        updateData.toBeImage = null;
+      }
+
+      if (uiuxToBeText) {
+        updateData.toBeText = uiuxToBeText;
+      } else if (editingUIUXUpdate) {
+        updateData.toBeText = null;
+      }
+
+      if (uiuxCurrentImage) {
+        updateData.currentImage = uiuxCurrentImage;
+      } else if (editingUIUXUpdate) {
+        updateData.currentImage = null;
+      }
+
+      if (uiuxFigmaUrl) {
+        updateData.figmaUrl = uiuxFigmaUrl;
+      } else if (editingUIUXUpdate) {
+        updateData.figmaUrl = null;
+      }
+
+      if (uiuxFigmaEmbedUrl) {
+        updateData.figmaEmbedUrl = uiuxFigmaEmbedUrl;
+      } else if (editingUIUXUpdate) {
+        updateData.figmaEmbedUrl = null;
+      }
+
+      if (uiuxPreviewUrl) {
+        updateData.previewUrl = uiuxPreviewUrl;
+      } else if (editingUIUXUpdate) {
+        updateData.previewUrl = null;
+      }
 
       if (editingUIUXUpdate) {
         await updateDoc(doc(db, 'uiuxUpdates', editingUIUXUpdate.id), updateData);
@@ -1530,11 +1580,11 @@ export default function AdminPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-bold text-gray-900">{update.title}</h3>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            update.status === 'completed'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-orange-100 text-orange-700'
-                          }`}>
+                          <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
+                            style={{
+                              backgroundColor: update.status === 'completed' ? 'rgba(0, 188, 125, 0.1)' : 'rgba(255, 157, 0, 0.1)',
+                              color: update.status === 'completed' ? '#00BC7D' : '#FF9D00'
+                            }}>
                             {update.status === 'completed' ? '완료' : '진행중'}
                           </span>
                           {update.version && (
@@ -1712,13 +1762,19 @@ export default function AdminPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-bold text-gray-900">{task.title}</h3>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            task.status === 'completed'
-                              ? 'bg-green-100 text-green-700'
-                              : task.status === 'active'
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-gray-200 text-gray-700'
-                          }`}>
+                          <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
+                            style={{
+                              backgroundColor: task.status === 'completed'
+                                ? 'rgba(0, 188, 125, 0.1)'
+                                : task.status === 'active'
+                                ? 'rgba(255, 157, 0, 0.1)'
+                                : 'rgba(97, 97, 97, 0.1)',
+                              color: task.status === 'completed'
+                                ? '#00BC7D'
+                                : task.status === 'active'
+                                ? '#FF9D00'
+                                : '#616161'
+                            }}>
                             {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
                           </span>
                         </div>

@@ -1614,13 +1614,19 @@ export default function Playground() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="text-lg font-bold text-[#313131]">{task.title}</h3>
-                            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                              task.status === 'completed'
-                                ? 'bg-[#00BC7D] text-white'
-                                : task.status === 'active'
-                                ? 'bg-[#FF9D00] text-white'
-                                : 'bg-gray-300 text-gray-700'
-                            }`}>
+                            <span className={`text-xs px-2.5 py-1 rounded-[6px] font-medium`}
+                              style={{
+                                backgroundColor: task.status === 'completed'
+                                  ? 'rgba(0, 188, 125, 0.1)'
+                                  : task.status === 'active'
+                                  ? 'rgba(255, 157, 0, 0.1)'
+                                  : 'rgba(97, 97, 97, 0.1)',
+                                color: task.status === 'completed'
+                                  ? '#00BC7D'
+                                  : task.status === 'active'
+                                  ? '#FF9D00'
+                                  : '#616161'
+                              }}>
                               {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
                             </span>
                           </div>

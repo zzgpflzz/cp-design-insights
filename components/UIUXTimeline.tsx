@@ -66,11 +66,11 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-base font-bold text-[#313131]">{update.title}</h3>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        isCompleted
-                          ? 'bg-gray-200 text-gray-700'
-                          : 'bg-[#FF9D00] text-white'
-                      }`}>
+                      <span className={`text-xs px-2.5 py-1 rounded-[6px] font-medium`}
+                        style={{
+                          backgroundColor: isCompleted ? 'rgba(0, 188, 125, 0.1)' : 'rgba(255, 157, 0, 0.1)',
+                          color: isCompleted ? '#00BC7D' : '#FF9D00'
+                        }}>
                         {isCompleted ? formatDate(update.date) : `ver. ${update.version || '1'}`}
                       </span>
                     </div>
