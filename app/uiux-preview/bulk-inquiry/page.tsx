@@ -131,7 +131,8 @@ export default function BulkInquiryPage() {
         <img src={imgPcHeader} alt="Header" className="w-full h-full object-cover" />
       </div>
 
-      <main className="max-w-[1920px] mx-auto px-[370px] py-[56px]">
+      <main className="max-w-[1920px] mx-auto flex justify-center py-[56px]">
+        <div className="w-[780px]">
         {/* Breadcrumb with Tabs */}
         <div className="flex gap-[12px] items-center text-[18px] mb-[34px]">
           <button
@@ -654,6 +655,7 @@ export default function BulkInquiryPage() {
         <button className="w-full h-[60px] bg-black text-white text-[18px] font-bold rounded-[2px] hover:bg-gray-800 transition-colors">
           문의 등록하기
         </button>
+        </div>
       </main>
 
       {/* Footer Image */}
