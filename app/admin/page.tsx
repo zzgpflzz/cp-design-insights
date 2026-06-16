@@ -1771,6 +1771,7 @@ export default function AdminPage() {
               <div className="space-y-3">
                 {tfTasks.map((task) => {
                   const designer = DESIGNERS[task.designer];
+                  const tfInfo = task.tfName ? TF_NAMES[task.tfName] : null;
                   return (
                     <div
                       key={task.id}
@@ -1778,13 +1779,15 @@ export default function AdminPage() {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
-                            style={{
-                              backgroundColor: TF_NAMES[task.tfName].bgColor,
-                              color: TF_NAMES[task.tfName].color
-                            }}>
-                            {TF_NAMES[task.tfName].name}
-                          </span>
+                          {tfInfo && (
+                            <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
+                              style={{
+                                backgroundColor: tfInfo.bgColor,
+                                color: tfInfo.color
+                              }}>
+                              {tfInfo.name}
+                            </span>
+                          )}
                           <h3 className="font-bold text-gray-900">{task.title}</h3>
                           <span className={`text-xs px-2.5 py-0.5 rounded-[6px] font-medium`}
                             style={{

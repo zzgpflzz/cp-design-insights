@@ -1607,7 +1607,7 @@ export default function Playground() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* LFSQ 앱구축 TF 컬럼 */}
                   {(() => {
-                    const lfsqTasks = tfTasks.filter(t => t.tfName === 'lfsq');
+                    const lfsqTasks = tfTasks.filter(t => t.tfName === 'lfsq' || !t.tfName);
                     const tfInfo = TF_NAMES.lfsq;
                     return (
                       <div className="flex flex-col">
