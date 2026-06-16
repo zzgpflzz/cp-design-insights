@@ -385,12 +385,13 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
 
               {/* AS-IS / TO-BE */}
               {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks || selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {(selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks) && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-4">
-                        <h3 className="text-xs font-bold text-red-600 uppercase tracking-wider">AS-IS</h3>
-                      </div>
+                <div className="border-t border-gray-200 pt-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {(selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks) && (
+                      <div className="bg-red-50 rounded-xl p-6 border border-red-100">
+                        <div className="flex items-center gap-2 mb-4">
+                          <h3 className="text-xs font-bold text-red-600 uppercase tracking-wider">AS-IS</h3>
+                        </div>
                       {selectedUpdate.asIsImage && (
                         <img
                           src={selectedUpdate.asIsImage}
@@ -426,7 +427,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     </div>
                   )}
                   {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
-                    <div>
+                    <div className="bg-green-50 rounded-xl p-6 border border-green-100">
                       <div className="flex items-center gap-2 mb-4">
                         <h3 className="text-xs font-bold text-[#00BC7D] uppercase tracking-wider">TO-BE</h3>
                       </div>
