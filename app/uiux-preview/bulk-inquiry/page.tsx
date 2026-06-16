@@ -39,34 +39,50 @@ interface Product {
 export default function BulkInquiryPage() {
   const [activeTab, setActiveTab] = useState<TabType>('bulk');
   const [products, setProducts] = useState<Product[]>([]);
-  const [productUrl, setProductUrl] = useState('');
+  const [selectedProductId, setSelectedProductId] = useState('');
   const [taxInvoice, setTaxInvoice] = useState<'yes' | 'no'>('no');
   const [agreed, setAgreed] = useState(true);
 
+  const availableProducts = [
+    {
+      id: 'bt21-keyring',
+      brand: 'BT21',
+      name: 'BT21 비욘드 더 저니 인형 키링',
+      thumbnail: imgProduct1,
+      previewUrl: '/uiux-preview/product/bt21-keyring'
+    },
+    {
+      id: 'joguman-pillow',
+      brand: 'JOGUMAN',
+      name: '조구만 우디 바디 필로우',
+      thumbnail: imgProduct2,
+      previewUrl: '/uiux-preview/product/joguman-pillow'
+    }
+  ];
+
   const addProduct = () => {
-    if (!productUrl.trim()) return;
+    if (!selectedProductId) return;
 
-    const sampleProducts = [
-      {
-        id: Date.now().toString(),
-        brand: 'BT21',
-        name: 'BT21 비욘드 더 저니 인형 키링',
-        thumbnail: imgProduct1,
-        selectedOptions: [],
-        showOptions: false
-      },
-      {
-        id: Date.now().toString(),
-        brand: 'JOGUMAN',
-        name: '조구만 우디 바디 필로우',
-        thumbnail: imgProduct2,
-        selectedOptions: [],
-        showOptions: false
-      }
-    ];
+    const selectedProduct = availableProducts.find(p => p.id === selectedProductId);
+    if (!selectedProduct) return;
 
-    setProducts([...products, sampleProducts[products.length % 2]]);
-    setProductUrl('');
+    // 이미 추가된 제품인지 확인
+    if (products.some(p => p.id === selectedProductId)) {
+      alert('이미 추가된 제품입니다.');
+      return;
+    }
+
+    const newProduct = {
+      id: selectedProductId,
+      brand: selectedProduct.brand,
+      name: selectedProduct.name,
+      thumbnail: selectedProduct.thumbnail,
+      selectedOptions: [],
+      showOptions: false
+    };
+
+    setProducts([...products, newProduct]);
+    setSelectedProductId('');
   };
 
   const removeProduct = (productId: string) => {
@@ -465,13 +481,18 @@ export default function BulkInquiryPage() {
                   </div>
                 </div>
                 <div className="flex gap-[8px] mb-[16px]">
-                  <input
-                    type="text"
-                    value={productUrl}
-                    onChange={(e) => setProductUrl(e.target.value)}
-                    placeholder="구매를 희망하는 제품의 url을 입력하세요"
-                    className="flex-1 h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] placeholder:text-[#a0a0a0]"
-                  />
+                  <select
+                    value={selectedProductId}
+                    onChange={(e) => setSelectedProductId(e.target.value)}
+                    className="flex-1 h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] text-[#111]"
+                  >
+                    <option value="">제품을 선택하세요</option>
+                    {availableProducts.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.brand} - {product.name}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     onClick={addProduct}
                     className="px-[24px] h-[40px] border border-[#111] rounded-[2px] text-[15px] font-bold hover:bg-gray-50"
@@ -498,7 +519,18 @@ export default function BulkInquiryPage() {
                           <img src={product.thumbnail} alt={product.name} className="w-[64px] h-[64px] object-cover" />
                           <div className="flex-1">
                             <div className="text-[13px] text-[#888] mb-[4px]">{product.brand}</div>
-                            <div className="text-[16px] font-bold text-[#111]">{product.name}</div>
+                            <div className="text-[16px] font-bold text-[#111] mb-[8px]">{product.name}</div>
+                            <a
+                              href={availableProducts.find(p => p.id === product.id)?.previewUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-[4px] text-[13px] text-[#00BC7D] hover:underline"
+                            >
+                              <span>제품 페이지 보기</span>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
                           </div>
                         </div>
 
