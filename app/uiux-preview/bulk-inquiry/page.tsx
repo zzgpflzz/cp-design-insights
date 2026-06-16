@@ -49,14 +49,16 @@ export default function BulkInquiryPage() {
       brand: 'BT21',
       name: 'BT21 비욘드 더 저니 인형 키링',
       thumbnail: imgProduct1,
-      previewUrl: '/uiux-preview/product/bt21-keyring'
+      hasOptions: true,
+      options: ['KOYA', 'CHIMMY']
     },
     {
       id: 'joguman-pillow',
       brand: 'JOGUMAN',
       name: '조구만 우디 바디 필로우',
       thumbnail: imgProduct2,
-      previewUrl: '/uiux-preview/product/joguman-pillow'
+      hasOptions: false,
+      options: []
     }
   ];
 
@@ -77,7 +79,11 @@ export default function BulkInquiryPage() {
       brand: selectedProduct.brand,
       name: selectedProduct.name,
       thumbnail: selectedProduct.thumbnail,
-      selectedOptions: [],
+      selectedOptions: selectedProduct.hasOptions ? [] : [{
+        id: 'default',
+        name: '단품',
+        quantity: 100
+      }],
       showOptions: false
     };
 
@@ -519,61 +525,43 @@ export default function BulkInquiryPage() {
                           <img src={product.thumbnail} alt={product.name} className="w-[64px] h-[64px] object-cover" />
                           <div className="flex-1">
                             <div className="text-[13px] text-[#888] mb-[4px]">{product.brand}</div>
-                            <div className="text-[16px] font-bold text-[#111] mb-[8px]">{product.name}</div>
-                            <a
-                              href={availableProducts.find(p => p.id === product.id)?.previewUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-[4px] text-[13px] text-[#00BC7D] hover:underline"
-                            >
-                              <span>제품 페이지 보기</span>
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                            </a>
+                            <div className="text-[16px] font-bold text-[#111]">{product.name}</div>
                           </div>
                         </div>
 
-                        {/* 옵션 선택 */}
-                        <div className="mb-[12px]">
-                          <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
-                            <span>옵션</span>
-                            <span className="text-[#f83baa]">*</span>
-                          </div>
-                          <div className="relative">
-                            <button
-                              onClick={() => toggleOptions(product.id)}
-                              className="w-full h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] text-left text-[#a0a0a0] bg-white flex items-center justify-between"
-                            >
-                              <span>옵션을 선택해 추가하세요</span>
-                              <img src={imgDropdownIcon} alt="" className="w-[12px] h-[7px]" />
-                            </button>
+                        {/* 옵션 선택 (옵션이 있는 제품만) */}
+                        {availableProducts.find(p => p.id === product.id)?.hasOptions && (
+                          <div className="mb-[12px]">
+                            <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
+                              <span>옵션</span>
+                              <span className="text-[#f83baa]">*</span>
+                            </div>
+                            <div className="relative">
+                              <button
+                                onClick={() => toggleOptions(product.id)}
+                                className="w-full h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] text-left text-[#a0a0a0] bg-white flex items-center justify-between"
+                              >
+                                <span>옵션을 선택해 추가하세요</span>
+                                <img src={imgDropdownIcon} alt="" className="w-[12px] h-[7px]" />
+                              </button>
 
-                            {/* 옵션 드롭다운 */}
-                            {product.showOptions && (
-                              <div className="absolute top-full left-0 right-0 mt-[4px] bg-white border border-[#dcdee0] rounded-[2px] shadow-lg z-10">
-                                <button
-                                  onClick={() => { addOption(product.id, 'KOYA'); toggleOptions(product.id); }}
-                                  className="w-full px-[14px] py-[12px] text-left text-[13px] text-[#616161] hover:bg-gray-50"
-                                >
-                                  KOYA
-                                </button>
-                                <button
-                                  onClick={() => { addOption(product.id, 'CHIMMY'); toggleOptions(product.id); }}
-                                  className="w-full px-[14px] py-[12px] text-left text-[13px] text-[#616161] hover:bg-gray-50"
-                                >
-                                  CHIMMY
-                                </button>
-                                <button
-                                  onClick={() => { addOption(product.id, '단품'); toggleOptions(product.id); }}
-                                  className="w-full px-[14px] py-[12px] text-left text-[13px] text-[#616161] hover:bg-gray-50"
-                                >
-                                  단품
-                                </button>
-                              </div>
-                            )}
+                              {/* 옵션 드롭다운 */}
+                              {product.showOptions && (
+                                <div className="absolute top-full left-0 right-0 mt-[4px] bg-white border border-[#dcdee0] rounded-[2px] shadow-lg z-10">
+                                  {availableProducts.find(p => p.id === product.id)?.options.map((option) => (
+                                    <button
+                                      key={option}
+                                      onClick={() => { addOption(product.id, option); toggleOptions(product.id); }}
+                                      className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {/* 선택된 옵션 목록 */}
                         {product.selectedOptions.length > 0 && (
