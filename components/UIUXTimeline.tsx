@@ -207,19 +207,22 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               )}
 
               {/* 링크 버튼들 */}
-              <div className="mb-6 flex gap-3">
+              <div className="mb-6 flex flex-wrap gap-3">
                 {selectedUpdate.previewUrl && (
                   <a
                     href={selectedUpdate.previewUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#00BC7D] text-white rounded-lg hover:bg-[#00A06D] transition-colors text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00BC7D] to-[#00A06D] text-white rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all text-sm font-semibold"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                     페이지 미리보기
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
                   </a>
                 )}
                 {selectedUpdate.figmaUrl && (
@@ -227,13 +230,16 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                     href={selectedUpdate.figmaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#313131] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#313131] text-white rounded-lg hover:bg-[#1a1a1a] hover:shadow-lg hover:scale-[1.02] transition-all text-sm font-semibold"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 12.5a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0zm-5-5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm0 10a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm5-15a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
                       <circle cx="14.5" cy="7.5" r="2.5"/>
                     </svg>
                     Figma에서 보기
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
                   </a>
                 )}
               </div>
@@ -258,34 +264,40 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.toBeImage || selectedUpdate.toBeText) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {(selectedUpdate.asIsImage || selectedUpdate.asIsText) && (
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-700 mb-3">AS-IS</h3>
+                    <div className="bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border-2 border-red-200">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <h3 className="text-sm font-bold text-red-700">AS-IS</h3>
+                      </div>
                       {selectedUpdate.asIsImage && (
                         <img
                           src={selectedUpdate.asIsImage}
                           alt="AS-IS"
-                          className="w-full rounded-lg border border-gray-200 mb-3"
+                          className="w-full rounded-lg border-2 border-red-200 mb-3 shadow-sm"
                         />
                       )}
                       {selectedUpdate.asIsText && (
-                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-red-200 shadow-sm">
                           {selectedUpdate.asIsText}
                         </div>
                       )}
                     </div>
                   )}
                   {(selectedUpdate.toBeImage || selectedUpdate.toBeText) && (
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-700 mb-3">TO-BE</h3>
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-5 rounded-xl border-2 border-green-200">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 rounded-full bg-[#00BC7D]"></div>
+                        <h3 className="text-sm font-bold text-[#00BC7D]">TO-BE</h3>
+                      </div>
                       {selectedUpdate.toBeImage && (
                         <img
                           src={selectedUpdate.toBeImage}
                           alt="TO-BE"
-                          className="w-full rounded-lg border border-gray-200 mb-3"
+                          className="w-full rounded-lg border-2 border-green-200 mb-3 shadow-sm"
                         />
                       )}
                       {selectedUpdate.toBeText && (
-                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-green-200 shadow-sm">
                           {selectedUpdate.toBeText}
                         </div>
                       )}
