@@ -1,139 +1,133 @@
 'use client';
 
-// Figma 이미지 에셋
-const imgGroup = "https://www.figma.com/api/mcp/asset/0a5c1fbc-a0d1-4e92-93e6-5adc400a9e16";
-const imgGroup1 = "https://www.figma.com/api/mcp/asset/52fdac05-67b7-4837-87b0-1ec3f4bbc7f5";
-const imgGroup2 = "https://www.figma.com/api/mcp/asset/78015fd2-cfc0-4cf5-8676-afb2e4823ecd";
-const imgStroke15Copy3 = "https://www.figma.com/api/mcp/asset/d1d613e6-ee1e-4338-a3ea-e4b14481981c";
-const imgGroup3 = "https://www.figma.com/api/mcp/asset/a6ad9ac8-9e0f-40c6-a83f-7cea56a89ae7";
-const imgGroup4 = "https://www.figma.com/api/mcp/asset/bb617d40-e393-4428-89a2-eebf50043036";
-const imgGroup5 = "https://www.figma.com/api/mcp/asset/6176ec80-4e3b-4745-a4a4-eb655cea4c07";
-const imgIpxIconSearch = "https://www.figma.com/api/mcp/asset/de85ac23-c513-4498-a2d2-eedeea928ec4";
-const imgGroup6 = "https://www.figma.com/api/mcp/asset/98651866-226b-45ce-b94c-5ea54710322d";
-const imgStroke1 = "https://www.figma.com/api/mcp/asset/17e13258-ce62-4456-99f6-bb2773257fd6";
-const imgStroke3 = "https://www.figma.com/api/mcp/asset/e02fdf1d-a70d-404e-bba9-1147087e2ee5";
-const imgPath = "https://www.figma.com/api/mcp/asset/fec6864d-c6a5-48f7-8070-1b7cf94f875d";
-const imgOval = "https://www.figma.com/api/mcp/asset/c7f9730d-1ef1-4ac4-94cb-30683ccc7209";
-const imgOval1 = "https://www.figma.com/api/mcp/asset/b3be0ea0-e458-41b6-9640-fdf2380ac13b";
-const imgOval2 = "https://www.figma.com/api/mcp/asset/23752d3b-673c-40cb-babd-c8ec80c58f01";
-const imgOval3 = "https://www.figma.com/api/mcp/asset/dc22a571-6690-42f2-b56b-6aaa16f66070";
+import { useState } from 'react';
 
-function PcHeader() {
-  return (
-    <div className="h-[151px] relative w-full bg-white">
-      <div className="absolute flex h-[54px] items-center justify-center left-0 top-[96px] w-full">
-        <div className="-scale-y-100 flex-none">
-          <div className="bg-white h-[54px] relative w-full" />
-        </div>
-      </div>
-      <div className="absolute bg-[#f0f2f4] h-px left-0 top-[150px] w-full" />
+// Header & Footer 이미지
+const imgPcHeader = "https://www.figma.com/api/mcp/asset/d0e253ae-635c-4814-8d65-a26c11165afa";
+const imgPcFooter = "https://www.figma.com/api/mcp/asset/9e108dea-5356-4c11-8d44-d6406710e931";
 
-      {/* Navigation */}
-      <div className="absolute content-stretch flex gap-[32px] items-center left-[370px] text-[16px] font-bold top-[112px] uppercase">
-        <div className="flex flex-col justify-center">세일탭</div>
-        <div className="flex flex-col justify-center">베스트</div>
-        <div className="flex flex-col justify-center">신제품</div>
-        <div className="flex flex-col justify-center">카테고리</div>
-        <div className="flex flex-col justify-center">이벤트</div>
-        <div className="flex flex-col justify-center">K-POP</div>
-        <div className="flex flex-col justify-center">브랜드</div>
-        <div className="flex flex-col justify-center">SALE</div>
-      </div>
+// 제품 이미지
+const imgProduct1 = "https://www.figma.com/api/mcp/asset/738af550-8cbf-4b20-9591-fc91e2b95581";
+const imgProduct2 = "https://www.figma.com/api/mcp/asset/46a95fff-a6f3-45ae-a6d6-523f03862674";
 
-      <div className="absolute bg-white h-[96px] left-0 top-0 w-full" />
+// 아이콘 이미지
+const imgPath = "https://www.figma.com/api/mcp/asset/72e2bba1-7afb-4c58-8911-abed1466a634";
+const imgOval = "https://www.figma.com/api/mcp/asset/ca4e35a6-79d1-4f99-a8fc-fc4233578d97";
+const imgOval1 = "https://www.figma.com/api/mcp/asset/11df2008-fe0c-4f26-baa4-0f6525f9d195";
+const imgOval2 = "https://www.figma.com/api/mcp/asset/7c791b25-c2e9-4c7b-88e4-ea4f926d618c";
+const imgOval3 = "https://www.figma.com/api/mcp/asset/5d7cf930-27cc-42c0-bed2-bc5346cdd807";
+const imgDeleteIcon = "https://www.figma.com/api/mcp/asset/cf7798b5-15f5-47de-a7d5-76dc5c0bad84";
+const imgDropdownIcon = "https://www.figma.com/api/mcp/asset/f9d42d60-9364-4d2e-a98a-087fa3b36c50";
 
-      {/* Global Official Badge */}
-      <div className="absolute bg-black content-stretch flex items-center justify-center p-[6px] rounded-[2px] right-[280px] top-[52px]">
-        <p className="font-bold text-[12px] text-center text-white tracking-[0.6px] whitespace-nowrap">
-          GLOBAL OFFICIAL
-        </p>
-      </div>
-
-      {/* Icons */}
-      <div className="absolute right-[340px] size-[24px] top-[50px]">
-        <img alt="Search" className="block max-w-none size-full" src={imgIpxIconSearch} />
-      </div>
-      <div className="absolute right-[236px] size-[24px] top-[50px]">
-        <img alt="My" className="block max-w-none size-full" src={imgGroup6} />
-      </div>
-      <div className="absolute right-[288px] size-[24px] top-[50px]">
-        <img alt="Cart" className="block max-w-none size-full" src={imgStroke1} />
-      </div>
-
-      {/* Language/Region */}
-      <div className="absolute right-[100px] text-[12px] text-[#616161] top-[19px]">한국어</div>
-      <div className="absolute right-[180px] text-[12px] text-[#616161] top-[19px]">대한민국 (KRW ₩)</div>
-
-      {/* Logo */}
-      <div className="absolute h-[20px] left-[370px] top-[52px] w-[374px] overflow-clip">
-        <img alt="LINE FRIENDS SQUARE" className="h-full" src={imgGroup3} />
-      </div>
-    </div>
-  );
+interface ProductOption {
+  id: string;
+  name: string;
+  quantity: number;
 }
 
-function PcFooter() {
-  return (
-    <div className="h-[378px] relative w-full bg-[#f6f8fa] border-t border-[#ebedee]">
-      <div className="absolute flex flex-col gap-[20px] left-[1070px] top-[145px] text-[15px] font-bold uppercase">
-        <div>1:1 문의</div>
-        <div>멤버십</div>
-        <div>공고</div>
-      </div>
-
-      <div className="absolute left-[1270px] top-[145px]">
-        <div className="text-[15px] font-bold uppercase mb-[15px]">Follow Us</div>
-        <div className="text-[13px] text-[#3f3f3f] mb-[12px]">INSTAGRAM</div>
-        <div className="text-[13px] text-[#3f3f3f]">X (Twitter)</div>
-      </div>
-
-      <div className="absolute bottom-[60px] left-[370px] text-[13px] text-[#3f3f3f]">
-        © LINE FRIENDS SQUARE All Rights Reserved.
-      </div>
-
-      <div className="absolute bg-[#3f3f3f] h-px left-[370px] right-[370px] top-[281px]" />
-
-      {/* Logo */}
-      <div className="absolute left-[370px] top-[107px] h-[60px]">
-        <img alt="LINE FRIENDS SQUARE" className="h-full" src={imgGroup} />
-      </div>
-
-      {/* Footer Links */}
-      <div className="absolute content-stretch flex gap-[16px] items-center left-[370px] top-[40px] text-[15px] font-bold uppercase">
-        <div>ABOUT US</div>
-        <div className="bg-[#a0a0a0] h-[12px] w-px" />
-        <div>사이트맵</div>
-        <div className="bg-[#a0a0a0] h-[12px] w-px" />
-        <div>서비스 약관</div>
-        <div className="bg-[#a0a0a0] h-[12px] w-px" />
-        <div>개인정보처리방침</div>
-        <div className="bg-[#a0a0a0] h-[12px] w-px" />
-        <div>배송・환불</div>
-      </div>
-
-      <div className="absolute left-[370px] top-[145px]">
-        <div className="text-[15px] font-bold mb-[12px]">고객센터</div>
-        <div className="flex gap-[8px] items-center text-[13px] text-[#3f3f3f] mb-[8px]">
-          <span>고객센터 : 1544-5921</span>
-          <div className="bg-[#3f3f3f] h-[11px] w-px" />
-          <span>이메일 : square_cs@linefriends.com</span>
-        </div>
-        <div className="text-[13px] text-[#3f3f3f]">
-          평일 09:00 – 18:00 (점심 12:00-13:00)
-        </div>
-
-        <div className="text-[15px] font-bold mt-[20px]">
-          라인프렌즈 스퀘어 주식회사 사업자 정보
-        </div>
-      </div>
-    </div>
-  );
+interface Product {
+  id: string;
+  brand: string;
+  name: string;
+  thumbnail: string;
+  selectedOptions: ProductOption[];
+  showOptions: boolean;
 }
 
 export default function BulkInquiryPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productUrl, setProductUrl] = useState('');
+  const [taxInvoice, setTaxInvoice] = useState<'yes' | 'no'>('yes');
+  const [agreed, setAgreed] = useState(true);
+
+  const addProduct = () => {
+    if (!productUrl.trim()) return;
+
+    // 샘플 제품 데이터 (실제로는 URL 파싱해서 가져와야 함)
+    const sampleProducts = [
+      {
+        id: Date.now().toString(),
+        brand: 'BT21',
+        name: 'BT21 비욘드 더 저니 인형 키링',
+        thumbnail: imgProduct1,
+        selectedOptions: [],
+        showOptions: false
+      },
+      {
+        id: Date.now().toString(),
+        brand: 'JOGUMAN',
+        name: '조구만 우디 바디 필로우',
+        thumbnail: imgProduct2,
+        selectedOptions: [],
+        showOptions: false
+      }
+    ];
+
+    setProducts([...products, sampleProducts[products.length % 2]]);
+    setProductUrl('');
+  };
+
+  const removeProduct = (productId: string) => {
+    setProducts(products.filter(p => p.id !== productId));
+  };
+
+  const toggleOptions = (productId: string) => {
+    setProducts(products.map(p =>
+      p.id === productId ? { ...p, showOptions: !p.showOptions } : p
+    ));
+  };
+
+  const addOption = (productId: string, optionName: string) => {
+    setProducts(products.map(p => {
+      if (p.id === productId) {
+        const existingOption = p.selectedOptions.find(o => o.name === optionName);
+        if (existingOption) return p;
+
+        return {
+          ...p,
+          selectedOptions: [...p.selectedOptions, {
+            id: Date.now().toString(),
+            name: optionName,
+            quantity: 100
+          }]
+        };
+      }
+      return p;
+    }));
+  };
+
+  const removeOption = (productId: string, optionId: string) => {
+    setProducts(products.map(p =>
+      p.id === productId
+        ? { ...p, selectedOptions: p.selectedOptions.filter(o => o.id !== optionId) }
+        : p
+    ));
+  };
+
+  const updateQuantity = (productId: string, optionId: string, delta: number) => {
+    setProducts(products.map(p => {
+      if (p.id === productId) {
+        return {
+          ...p,
+          selectedOptions: p.selectedOptions.map(o => {
+            if (o.id === optionId) {
+              const newQuantity = Math.max(100, o.quantity + delta);
+              return { ...o, quantity: newQuantity };
+            }
+            return o;
+          })
+        };
+      }
+      return p;
+    }));
+  };
+
   return (
     <div className="bg-white min-h-screen">
-      <PcHeader />
+      {/* Header Image */}
+      <div className="h-[151px] w-full">
+        <img src={imgPcHeader} alt="Header" className="w-full h-full object-cover" />
+      </div>
 
       <main className="max-w-[1920px] mx-auto px-[370px] py-[56px]">
         {/* Breadcrumb */}
@@ -149,49 +143,63 @@ export default function BulkInquiryPage() {
           <div className="font-bold text-[15px] text-[#616161] mb-[16px]">
             문의 전 꼭 확인해주세요!
           </div>
-          <div className="text-[15px] text-[#616161] leading-[1.45]">
-            <p className="font-bold mb-[8px]">[목적]</p>
-            <ul className="list-disc ml-[22.5px] mb-[16px]">
-              <li>공급 희망 업체에 대한 사전 확인이 필요합니다.</li>
-              <li>리셀, 수출 등 영리 목적의 공급은 불가합니다.</li>
-            </ul>
+          <div className="text-[15px] text-[#616161] leading-[1.45] space-y-[12px]">
+            <div>
+              <p className="font-bold mb-[8px]">[목적]</p>
+              <ul className="list-disc ml-[22.5px] space-y-[4px]">
+                <li>공급 희망 업체에 대한 사전 확인이 필요합니다.</li>
+                <li>리셀, 수출 등 영리 목적의 공급은 불가합니다.</li>
+              </ul>
+            </div>
 
-            <p className="font-bold mb-[8px]">[혜택 제한]</p>
-            <ul className="list-disc ml-[22.5px] mb-[16px]">
-              <li>쿠폰/적립금 등 추가 할인 혜택은 제한되며, 구매 건에 대한 적립금은 지급되지 않습니다.</li>
-            </ul>
+            <div>
+              <p className="font-bold mb-[8px]">[혜택 제한]</p>
+              <ul className="list-disc ml-[22.5px] space-y-[4px]">
+                <li>쿠폰/적립금 등 추가 할인 혜택은 제한되며, 구매 건에 대한 적립금은 지급되지 않습니다.</li>
+              </ul>
+            </div>
 
-            <p className="font-bold mb-[8px]">[회원 구매 전용]</p>
-            <ul className="list-disc ml-[22.5px] mb-[16px]">
-              <li>무신사스토어 회원 가입 후 회원 로그인 상태에서 구매 가능합니다.</li>
-              <li>사업자 회원 가입, 비회원 주문은 불가능합니다.</li>
-            </ul>
+            <div>
+              <p className="font-bold mb-[8px]">[회원 구매 전용]</p>
+              <ul className="list-disc ml-[22.5px] space-y-[4px]">
+                <li>무신사스토어 회원 가입 후 회원 로그인 상태에서 구매 가능합니다.</li>
+                <li>사업자 회원 가입, 비회원 주문은 불가능합니다.</li>
+              </ul>
+            </div>
 
-            <p className="font-bold mb-[8px]">[결제 수단]</p>
-            <ul className="list-disc ml-[22.5px] mb-[16px]">
-              <li>공급 후 결제(후불 결제)는 불가합니다.</li>
-              <li>주문 시점의 재고로 공급이 가능하며, 재고 수급 및 홀딩은 불가합니다.</li>
-              <li>카드 결제를 권장드리며, 계좌이체 희망 시 가상계좌 입금으로 진행되고 1회 50만 원 한도 제한이 있습니다.</li>
-            </ul>
+            <div>
+              <p className="font-bold mb-[8px]">[결제 수단]</p>
+              <ul className="list-disc ml-[22.5px] space-y-[4px]">
+                <li>공급 후 결제(후불 결제)는 불가합니다.</li>
+                <li>주문 시점의 재고로 공급이 가능하며, 재고 수급 및 홀딩은 불가합니다.</li>
+                <li>카드 결제를 권장드리며, 계좌이체 희망 시 가상계좌 입금으로 진행되고 1회 50만 원 한도 제한이 있습니다.</li>
+              </ul>
+            </div>
 
-            <p className="font-bold mb-[8px]">[상품 정보]</p>
-            <ul className="list-disc ml-[22.5px] mb-[16px]">
-              <li>공급 희망 상품 정보를 정확히 기입하지 않으면, 공급 여부 확인이 불가합니다.<br />(상품 링크/브랜드명/상품명/컬러/사이즈 옵션)</li>
-            </ul>
+            <div>
+              <p className="font-bold mb-[8px]">[상품 정보]</p>
+              <ul className="list-disc ml-[22.5px] space-y-[4px]">
+                <li>공급 희망 상품 정보를 정확히 기입하지 않으면, 공급 여부 확인이 불가합니다.<br />(상품 링크/브랜드명/상품명/컬러/사이즈 옵션)</li>
+              </ul>
+            </div>
 
-            <p className="font-bold mb-[8px]">[가능 여부]</p>
-            <ul className="list-disc ml-[22.5px] mb-[16px]">
-              <li>스토어 내 판매 중인 상품, 판매 가능한 옵션 내에 한하여 공급이 가능합니다.</li>
-              <li>품절, 미제공 옵션은 공급 불가하며, 사이즈 옵션별 재고 수량은 상이합니다.</li>
-              <li>단일 상품 기준 총 구매 수량, 할인 진행 여부 확인 후 공급 가능 여부가 달라질 수 있습니다.</li>
-              <li>현재 진행 중인 프로모션 할인율이 대량 구매 최대 할인율보다 높거나 같은 경우에는 일반 구매로 전환됩니다.</li>
-              <li>프로모션 진행 일정은 내부 운영 정책 및 재고 상황에 따라 유동적으로 변경될 수 있습니다.</li>
-            </ul>
+            <div>
+              <p className="font-bold mb-[8px]">[가능 여부]</p>
+              <ul className="list-disc ml-[22.5px] space-y-[4px]">
+                <li>스토어 내 판매 중인 상품, 판매 가능한 옵션 내에 한하여 공급이 가능합니다.</li>
+                <li>품절, 미제공 옵션은 공급 불가하며, 사이즈 옵션별 재고 수량은 상이합니다.</li>
+                <li>단일 상품 기준 총 구매 수량, 할인 진행 여부 확인 후 공급 가능 여부가 달라질 수 있습니다.</li>
+                <li>현재 진행 중인 프로모션 할인율이 대량 구매 최대 할인율보다 높거나 같은 경우에는 일반 구매로 전환됩니다.</li>
+                <li>프로모션 진행 일정은 내부 운영 정책 및 재고 상황에 따라 유동적으로 변경될 수 있습니다.</li>
+              </ul>
+            </div>
 
-            <p className="font-bold mb-[8px]">[회신 일자]</p>
-            <ul className="list-disc ml-[22.5px]">
-              <li>영업일 기준 5일 이내에 담당자가 배정되어 이메일 혹은 유선으로 회신을 드립니다.</li>
-            </ul>
+            <div>
+              <p className="font-bold mb-[8px]">[회신 일자]</p>
+              <ul className="list-disc ml-[22.5px]">
+                <li>영업일 기준 5일 이내에 담당자가 배정되어 이메일 혹은 유선으로 회신을 드립니다.</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -231,7 +239,7 @@ export default function BulkInquiryPage() {
             </div>
             <input
               type="email"
-              placeholder="이메일을 입력하세요"
+              placeholder="전화번호를 입력하세요"
               className="w-full h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] placeholder:text-[#a0a0a0]"
             />
           </div>
@@ -254,38 +262,156 @@ export default function BulkInquiryPage() {
             <div className="text-[14px] font-bold mb-[12px]">
               구매 희망 제품 (중복선택 가능)
             </div>
-            <div className="flex gap-[8px]">
+            <div className="text-[14px] text-[#a0a0a0] mb-[12px]">
+              대량구매는 최소 100개부터 주문 가능하며, 20개 단위로 추가할 수 있습니다.
+            </div>
+            <div className="flex gap-[8px] mb-[16px]">
               <input
                 type="text"
+                value={productUrl}
+                onChange={(e) => setProductUrl(e.target.value)}
                 placeholder="구매를 희망하는 제품의 url을 입력하세요"
                 className="flex-1 h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] placeholder:text-[#a0a0a0]"
               />
-              <button className="px-[24px] h-[40px] border border-[#111] rounded-[2px] text-[15px] font-bold">
+              <button
+                onClick={addProduct}
+                className="px-[24px] h-[40px] border border-[#111] rounded-[2px] text-[15px] font-bold hover:bg-gray-50"
+              >
                 추가하기
               </button>
             </div>
+
+            {/* 추가된 제품 목록 */}
+            {products.length > 0 && (
+              <div className="space-y-[16px]">
+                {products.map((product) => (
+                  <div key={product.id} className="bg-[#f6f8fa] border border-[#dcdee0] rounded-[2px] p-[20px] relative">
+                    {/* 제품 삭제 버튼 */}
+                    <button
+                      onClick={() => removeProduct(product.id)}
+                      className="absolute right-[20px] top-[20px] w-[12px] h-[12px]"
+                    >
+                      <img src={imgDeleteIcon} alt="삭제" className="w-full h-full" />
+                    </button>
+
+                    {/* 제품 정보 */}
+                    <div className="flex gap-[18px] mb-[16px]">
+                      <img src={product.thumbnail} alt={product.name} className="w-[64px] h-[64px] object-cover" />
+                      <div className="flex-1">
+                        <div className="text-[13px] text-[#888] mb-[4px]">{product.brand}</div>
+                        <div className="text-[16px] font-bold text-[#111]">{product.name}</div>
+                      </div>
+                    </div>
+
+                    {/* 옵션 선택 */}
+                    <div className="mb-[12px]">
+                      <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
+                        <span>옵션</span>
+                        <span className="text-[#f83baa]">*</span>
+                      </div>
+                      <div className="relative">
+                        <button
+                          onClick={() => toggleOptions(product.id)}
+                          className="w-full h-[40px] px-[14px] border border-[#dcdee0] rounded-[2px] text-[15px] text-left text-[#a0a0a0] bg-white flex items-center justify-between"
+                        >
+                          <span>옵션을 선택해 추가하세요</span>
+                          <img src={imgDropdownIcon} alt="" className="w-[12px] h-[7px]" />
+                        </button>
+
+                        {/* 옵션 드롭다운 */}
+                        {product.showOptions && (
+                          <div className="absolute top-full left-0 right-0 mt-[4px] bg-white border border-[#dcdee0] rounded-[2px] shadow-lg z-10">
+                            <button
+                              onClick={() => { addOption(product.id, 'KOYA'); toggleOptions(product.id); }}
+                              className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                            >
+                              KOYA
+                            </button>
+                            <button
+                              onClick={() => { addOption(product.id, 'CHIMMY'); toggleOptions(product.id); }}
+                              className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                            >
+                              CHIMMY
+                            </button>
+                            <button
+                              onClick={() => { addOption(product.id, '단품'); toggleOptions(product.id); }}
+                              className="w-full px-[14px] py-[12px] text-left text-[15px] text-[#616161] hover:bg-gray-50"
+                            >
+                              단품
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 선택된 옵션 목록 */}
+                    {product.selectedOptions.length > 0 && (
+                      <div className="space-y-[8px]">
+                        {product.selectedOptions.map((option) => (
+                          <div key={option.id} className="flex items-center justify-between bg-white border border-[#ebedee] rounded-[2px] px-[14px] py-[12px]">
+                            <span className="text-[15px] text-[#616161]">{option.name}</span>
+                            <div className="flex items-center gap-[8px]">
+                              <div className="flex items-center border border-[#dcdee0] rounded-[2px] h-[30px]">
+                                <button
+                                  onClick={() => updateQuantity(product.id, option.id, -20)}
+                                  className="w-[30px] h-full flex items-center justify-center text-[14px] text-[#111]"
+                                >
+                                  −
+                                </button>
+                                <div className="w-[50px] h-full flex items-center justify-center text-[14px] font-bold border-x border-[#dcdee0]">
+                                  {option.quantity}
+                                </div>
+                                <button
+                                  onClick={() => updateQuantity(product.id, option.id, 20)}
+                                  className="w-[30px] h-full flex items-center justify-center text-[14px] text-[#111]"
+                                >
+                                  +
+                                </button>
+                              </div>
+                              <button
+                                onClick={() => removeOption(product.id, option.id)}
+                                className="w-[12px] h-[12px]"
+                              >
+                                <img src={imgDeleteIcon} alt="삭제" className="w-full h-full" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* 바우처 발행 여부 */}
+          {/* 세금계산서 발행 여부 */}
           <div>
             <div className="flex gap-[2px] items-center text-[14px] font-bold mb-[12px]">
-              <span>바우처 발행 여부</span>
+              <span>세금계산서 발행 여부</span>
               <span className="text-[#f83baa]">*</span>
+            </div>
+            <div className="text-[14px] text-[#a0a0a0] mb-[12px]">
+              발행시에는 제휴제안으로 ~
             </div>
             <div className="flex gap-[24px] items-center">
               <label className="flex gap-[6px] items-center cursor-pointer">
-                <div className="relative size-[18px]">
-                  <img alt="" className="size-full" src={imgOval} />
-                  <img alt="" className="absolute left-[4.5px] top-[4.5px] size-[9px]" src={imgOval1} />
+                <div className="relative w-[18px] h-[18px]">
+                  <img src={imgOval} alt="" className="w-full h-full" />
+                  {taxInvoice === 'yes' && (
+                    <img src={imgOval1} alt="" className="absolute left-[4.5px] top-[4.5px] w-[9px] h-[9px]" />
+                  )}
                 </div>
-                <span className="text-[15px]">발행</span>
+                <span className="text-[15px]" onClick={() => setTaxInvoice('yes')}>발행</span>
               </label>
               <label className="flex gap-[6px] items-center cursor-pointer">
-                <div className="relative size-[18px]">
-                  <img alt="" className="size-full" src={imgOval2} />
-                  <img alt="" className="absolute left-[4.5px] top-[4.5px] size-[9px]" src={imgOval3} />
+                <div className="relative w-[18px] h-[18px]">
+                  <img src={imgOval2} alt="" className="w-full h-full" />
+                  {taxInvoice === 'no' && (
+                    <img src={imgOval3} alt="" className="absolute left-[4.5px] top-[4.5px] w-[9px] h-[9px]" />
+                  )}
                 </div>
-                <span className="text-[15px]">미발행</span>
+                <span className="text-[15px]" onClick={() => setTaxInvoice('no')}>미발행</span>
               </label>
             </div>
           </div>
@@ -309,10 +435,15 @@ export default function BulkInquiryPage() {
 
         {/* Checkbox */}
         <div className="flex gap-[8px] items-center mb-[40px]">
-          <div className="relative size-[20px]">
+          <button
+            onClick={() => setAgreed(!agreed)}
+            className="relative w-[20px] h-[20px] flex-shrink-0"
+          >
             <div className="absolute inset-0 bg-black border border-black rounded-[3px]" />
-            <img alt="" className="absolute inset-[25%] size-[50%]" src={imgPath} />
-          </div>
+            {agreed && (
+              <img src={imgPath} alt="" className="absolute inset-[25%] w-[50%] h-[50%]" />
+            )}
+          </button>
           <span className="text-[16px] font-bold">
             [필수] 개인정보 수집 및 이용에 동의합니다.
           </span>
@@ -324,7 +455,10 @@ export default function BulkInquiryPage() {
         </button>
       </main>
 
-      <PcFooter />
+      {/* Footer Image */}
+      <div className="h-[378px] w-full mt-[100px]">
+        <img src={imgPcFooter} alt="Footer" className="w-full h-full object-cover" />
+      </div>
     </div>
   );
 }
