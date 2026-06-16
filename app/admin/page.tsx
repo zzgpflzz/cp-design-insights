@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
-import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject } from '@/lib/types';
+import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject, UIUXUpdate } from '@/lib/types';
 
-type AdminTabType = 'insights' | 'project';
+type AdminTabType = 'insights' | 'project' | 'uiux';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -16,12 +16,14 @@ export default function AdminPage() {
   const [agendas, setAgendas] = useState<MonthlyAgenda[]>([]);
   const [roadmapProjects, setRoadmapProjects] = useState<RoadmapProject[]>([]);
   const [projectProgresses, setProjectProgresses] = useState<ProjectProgress[]>([]);
+  const [uiuxUpdates, setUiuxUpdates] = useState<UIUXUpdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingAgenda, setEditingAgenda] = useState<MonthlyAgenda | null>(null);
   const [editingRoadmapProject, setEditingRoadmapProject] = useState<RoadmapProject | null>(null);
   const [editingProgress, setEditingProgress] = useState<ProjectProgress | null>(null);
+  const [editingUIUXUpdate, setEditingUIUXUpdate] = useState<UIUXUpdate | null>(null);
   const [selectedRoadmapProjectId, setSelectedRoadmapProjectId] = useState<string>('');
   const [calViewMonth, setCalViewMonth] = useState<Date>(new Date());
   const [expandedDateKey, setExpandedDateKey] = useState<string | null>(null);
@@ -64,6 +66,23 @@ export default function AdminPage() {
   const [progressStartDate, setProgressStartDate] = useState('');
   const [progressEndDate, setProgressEndDate] = useState('');
   const [progressPercent, setProgressPercent] = useState<number>(0);
+
+  // UI/UX Update Form state
+  const [uiuxTitle, setUiuxTitle] = useState('');
+  const [uiuxVersion, setUiuxVersion] = useState('');
+  const [uiuxDate, setUiuxDate] = useState(() => {
+    const now = new Date();
+    return now.toISOString().split('T')[0]; // YYYY-MM-DD
+  });
+  const [uiuxStatus, setUiuxStatus] = useState<'completed' | 'inprogress'>('inprogress');
+  const [uiuxDescription, setUiuxDescription] = useState('');
+  const [uiuxAsIsImage, setUiuxAsIsImage] = useState('');
+  const [uiuxToBeImage, setUiuxToBeImage] = useState('');
+  const [uiuxCurrentImage, setUiuxCurrentImage] = useState('');
+  const [uiuxFigmaUrl, setUiuxFigmaUrl] = useState('');
+  const [uiuxFigmaEmbedUrl, setUiuxFigmaEmbedUrl] = useState('');
+  const [uiuxPreviewUrl, setUiuxPreviewUrl] = useState('');
+  const [uiuxDesigner, setUiuxDesigner] = useState<Designer>('hyeri');
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -132,6 +151,21 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchUIUXUpdates = useCallback(async () => {
+    try {
+      const q = query(collection(db, 'uiuxUpdates'), orderBy('date', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const updatesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+      })) as UIUXUpdate[];
+      setUiuxUpdates(updatesData);
+    } catch (error) {
+      console.error('Error fetching UIUX updates:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push('/');
@@ -143,12 +177,13 @@ export default function AdminPage() {
         fetchProjects(),
         fetchAgendas(),
         fetchRoadmapProjects(),
-        fetchProjectProgresses()
+        fetchProjectProgresses(),
+        fetchUIUXUpdates()
       ]);
     };
 
     initializeData();
-  }, [router, fetchProjects, fetchAgendas, fetchRoadmapProjects, fetchProjectProgresses]);
+  }, [router, fetchProjects, fetchAgendas, fetchRoadmapProjects, fetchProjectProgresses, fetchUIUXUpdates]);
 
   // 대시보드 요약 지표
   const dashboardStats = useMemo(() => {
@@ -500,6 +535,95 @@ export default function AdminPage() {
     }
   };
 
+  // UI/UX Update 핸들러
+  const handleUIUXSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const updateData: any = {
+        title: uiuxTitle,
+        date: uiuxDate,
+        status: uiuxStatus,
+        designer: uiuxDesigner,
+        createdAt: new Date(),
+      };
+
+      if (uiuxVersion) updateData.version = uiuxVersion;
+      if (uiuxDescription) updateData.description = uiuxDescription;
+      if (uiuxAsIsImage) updateData.asIsImage = uiuxAsIsImage;
+      if (uiuxToBeImage) updateData.toBeImage = uiuxToBeImage;
+      if (uiuxCurrentImage) updateData.currentImage = uiuxCurrentImage;
+      if (uiuxFigmaUrl) updateData.figmaUrl = uiuxFigmaUrl;
+      if (uiuxFigmaEmbedUrl) updateData.figmaEmbedUrl = uiuxFigmaEmbedUrl;
+      if (uiuxPreviewUrl) updateData.previewUrl = uiuxPreviewUrl;
+
+      if (editingUIUXUpdate) {
+        await updateDoc(doc(db, 'uiuxUpdates', editingUIUXUpdate.id), updateData);
+        alert('UI/UX 업데이트가 수정되었습니다!');
+      } else {
+        await addDoc(collection(db, 'uiuxUpdates'), updateData);
+        alert('UI/UX 업데이트가 추가되었습니다!');
+      }
+
+      resetUIUXForm();
+      fetchUIUXUpdates();
+    } catch (error) {
+      console.error('Error adding/updating UIUX update:', error);
+      alert('UI/UX 업데이트 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUIUXEdit = (update: UIUXUpdate) => {
+    setEditingUIUXUpdate(update);
+    setUiuxTitle(update.title);
+    setUiuxVersion(update.version || '');
+    setUiuxDate(update.date);
+    setUiuxStatus(update.status);
+    setUiuxDescription(update.description || '');
+    setUiuxAsIsImage(update.asIsImage || '');
+    setUiuxToBeImage(update.toBeImage || '');
+    setUiuxCurrentImage(update.currentImage || '');
+    setUiuxFigmaUrl(update.figmaUrl || '');
+    setUiuxFigmaEmbedUrl(update.figmaEmbedUrl || '');
+    setUiuxPreviewUrl(update.previewUrl || '');
+    setUiuxDesigner(update.designer);
+  };
+
+  const handleUIUXDelete = async (id: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+      await deleteDoc(doc(db, 'uiuxUpdates', id));
+      alert('UI/UX 업데이트가 삭제되었습니다.');
+      fetchUIUXUpdates();
+      if (editingUIUXUpdate?.id === id) {
+        resetUIUXForm();
+      }
+    } catch (error) {
+      console.error('Error deleting UIUX update:', error);
+      alert('UI/UX 업데이트 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const resetUIUXForm = () => {
+    setEditingUIUXUpdate(null);
+    setUiuxTitle('');
+    setUiuxVersion('');
+    setUiuxDate(new Date().toISOString().split('T')[0]);
+    setUiuxStatus('inprogress');
+    setUiuxDescription('');
+    setUiuxAsIsImage('');
+    setUiuxToBeImage('');
+    setUiuxCurrentImage('');
+    setUiuxFigmaUrl('');
+    setUiuxFigmaEmbedUrl('');
+    setUiuxPreviewUrl('');
+    setUiuxDesigner('hyeri');
+  };
+
   const formatMonth = useCallback((month: string) => {
     const [year, monthNum] = month.split('-');
     return `${year}년 ${parseInt(monthNum)}월`;
@@ -532,6 +656,16 @@ export default function AdminPage() {
                   }`}
                 >
                   Monthly Insights
+                </button>
+                <button
+                  onClick={() => setAdminTab('uiux')}
+                  className={`text-sm font-medium transition-colors ${
+                    adminTab === 'uiux'
+                      ? 'text-[#313131]'
+                      : 'text-gray-400 hover:text-[#313131]'
+                  }`}
+                >
+                  UI/UX Updates
                 </button>
                 <button
                   onClick={() => setAdminTab('project')}
@@ -1039,6 +1173,272 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* UI/UX Updates Tab */}
+        {adminTab === 'uiux' && (
+          <div className="space-y-8">
+            {/* UI/UX Update Form */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-[#313131] mb-6">
+                {editingUIUXUpdate ? '✏️ UI/UX 업데이트 수정' : '🎨 UI/UX 업데이트 추가'}
+              </h2>
+              <form onSubmit={handleUIUXSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      제목 *
+                    </label>
+                    <input
+                      type="text"
+                      value={uiuxTitle}
+                      onChange={(e) => setUiuxTitle(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                      placeholder="예: 프로젝트 카드 레이아웃 개선"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      버전
+                    </label>
+                    <input
+                      type="text"
+                      value={uiuxVersion}
+                      onChange={(e) => setUiuxVersion(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                      placeholder="예: 1.0, 2.0"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      날짜 *
+                    </label>
+                    <input
+                      type="date"
+                      value={uiuxDate}
+                      onChange={(e) => setUiuxDate(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      상태 *
+                    </label>
+                    <select
+                      value={uiuxStatus}
+                      onChange={(e) => setUiuxStatus(e.target.value as 'completed' | 'inprogress')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    >
+                      <option value="inprogress">진행중</option>
+                      <option value="completed">완료</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      담당 디자이너 *
+                    </label>
+                    <select
+                      value={uiuxDesigner}
+                      onChange={(e) => setUiuxDesigner(e.target.value as Designer)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    >
+                      <option value="hyeri">🐰 장혜리</option>
+                      <option value="ayoung">🐶 김아영</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    설명
+                  </label>
+                  <textarea
+                    value={uiuxDescription}
+                    onChange={(e) => setUiuxDescription(e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    placeholder="업데이트 내용을 간단히 설명하세요"
+                  />
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-sm font-bold text-gray-700 mb-3">🔗 Figma 연동</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Figma URL
+                      </label>
+                      <input
+                        type="url"
+                        value={uiuxFigmaUrl}
+                        onChange={(e) => setUiuxFigmaUrl(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="https://www.figma.com/file/..."
+                      />
+                      <p className="text-xs text-gray-500 mt-1">새 탭에서 열기 버튼으로 표시됩니다</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Figma Embed URL
+                      </label>
+                      <input
+                        type="url"
+                        value={uiuxFigmaEmbedUrl}
+                        onChange={(e) => setUiuxFigmaEmbedUrl(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="https://www.figma.com/embed?..."
+                      />
+                      <p className="text-xs text-gray-500 mt-1">모달에 iframe으로 표시됩니다</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Preview URL (구현된 페이지)
+                      </label>
+                      <input
+                        type="url"
+                        value={uiuxPreviewUrl}
+                        onChange={(e) => setUiuxPreviewUrl(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="/uiux-preview/bulk-inquiry"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">구현된 페이지 URL (상대 또는 절대 경로)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-sm font-bold text-gray-700 mb-3">🖼️ 이미지 (완료된 업데이트용)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        AS-IS 이미지 URL
+                      </label>
+                      <input
+                        type="url"
+                        value={uiuxAsIsImage}
+                        onChange={(e) => setUiuxAsIsImage(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        TO-BE 이미지 URL
+                      </label>
+                      <input
+                        type="url"
+                        value={uiuxToBeImage}
+                        onChange={(e) => setUiuxToBeImage(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    현재 진행중인 UI 이미지 URL (진행중 업데이트용)
+                  </label>
+                  <input
+                    type="url"
+                    value={uiuxCurrentImage}
+                    onChange={(e) => setUiuxCurrentImage(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 bg-[#313131] text-white py-2.5 px-4 rounded-lg hover:bg-[#1a1a1a] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+                  >
+                    {isSubmitting ? '저장 중...' : editingUIUXUpdate ? '수정하기' : '추가하기'}
+                  </button>
+                  {editingUIUXUpdate && (
+                    <button
+                      type="button"
+                      onClick={resetUIUXForm}
+                      className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                    >
+                      취소
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* UI/UX Updates List */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-[#313131] mb-6">📋 등록된 UI/UX 업데이트</h2>
+              <div className="space-y-3">
+                {uiuxUpdates.map((update) => {
+                  const designer = DESIGNERS[update.designer];
+                  return (
+                    <div
+                      key={update.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#313131] transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-bold text-gray-900">{update.title}</h3>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            update.status === 'completed'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-orange-100 text-orange-700'
+                          }`}>
+                            {update.status === 'completed' ? '완료' : '진행중'}
+                          </span>
+                          {update.version && (
+                            <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full font-medium">
+                              v{update.version}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                          <span>{designer.emoji} {designer.name}</span>
+                          <span>•</span>
+                          <span>{update.date}</span>
+                          {update.figmaUrl && (
+                            <>
+                              <span>•</span>
+                              <span className="text-purple-600">Figma 연동</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleUIUXEdit(update)}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleUIUXDelete(update.id)}
+                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {uiuxUpdates.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    등록된 UI/UX 업데이트가 없습니다.
+                  </div>
+                )}
               </div>
             </div>
           </div>

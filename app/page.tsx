@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
-import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer } from '@/lib/types';
+import { Project, MonthlyData, ProjectProgress, MonthlyAgenda, Category, Tier, Status, Designer, UIUXUpdate } from '@/lib/types';
 import LoginModal from '@/components/LoginModal';
 import PipelineCalendar from '@/components/PipelineCalendar';
 import ModernCalendarView from '@/components/ModernCalendarView';
+import UIUXTimeline from '@/components/UIUXTimeline';
 import { loadAnalyticsData, getProjectAnalytics, AggregatedAnalytics } from '@/lib/analyticsData';
 
-type TabType = 'monthly' | 'roadmap';
+type TabType = 'monthly' | 'roadmap' | 'uiux';
 type RoadmapViewType = 'pipeline' | 'calendar';
 type MonthlyViewType = 'list' | 'calendar';
 
@@ -38,6 +39,7 @@ export default function Playground() {
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [agendas, setAgendas] = useState<MonthlyAgenda[]>([]);
   const [projectProgresses, setProjectProgresses] = useState<ProjectProgress[]>([]);
+  const [uiuxUpdates, setUiuxUpdates] = useState<UIUXUpdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
@@ -152,6 +154,25 @@ export default function Playground() {
     }
   }, []);
 
+  const fetchUIUXUpdates = useCallback(async () => {
+    console.log('🔵 fetchUIUXUpdates started');
+    const startTime = performance.now();
+    try {
+      const q = query(collection(db, 'uiuxUpdates'), orderBy('date', 'desc'));
+      const querySnapshot = await getDocs(q);
+      console.log(`✅ UIUXUpdates fetched: ${querySnapshot.docs.length} docs in ${(performance.now() - startTime).toFixed(2)}ms`);
+
+      const updatesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+      })) as UIUXUpdate[];
+      setUiuxUpdates(updatesData);
+    } catch (error) {
+      console.error('Error fetching UIUX updates:', error);
+    }
+  }, []);
+
   useEffect(() => {
     console.log('🚀 Component mounted - starting data fetch');
     const mountTime = performance.now();
@@ -165,6 +186,7 @@ export default function Playground() {
         fetchProjects(),
         fetchAgendas(),
         fetchProjectProgresses(),
+        fetchUIUXUpdates(),
         loadAnalyticsData().then(setAnalyticsData)
       ]);
       console.log(`✅ All data loaded in ${(performance.now() - startTime).toFixed(2)}ms`);
@@ -722,6 +744,17 @@ export default function Playground() {
                   Monthly
                 </button>
                 <button
+                  onClick={() => setActiveTab('uiux')}
+                  className={`text-sm font-medium transition-colors ${
+                    activeTab === 'uiux'
+                      ? 'text-[#313131]'
+                      : 'text-gray-400 hover:text-[#313131]'
+                  }`}
+                >
+                  UI/UX Updates
+                </button>
+                {/* Pipeline Calendar 숨김 처리 */}
+                {/* <button
                   onClick={() => setActiveTab('roadmap')}
                   className={`text-sm font-medium transition-colors ${
                     activeTab === 'roadmap'
@@ -730,7 +763,7 @@ export default function Playground() {
                   }`}
                 >
                   Pipeline Calendar
-                </button>
+                </button> */}
               </nav>
             </div>
 
@@ -1523,6 +1556,11 @@ export default function Playground() {
                 </div>
               </div>
             )}
+          </>
+        ) : activeTab === 'uiux' ? (
+          <>
+            {/* UI/UX Timeline */}
+            <UIUXTimeline updates={uiuxUpdates} />
           </>
         ) : (
           <>
