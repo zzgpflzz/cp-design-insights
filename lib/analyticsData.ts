@@ -4,6 +4,7 @@ export interface AnalyticsRow {
   '방문 페이지 경로': string;
   '유입 채널': string;
   '세션': string;
+  '세션당 페이지 뷰': string;
   '평균 세션 지속 시간': string;
 }
 
