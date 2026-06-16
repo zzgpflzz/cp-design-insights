@@ -117,7 +117,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         </div>
 
                         {update.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{stripMarkdown(update.description)}</p>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-1">{stripMarkdown(update.description)}</p>
                         )}
 
                         <div className="flex items-center justify-between">
@@ -180,7 +180,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         </div>
 
                         {update.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{stripMarkdown(update.description)}</p>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-1">{stripMarkdown(update.description)}</p>
                         )}
 
                         <div className="flex items-center justify-between">
@@ -243,7 +243,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         </div>
 
                         {update.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{stripMarkdown(update.description)}</p>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-1">{stripMarkdown(update.description)}</p>
                         )}
 
                         <div className="flex items-center justify-between">
