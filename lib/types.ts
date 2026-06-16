@@ -103,7 +103,9 @@ export interface UIUXUpdate {
   status: 'completed' | 'inprogress'; // completed면 날짜, inprogress면 'ver. X' 표시
   description?: string; // 간단한 설명
   asIsImage?: string; // AS-IS 이미지 URL
+  asIsText?: string; // AS-IS 텍스트 설명
   toBeImage?: string; // TO-BE 이미지 URL
+  toBeText?: string; // TO-BE 텍스트 설명
   currentImage?: string; // 진행중인 UI 이미지 URL
   figmaUrl?: string; // 피그마 파일 URL (클릭 시 새 탭에서 열기)
   figmaEmbedUrl?: string; // 피그마 Embed URL (모달에서 iframe으로 표시)

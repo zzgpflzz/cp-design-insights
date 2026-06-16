@@ -191,26 +191,40 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               )}
 
               {/* AS-IS / TO-BE */}
-              {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.toBeImage) && (
+              {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.toBeImage || selectedUpdate.toBeText) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {selectedUpdate.asIsImage && (
+                  {(selectedUpdate.asIsImage || selectedUpdate.asIsText) && (
                     <div>
                       <h3 className="text-sm font-bold text-gray-700 mb-3">AS-IS</h3>
-                      <img
-                        src={selectedUpdate.asIsImage}
-                        alt="AS-IS"
-                        className="w-full rounded-lg border border-gray-200"
-                      />
+                      {selectedUpdate.asIsImage && (
+                        <img
+                          src={selectedUpdate.asIsImage}
+                          alt="AS-IS"
+                          className="w-full rounded-lg border border-gray-200 mb-3"
+                        />
+                      )}
+                      {selectedUpdate.asIsText && (
+                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          {selectedUpdate.asIsText}
+                        </div>
+                      )}
                     </div>
                   )}
-                  {selectedUpdate.toBeImage && (
+                  {(selectedUpdate.toBeImage || selectedUpdate.toBeText) && (
                     <div>
                       <h3 className="text-sm font-bold text-gray-700 mb-3">TO-BE</h3>
-                      <img
-                        src={selectedUpdate.toBeImage}
-                        alt="TO-BE"
-                        className="w-full rounded-lg border border-gray-200"
-                      />
+                      {selectedUpdate.toBeImage && (
+                        <img
+                          src={selectedUpdate.toBeImage}
+                          alt="TO-BE"
+                          className="w-full rounded-lg border border-gray-200 mb-3"
+                        />
+                      )}
+                      {selectedUpdate.toBeText && (
+                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          {selectedUpdate.toBeText}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

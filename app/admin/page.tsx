@@ -77,7 +77,9 @@ export default function AdminPage() {
   const [uiuxStatus, setUiuxStatus] = useState<'completed' | 'inprogress'>('inprogress');
   const [uiuxDescription, setUiuxDescription] = useState('');
   const [uiuxAsIsImage, setUiuxAsIsImage] = useState('');
+  const [uiuxAsIsText, setUiuxAsIsText] = useState('');
   const [uiuxToBeImage, setUiuxToBeImage] = useState('');
+  const [uiuxToBeText, setUiuxToBeText] = useState('');
   const [uiuxCurrentImage, setUiuxCurrentImage] = useState('');
   const [uiuxFigmaUrl, setUiuxFigmaUrl] = useState('');
   const [uiuxFigmaEmbedUrl, setUiuxFigmaEmbedUrl] = useState('');
@@ -552,7 +554,9 @@ export default function AdminPage() {
       if (uiuxVersion) updateData.version = uiuxVersion;
       if (uiuxDescription) updateData.description = uiuxDescription;
       if (uiuxAsIsImage) updateData.asIsImage = uiuxAsIsImage;
+      if (uiuxAsIsText) updateData.asIsText = uiuxAsIsText;
       if (uiuxToBeImage) updateData.toBeImage = uiuxToBeImage;
+      if (uiuxToBeText) updateData.toBeText = uiuxToBeText;
       if (uiuxCurrentImage) updateData.currentImage = uiuxCurrentImage;
       if (uiuxFigmaUrl) updateData.figmaUrl = uiuxFigmaUrl;
       if (uiuxFigmaEmbedUrl) updateData.figmaEmbedUrl = uiuxFigmaEmbedUrl;
@@ -584,7 +588,9 @@ export default function AdminPage() {
     setUiuxStatus(update.status);
     setUiuxDescription(update.description || '');
     setUiuxAsIsImage(update.asIsImage || '');
+    setUiuxAsIsText(update.asIsText || '');
     setUiuxToBeImage(update.toBeImage || '');
+    setUiuxToBeText(update.toBeText || '');
     setUiuxCurrentImage(update.currentImage || '');
     setUiuxFigmaUrl(update.figmaUrl || '');
     setUiuxFigmaEmbedUrl(update.figmaEmbedUrl || '');
@@ -616,7 +622,9 @@ export default function AdminPage() {
     setUiuxStatus('inprogress');
     setUiuxDescription('');
     setUiuxAsIsImage('');
+    setUiuxAsIsText('');
     setUiuxToBeImage('');
+    setUiuxToBeText('');
     setUiuxCurrentImage('');
     setUiuxFigmaUrl('');
     setUiuxFigmaEmbedUrl('');
@@ -1315,31 +1323,65 @@ export default function AdminPage() {
                 </div>
 
                 <div className="border-t border-gray-200 pt-4">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">🖼️ 이미지 (완료된 업데이트용)</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <h3 className="text-sm font-bold text-gray-700 mb-3">🖼️ AS-IS / TO-BE (완료된 업데이트용)</h3>
+                  <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        AS-IS 이미지 URL
-                      </label>
-                      <input
-                        type="url"
-                        value={uiuxAsIsImage}
-                        onChange={(e) => setUiuxAsIsImage(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
-                        placeholder="https://..."
-                      />
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">AS-IS</h4>
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">
+                            이미지 URL
+                          </label>
+                          <input
+                            type="url"
+                            value={uiuxAsIsImage}
+                            onChange={(e) => setUiuxAsIsImage(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">
+                            텍스트 설명
+                          </label>
+                          <textarea
+                            value={uiuxAsIsText}
+                            onChange={(e) => setUiuxAsIsText(e.target.value)}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                            placeholder="AS-IS 상태에 대한 설명을 입력하세요"
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        TO-BE 이미지 URL
-                      </label>
-                      <input
-                        type="url"
-                        value={uiuxToBeImage}
-                        onChange={(e) => setUiuxToBeImage(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
-                        placeholder="https://..."
-                      />
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">TO-BE</h4>
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">
+                            이미지 URL
+                          </label>
+                          <input
+                            type="url"
+                            value={uiuxToBeImage}
+                            onChange={(e) => setUiuxToBeImage(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">
+                            텍스트 설명
+                          </label>
+                          <textarea
+                            value={uiuxToBeText}
+                            onChange={(e) => setUiuxToBeText(e.target.value)}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#313131] focus:border-transparent"
+                            placeholder="TO-BE 상태에 대한 설명을 입력하세요"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
