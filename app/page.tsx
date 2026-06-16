@@ -1596,14 +1596,12 @@ export default function Playground() {
         ) : activeTab === 'tf' ? (
           <>
             {/* TF Tasks - 칸반보드 */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-[#313131] mb-6">TF 업무</h2>
-
-              {tfTasks.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
-                  등록된 TF 업무가 없습니다.
-                </div>
-              ) : (
+            {tfTasks.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
+                등록된 TF 업무가 없습니다.
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* LFSQ 앱구축 TF 컬럼 */}
                   {(() => {
@@ -1743,8 +1741,8 @@ export default function Playground() {
                     );
                   })()}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </>
         ) : (
           <>

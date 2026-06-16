@@ -60,29 +60,28 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-[#313131]">UI/UX Updates</h2>
-
-          {periods.length > 1 && (
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-[#313131] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="all">전체</option>
-              {periods.filter(p => p !== 'all').map(period => (
-                <option key={period} value={period}>{period}</option>
-              ))}
-            </select>
-          )}
+      {/* 기간 필터 */}
+      {periods.length > 1 && (
+        <div className="mb-6 flex justify-end">
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-[#313131] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="all">전체</option>
+            {periods.filter(p => p !== 'all').map(period => (
+              <option key={period} value={period}>{period}</option>
+            ))}
+          </select>
         </div>
+      )}
 
-        {updates.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            등록된 UI/UX 업데이트가 없습니다.
-          </div>
-        ) : (
+      {updates.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
+          등록된 UI/UX 업데이트가 없습니다.
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* 진행 예정 컬럼 */}
             <div className="flex flex-col">
@@ -273,8 +272,8 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && selectedUpdate && (
