@@ -110,6 +110,7 @@ export interface UIUXUpdate {
   figmaUrl?: string; // 피그마 파일 URL (클릭 시 새 탭에서 열기)
   figmaEmbedUrl?: string; // 피그마 Embed URL (모달에서 iframe으로 표시)
   previewUrl?: string; // 구현된 페이지 미리보기 URL (내부 서브페이지)
+  previewLabel?: string; // 미리보기 버튼 텍스트 (기본값: "바로가기")
   designer: Designer;
   createdAt: Date;
 }
