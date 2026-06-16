@@ -100,7 +100,8 @@ export interface UIUXUpdate {
   title: string;
   version?: string; // 'v1.0', 'v2.0' 등
   date: string; // YYYY-MM-DD 형식
-  status: 'completed' | 'inprogress'; // completed면 날짜, inprogress면 'ver. X' 표시
+  status: 'completed' | 'inprogress' | 'planned'; // completed면 날짜, inprogress면 'ver. X', planned면 '예정'
+  period?: string; // 기간 표시 (예: '2026년 5-6월', '2026 Q2')
   description?: string; // 간단한 설명
   asIsImage?: string; // AS-IS 이미지 URL
   asIsText?: string; // AS-IS 텍스트 설명

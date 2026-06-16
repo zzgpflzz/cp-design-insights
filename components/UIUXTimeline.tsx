@@ -12,6 +12,7 @@ interface UIUXTimelineProps {
 export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
   const [selectedUpdate, setSelectedUpdate] = useState<UIUXUpdate | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
 
   const handleUpdateClick = (update: UIUXUpdate) => {
     setSelectedUpdate(update);
@@ -38,25 +39,114 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
       .trim();
   };
 
+  // 기간 목록 추출 (중복 제거)
+  const periods = ['all', ...new Set(updates.map(u => u.period).filter(Boolean))];
+
+  // 기간별 필터링
+  const filteredUpdates = selectedPeriod === 'all'
+    ? updates
+    : updates.filter(u => u.period === selectedPeriod);
+
   // 상태별로 분류
-  const inProgressUpdates = updates.filter(u => u.status === 'inprogress').sort((a, b) =>
+  const plannedUpdates = filteredUpdates.filter(u => u.status === 'planned').sort((a, b) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
-  const completedUpdates = updates.filter(u => u.status === 'completed').sort((a, b) =>
+  const inProgressUpdates = filteredUpdates.filter(u => u.status === 'inprogress').sort((a, b) =>
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  const completedUpdates = filteredUpdates.filter(u => u.status === 'completed').sort((a, b) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   return (
     <>
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-[#313131] mb-6">UI/UX Updates</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-[#313131]">UI/UX Updates</h2>
+
+          {periods.length > 1 && (
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-[#313131] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="all">전체</option>
+              {periods.filter(p => p !== 'all').map(period => (
+                <option key={period} value={period}>{period}</option>
+              ))}
+            </select>
+          )}
+        </div>
 
         {updates.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             등록된 UI/UX 업데이트가 없습니다.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 진행 예정 컬럼 */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-3 h-3 rounded-full bg-[#616161]" />
+                <h3 className="text-sm font-bold text-[#313131]">진행 예정</h3>
+                <span className="text-xs text-gray-500">({plannedUpdates.length})</span>
+              </div>
+              <div className="space-y-3 flex-1">
+                {plannedUpdates.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400 text-sm bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                    진행 예정 업데이트가 없습니다
+                  </div>
+                ) : (
+                  plannedUpdates.map((update) => {
+                    const designer = DESIGNERS[update.designer];
+                    return (
+                      <div
+                        key={update.id}
+                        onClick={() => handleUpdateClick(update)}
+                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#616161] hover:shadow-md transition-all cursor-pointer"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="text-base font-bold text-[#313131] flex-1">{update.title}</h4>
+                          <span className="text-xs px-2.5 py-1 rounded-[6px] font-medium ml-2"
+                            style={{
+                              backgroundColor: 'rgba(97, 97, 97, 0.1)',
+                              color: '#616161'
+                            }}>
+                            예정
+                          </span>
+                        </div>
+
+                        {update.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{stripMarkdown(update.description)}</p>
+                        )}
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <span>{designer.emoji}</span>
+                            <span>{designer.name}</span>
+                          </div>
+                          {update.previewUrl && (
+                            <a
+                              href={update.previewUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-[#616161] hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {update.previewLabel || '바로가기'}
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
             {/* 진행중 컬럼 */}
             <div className="flex flex-col">
               <div className="flex items-center gap-2 mb-4">
