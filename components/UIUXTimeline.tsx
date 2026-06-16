@@ -23,6 +23,21 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
+  // 마크다운 문법을 제거하고 일반 텍스트로 변환
+  const stripMarkdown = (text: string): string => {
+    return text
+      .replace(/#{1,6}\s/g, '') // 제목 (#, ##, ###)
+      .replace(/\*\*(.+?)\*\*/g, '$1') // 굵은 글씨
+      .replace(/\*(.+?)\*/g, '$1') // 기울임
+      .replace(/~~(.+?)~~/g, '$1') // 취소선
+      .replace(/`(.+?)`/g, '$1') // 인라인 코드
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1') // 링크
+      .replace(/^>\s/gm, '') // 인용구
+      .replace(/^[-*+]\s/gm, '') // 리스트
+      .replace(/^\d+\.\s/gm, '') // 번호 리스트
+      .trim();
+  };
+
   // 상태별로 분류
   const inProgressUpdates = updates.filter(u => u.status === 'inprogress').sort((a, b) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -75,7 +90,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         </div>
 
                         {update.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{update.description}</p>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{stripMarkdown(update.description)}</p>
                         )}
 
                         <div className="flex items-center justify-between">
@@ -130,7 +145,7 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         </div>
 
                         {update.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{update.description}</p>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{stripMarkdown(update.description)}</p>
                         )}
 
                         <div className="flex items-center justify-between">
