@@ -392,38 +392,38 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         <div className="flex items-center gap-2 mb-4">
                           <h3 className="text-xs font-bold text-red-600 uppercase tracking-wider">AS-IS</h3>
                         </div>
-                      {selectedUpdate.asIsImage && (
-                        <img
-                          src={selectedUpdate.asIsImage}
-                          alt="AS-IS"
-                          className="w-full rounded-lg mb-4 shadow-sm"
-                        />
-                      )}
-                      {selectedUpdate.asIsText && (
-                        <div className="prose prose-sm max-w-none text-gray-600 mb-4">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {selectedUpdate.asIsText}
-                          </ReactMarkdown>
-                        </div>
-                      )}
-                      {selectedUpdate.asIsLinks && selectedUpdate.asIsLinks.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {selectedUpdate.asIsLinks.map((link, index) => (
-                            <a
-                              key={index}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
-                            >
-                              {link.label}
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                            </a>
-                          ))}
-                        </div>
-                      )}
+                        {selectedUpdate.asIsImage && (
+                          <img
+                            src={selectedUpdate.asIsImage}
+                            alt="AS-IS"
+                            className="w-full rounded-lg mb-4 shadow-sm"
+                          />
+                        )}
+                        {selectedUpdate.asIsText && (
+                          <div className="prose prose-sm max-w-none text-gray-600 mb-4">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {selectedUpdate.asIsText}
+                            </ReactMarkdown>
+                          </div>
+                        )}
+                        {selectedUpdate.asIsLinks && selectedUpdate.asIsLinks.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {selectedUpdate.asIsLinks.map((link, index) => (
+                              <a
+                                key={index}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
+                              >
+                                {link.label}
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </a>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
