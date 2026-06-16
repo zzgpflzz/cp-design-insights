@@ -134,7 +134,7 @@ export default function BulkInquiryPage() {
       <main className="max-w-[1920px] mx-auto flex justify-center py-[56px]">
         <div className="w-[780px]">
         {/* Breadcrumb with Tabs */}
-        <div className="flex gap-[12px] items-center text-[18px] mb-[34px]">
+        <div className="flex gap-[12px] items-center text-[15px] mb-[34px]">
           <button
             onClick={() => setActiveTab('partnership')}
             className={activeTab === 'partnership' ? 'font-bold text-[#111]' : 'text-[#a0a0a0]'}
