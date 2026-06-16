@@ -424,8 +424,8 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                           ))}
                         </div>
                       )}
-                    </div>
-                  )}
+                      </div>
+                    )}
                   {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
                     <div className="bg-green-50 rounded-xl p-6 border border-green-100">
                       <div className="flex items-center gap-2 mb-4">
