@@ -397,8 +397,10 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         />
                       )}
                       {selectedUpdate.asIsText && (
-                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap mb-4">
-                          {selectedUpdate.asIsText}
+                        <div className="prose prose-sm max-w-none text-gray-600 mb-4">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {selectedUpdate.asIsText}
+                          </ReactMarkdown>
                         </div>
                       )}
                       {selectedUpdate.asIsLinks && selectedUpdate.asIsLinks.length > 0 && (
@@ -434,8 +436,10 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         />
                       )}
                       {selectedUpdate.toBeText && (
-                        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap mb-4">
-                          {selectedUpdate.toBeText}
+                        <div className="prose prose-sm max-w-none text-gray-600 mb-4">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {selectedUpdate.toBeText}
+                          </ReactMarkdown>
                         </div>
                       )}
                       {selectedUpdate.toBeLinks && selectedUpdate.toBeLinks.length > 0 && (
