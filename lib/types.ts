@@ -94,6 +94,12 @@ export interface ProjectProgress {
   createdAt: Date;
 }
 
+// UI/UX 업데이트 링크
+export interface UIUXUpdateLink {
+  url: string;
+  label: string; // 버튼에 표시될 텍스트
+}
+
 // UI/UX 업데이트 (타임라인 형식)
 export interface UIUXUpdate {
   id: string;
@@ -103,10 +109,12 @@ export interface UIUXUpdate {
   status: 'completed' | 'inprogress' | 'planned'; // completed면 날짜, inprogress면 'ver. X', planned면 '예정'
   period?: string; // 기간 표시 (예: '2026년 5-6월', '2026 Q2')
   description?: string; // 간단한 설명
-  asIsImage?: string; // AS-IS 이미지 URL
+  asIsImage?: string; // AS-IS 이미지 URL (deprecated - asIsLinks 사용 권장)
   asIsText?: string; // AS-IS 텍스트 설명
-  toBeImage?: string; // TO-BE 이미지 URL
+  asIsLinks?: UIUXUpdateLink[]; // AS-IS 사이트 링크들
+  toBeImage?: string; // TO-BE 이미지 URL (deprecated - toBeLinks 사용 권장)
   toBeText?: string; // TO-BE 텍스트 설명
+  toBeLinks?: UIUXUpdateLink[]; // TO-BE 사이트 링크들
   currentImage?: string; // 진행중인 UI 이미지 URL
   figmaUrl?: string; // 피그마 파일 URL (클릭 시 새 탭에서 열기)
   figmaEmbedUrl?: string; // 피그마 Embed URL (모달에서 iframe으로 표시)

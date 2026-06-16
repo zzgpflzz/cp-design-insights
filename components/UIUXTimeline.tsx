@@ -379,9 +379,9 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
               )}
 
               {/* AS-IS / TO-BE */}
-              {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.toBeImage || selectedUpdate.toBeText) && (
+              {selectedUpdate.status === 'completed' && (selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks || selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {(selectedUpdate.asIsImage || selectedUpdate.asIsText) && (
+                  {(selectedUpdate.asIsImage || selectedUpdate.asIsText || selectedUpdate.asIsLinks) && (
                     <div className="bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border-2 border-red-200">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-2 h-2 rounded-full bg-red-500"></div>
@@ -395,13 +395,31 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         />
                       )}
                       {selectedUpdate.asIsText && (
-                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-red-200 shadow-sm">
+                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-red-200 shadow-sm mb-3">
                           {selectedUpdate.asIsText}
+                        </div>
+                      )}
+                      {selectedUpdate.asIsLinks && selectedUpdate.asIsLinks.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {selectedUpdate.asIsLinks.map((link, index) => (
+                            <a
+                              key={index}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline bg-white px-3 py-1.5 rounded-lg border border-red-200"
+                            >
+                              {link.label}
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          ))}
                         </div>
                       )}
                     </div>
                   )}
-                  {(selectedUpdate.toBeImage || selectedUpdate.toBeText) && (
+                  {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-5 rounded-xl border-2 border-green-200">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-2 h-2 rounded-full bg-[#00BC7D]"></div>
@@ -415,8 +433,26 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         />
                       )}
                       {selectedUpdate.toBeText && (
-                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-green-200 shadow-sm mb-3">
                           {selectedUpdate.toBeText}
+                        </div>
+                      )}
+                      {selectedUpdate.toBeLinks && selectedUpdate.toBeLinks.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {selectedUpdate.toBeLinks.map((link, index) => (
+                            <a
+                              key={index}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-medium text-[#00BC7D] hover:underline bg-white px-3 py-1.5 rounded-lg border border-green-200"
+                            >
+                              {link.label}
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          ))}
                         </div>
                       )}
                     </div>
