@@ -426,8 +426,8 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                         )}
                       </div>
                     )}
-                  {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
-                    <div className="bg-green-50 rounded-xl p-6 border border-green-100">
+                    {(selectedUpdate.toBeImage || selectedUpdate.toBeText || selectedUpdate.toBeLinks) && (
+                      <div className="bg-green-50 rounded-xl p-6 border border-green-100">
                       <div className="flex items-center gap-2 mb-4">
                         <h3 className="text-xs font-bold text-[#00BC7D] uppercase tracking-wider">TO-BE</h3>
                       </div>
@@ -463,8 +463,9 @@ export default function UIUXTimeline({ updates }: UIUXTimelineProps) {
                           ))}
                         </div>
                       )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
