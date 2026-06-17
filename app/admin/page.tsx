@@ -761,30 +761,45 @@ export default function AdminPage() {
     setIsSubmitting(true);
 
     try {
-      const tfData: any = {
-        tfName: tfName,
-        title: tfTitle,
-        description: tfDescription,
-        link: tfLink,
-        status: tfStatus,
-        designer: tfDesigner,
-      };
-
-      if (tfLinkLabel && tfLinkLabel.trim()) {
-        tfData.linkLabel = tfLinkLabel;
-      } else if (editingTFTask) {
-        // 수정 시 linkLabel이 비어있으면 필드 삭제
-        tfData.linkLabel = deleteField();
-      }
-
       if (editingTFTask) {
-        // 수정 시에는 createdAt을 업데이트하지 않음
-        await updateDoc(doc(db, 'tfTasks', editingTFTask.id), tfData);
+        // 수정 시: 변경된 필드만 업데이트
+        const updateData: any = {
+          tfName: tfName,
+          title: tfTitle,
+          description: tfDescription,
+          link: tfLink,
+          status: tfStatus,
+          designer: tfDesigner,
+        };
+
+        // linkLabel은 값이 있을 때만 업데이트
+        if (tfLinkLabel && tfLinkLabel.trim()) {
+          updateData.linkLabel = tfLinkLabel;
+        } else if (editingTFTask.linkLabel) {
+          // 기존에 linkLabel이 있었는데 이제 비워진 경우 삭제
+          updateData.linkLabel = deleteField();
+        }
+
+        await updateDoc(doc(db, 'tfTasks', editingTFTask.id), updateData);
         alert('TF 업무가 수정되었습니다!');
       } else {
-        // 새로 추가할 때만 createdAt 설정
-        tfData.createdAt = new Date();
-        await addDoc(collection(db, 'tfTasks'), tfData);
+        // 새로 추가: 모든 필드 설정
+        const newData: any = {
+          tfName: tfName,
+          title: tfTitle,
+          description: tfDescription,
+          link: tfLink,
+          status: tfStatus,
+          designer: tfDesigner,
+          createdAt: new Date(),
+        };
+
+        // linkLabel은 값이 있을 때만 추가
+        if (tfLinkLabel && tfLinkLabel.trim()) {
+          newData.linkLabel = tfLinkLabel;
+        }
+
+        await addDoc(collection(db, 'tfTasks'), newData);
         alert('TF 업무가 추가되었습니다!');
       }
 
