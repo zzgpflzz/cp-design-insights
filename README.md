@@ -216,14 +216,62 @@ git merge backup/stable-insight-v1
 - 새 기능 추가 전 안정 버전 확인이 필요할 때
 - 디자인/로직이 꼬여서 처음부터 다시 시작하고 싶을 때
 
+## 📊 Google Sheets 통합 관리
+
+CSV 파일을 Google Sheets로 중앙 관리하고 Firebase와 자동 동기화할 수 있습니다.
+
+### 설정 방법
+
+자세한 설정 방법은 [Google Sheets 설정 가이드](./docs/GOOGLE_SHEETS_SETUP.md)를 참고하세요.
+
+### 사용 명령어
+
+```bash
+# CSV 파일을 Google Sheets로 업로드
+npm run sheets:upload-csv
+
+# Google Sheets 데이터를 Firebase로 동기화
+npm run sheets:sync
+
+# 전체 동기화 (CSV → Google Sheets → Firebase)
+npm run sheets:full-sync
+```
+
+### 워크플로우
+
+```
+CSV 파일 (세션 데이터)
+    ↓
+[npm run sheets:upload-csv]
+    ↓
+Google Sheets (중앙 관리)
+    ↓
+[npm run sheets:sync]
+    ↓
+Firebase (프로덕션)
+    ↓
+웹 대시보드
+```
+
+### 장점
+
+1. **중앙 관리**: Google Sheets에서 모든 세션 데이터를 한눈에 관리
+2. **협업**: 팀원들과 실시간으로 데이터 공유 및 수정
+3. **히스토리**: Google Sheets의 버전 관리 기능 활용
+4. **유연성**: 스프레드시트에서 수식, 차트 등 활용 가능
+5. **자동화**: 스크립트로 간편하게 동기화
+
 ## 개선 사항 제안
 
+- [x] Google Sheets 통합 관리 시스템
 - [ ] Firebase Authentication 추가 (관리자 로그인)
 - [ ] 이미지 업로드 기능 (Firebase Storage)
 - [ ] 프로젝트 검색 기능
 - [ ] 통계 대시보드 (월별 작업량 등)
 - [ ] 다크 모드 지원
 - [ ] 반응형 디자인 개선
+- [ ] GitHub Actions 자동 동기화
+- [ ] Slack 알림 추가
 
 ## 라이선스
 

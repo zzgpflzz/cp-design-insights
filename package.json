@@ -9,11 +9,15 @@
     "lint": "eslint",
     "add-sample-data": "tsx scripts/add-sample-data.ts",
     "check-legacy-data": "tsx scripts/check-legacy-data.ts",
-    "delete-legacy-data": "tsx scripts/delete-legacy-data.ts"
+    "delete-legacy-data": "tsx scripts/delete-legacy-data.ts",
+    "sheets:upload-csv": "tsx scripts/google-sheets-sync.ts upload-csv",
+    "sheets:sync": "tsx scripts/google-sheets-sync.ts sync-to-firebase",
+    "sheets:full-sync": "tsx scripts/google-sheets-sync.ts full-sync"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "firebase": "^12.12.0",
+    "googleapis": "^173.0.0",
     "next": "16.2.3",
     "papaparse": "^5.5.3",
     "react": "19.2.4",

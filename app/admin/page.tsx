@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, updateDoc, deleteField } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAuthenticated } from '@/lib/auth';
 import { Project, Designer, Status, Category, Tier, DESIGNERS, MonthlyAgenda, ProjectProgress, RoadmapProject, UIUXUpdate, TFTask, TFName, TF_NAMES } from '@/lib/types';
@@ -770,10 +770,11 @@ export default function AdminPage() {
         designer: tfDesigner,
       };
 
-      if (tfLinkLabel) {
+      if (tfLinkLabel && tfLinkLabel.trim()) {
         tfData.linkLabel = tfLinkLabel;
       } else if (editingTFTask) {
-        tfData.linkLabel = null;
+        // 수정 시 linkLabel이 비어있으면 필드 삭제
+        tfData.linkLabel = deleteField();
       }
 
       if (editingTFTask) {
