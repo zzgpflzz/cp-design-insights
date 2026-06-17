@@ -768,15 +768,21 @@ export default function AdminPage() {
         link: tfLink,
         status: tfStatus,
         designer: tfDesigner,
-        createdAt: editingTFTask ? editingTFTask.createdAt : new Date(),
       };
 
-      if (tfLinkLabel) tfData.linkLabel = tfLinkLabel;
+      if (tfLinkLabel) {
+        tfData.linkLabel = tfLinkLabel;
+      } else if (editingTFTask) {
+        tfData.linkLabel = null;
+      }
 
       if (editingTFTask) {
+        // 수정 시에는 createdAt을 업데이트하지 않음
         await updateDoc(doc(db, 'tfTasks', editingTFTask.id), tfData);
         alert('TF 업무가 수정되었습니다!');
       } else {
+        // 새로 추가할 때만 createdAt 설정
+        tfData.createdAt = new Date();
         await addDoc(collection(db, 'tfTasks'), tfData);
         alert('TF 업무가 추가되었습니다!');
       }
