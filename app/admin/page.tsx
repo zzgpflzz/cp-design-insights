@@ -1626,7 +1626,7 @@ export default function AdminPage() {
                                   const newLinks = uiuxAsIsLinks.filter((_, i) => i !== index);
                                   setUiuxAsIsLinks(newLinks);
                                 }}
-                                className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                className="px-3 py-2 bg-white border border-red-300 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               >
                                 삭제
                               </button>
@@ -1703,7 +1703,7 @@ export default function AdminPage() {
                                   const newLinks = uiuxToBeLinks.filter((_, i) => i !== index);
                                   setUiuxToBeLinks(newLinks);
                                 }}
-                                className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                className="px-3 py-2 bg-white border border-red-300 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               >
                                 삭제
                               </button>
@@ -1798,13 +1798,13 @@ export default function AdminPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleUIUXEdit(update)}
-                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-[#313131] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors text-sm font-medium"
                         >
                           수정
                         </button>
                         <button
                           onClick={() => handleUIUXDelete(update.id)}
-                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-white border border-red-300 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium"
                         >
                           삭제
                         </button>
@@ -2008,13 +2008,13 @@ export default function AdminPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleTFEdit(task)}
-                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-[#313131] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors text-sm font-medium"
                         >
                           수정
                         </button>
                         <button
                           onClick={() => handleTFDelete(task.id)}
-                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-white border border-red-300 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium"
                         >
                           삭제
                         </button>
