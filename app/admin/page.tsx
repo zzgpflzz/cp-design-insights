@@ -763,14 +763,19 @@ export default function AdminPage() {
     try {
       if (editingTFTask) {
         // 수정 시: 변경된 필드만 업데이트
-        const updateData: any = {
-          tfName: tfName,
-          title: tfTitle,
-          description: tfDescription,
-          link: tfLink,
-          status: tfStatus,
-          designer: tfDesigner,
-        };
+        const updateData: any = {};
+
+        // tfName이 유효한 값일 때만 업데이트
+        if (tfName && (tfName === 'lfsq' || tfName === 'ax')) {
+          updateData.tfName = tfName;
+        }
+
+        // 필수 필드들
+        if (tfTitle?.trim()) updateData.title = tfTitle;
+        if (tfDescription?.trim()) updateData.description = tfDescription;
+        if (tfLink?.trim()) updateData.link = tfLink;
+        if (tfStatus) updateData.status = tfStatus;
+        if (tfDesigner) updateData.designer = tfDesigner;
 
         // linkLabel은 값이 있을 때만 업데이트
         if (tfLinkLabel && tfLinkLabel.trim()) {
@@ -815,7 +820,8 @@ export default function AdminPage() {
 
   const handleTFEdit = (task: TFTask) => {
     setEditingTFTask(task);
-    setTfName(task.tfName);
+    // tfName이 없는 경우 기본값 'lfsq' 사용
+    setTfName(task.tfName || 'lfsq');
     setTfTitle(task.title);
     setTfDescription(task.description);
     setTfLink(task.link);
