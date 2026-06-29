@@ -375,16 +375,21 @@ export default function AdminPage() {
     setIsSubmitting(true);
 
     try {
-      const agendaData = {
-        month: agendaMonth,
-        content: agendaContent,
-        createdAt: new Date(),
-      };
-
       if (editingAgenda) {
-        await updateDoc(doc(db, 'agendas', editingAgenda.id), agendaData);
+        // 수정 시에는 createdAt을 업데이트하지 않음
+        const updateData = {
+          month: agendaMonth,
+          content: agendaContent,
+        };
+        await updateDoc(doc(db, 'agendas', editingAgenda.id), updateData);
         alert('아젠다가 수정되었습니다!');
       } else {
+        // 새로 추가할 때만 createdAt 설정
+        const agendaData = {
+          month: agendaMonth,
+          content: agendaContent,
+          createdAt: new Date(),
+        };
         await addDoc(collection(db, 'agendas'), agendaData);
         alert('아젠다가 추가되었습니다!');
       }
