@@ -1996,7 +1996,7 @@ export default function AdminPage() {
                             {task.status === 'completed' ? '완료' : task.status === 'active' ? '진행중' : '예정'}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                        <p className="text-sm text-gray-600 mb-2 break-words">{task.description}</p>
                         <div className="flex items-center gap-3 text-sm text-gray-600">
                           <span>{designer.emoji} {designer.name}</span>
                           <span>•</span>
