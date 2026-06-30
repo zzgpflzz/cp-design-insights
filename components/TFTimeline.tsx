@@ -110,7 +110,7 @@ export default function TFTimeline({ tasks }: TFTimelineProps) {
                           </span>
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2 break-words">{task.description}</p>
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -162,7 +162,7 @@ export default function TFTimeline({ tasks }: TFTimelineProps) {
                           </span>
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2 break-words">{task.description}</p>
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -214,7 +214,7 @@ export default function TFTimeline({ tasks }: TFTimelineProps) {
                           </span>
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2 break-words">{task.description}</p>
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -300,7 +300,7 @@ export default function TFTimeline({ tasks }: TFTimelineProps) {
             <div className="p-6">
               {selectedTask.description && (
                 <div className="mb-8">
-                  <div className="prose prose-sm max-w-none text-gray-700" style={{ lineHeight: '1.8' }}>
+                  <div className="prose prose-sm max-w-none text-gray-700 break-words" style={{ lineHeight: '1.8', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {selectedTask.description}
                     </ReactMarkdown>
