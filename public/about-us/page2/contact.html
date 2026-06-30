@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE FRIENDS SQUARE - Contact Us</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fff;
+        }
+
+        /* GNB Header */
+        .gnb-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 66px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-bottom: 1px solid #f3f3f3;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 370px;
+        }
+
+        .gnb-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gnb-logo-svg {
+            height: 22px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .gnb-nav {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .gnb-nav a {
+            font-size: 13px;
+            color: #111;
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
+
+        .gnb-nav a:hover {
+            color: #666;
+        }
+
+        .gnb-nav a.active {
+            color: #f83baa;
+            font-weight: 700;
+        }
+
+        .gnb-nav .lang-selector {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #a0a0a0;
+            cursor: pointer;
+        }
+
+        .gnb-nav .lang-selector::after {
+            content: '▲';
+            font-size: 8px;
+            transform: rotate(180deg);
+            display: inline-block;
+        }
+
+        .content-wrapper {
+            margin-top: 66px;
+        }
+
+        .page-image {
+            width: 100%;
+            display: block;
+            image-rendering: auto;
+        }
+
+        .clickable-wrapper {
+            position: relative;
+        }
+
+        .click-area {
+            position: absolute;
+            cursor: pointer;
+            background: rgba(255, 0, 0, 0.3);
+            border: 2px solid red;
+        }
+
+        /* 제휴 제안 영역 (왼쪽 카드) */
+        .partnership-area {
+            top: 50%;
+            left: 18.5%;
+            width: 30%;
+            height: 17%;
+        }
+
+        /* 대량 구매 영역 (오른쪽 카드) */
+        .bulk-area {
+            top: 50%;
+            left: 51.5%;
+            width: 30%;
+            height: 17%;
+        }
+
+        @media (max-width: 1400px) {
+            .gnb-header {
+                padding: 0 60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gnb-header {
+                padding: 0 20px;
+            }
+
+            .gnb-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- GNB Header -->
+    <header class="gnb-header">
+        <div class="gnb-logo">
+            <img src="gnb_logo.svg" alt="LINE FRIENDS SQUARE" class="gnb-logo-svg" onclick="location.href='template.html'">
+        </div>
+        <nav class="gnb-nav">
+            <a href="template.html">About</a>
+            <a href="store.html">Store</a>
+            <a href="media.html">Media</a>
+            <a href="contact.html" class="active">Contact Us</a>
+            <a href="#">Shop</a>
+            <span class="lang-selector">KR</span>
+        </nav>
+    </header>
+
+    <!-- Content -->
+    <div class="content-wrapper">
+        <div class="clickable-wrapper">
+            <img src="main_template/sub/PC_about_us_Contactus-main.jpg" alt="Contact Us Page" class="page-image">
+
+            <!-- 제휴 제안 클릭 영역 -->
+            <div class="click-area partnership-area" onclick="location.href='contact-partnership.html'" title="제휴 제안 상세보기"></div>
+
+            <!-- 대량 구매 클릭 영역 -->
+            <div class="click-area bulk-area" onclick="location.href='contact-bulk.html'" title="대량 구매 상세보기"></div>
+        </div>
+    </div>
+</body>
+</html>

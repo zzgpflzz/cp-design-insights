@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE FRIENDS SQUARE - About Us</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #000;
+            background: #fff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 0 60px;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 42px;
+            align-items: center;
+        }
+
+        .nav a {
+            font-size: 12px;
+            color: #000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav .lang {
+            font-weight: 700;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            margin-top: 60px;
+            height: 600px;
+            background: url('PC_about us main.jpg') center 30% / cover no-repeat;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .hero-logo {
+            position: relative;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.8px;
+            z-index: 1;
+        }
+
+        /* Hero Title */
+        .hero-title-section {
+            background: #000;
+            padding: 140px 60px;
+            text-align: center;
+        }
+
+        .hero-title-section h1 {
+            font-size: 80px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        .hero-title-section p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Section Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 60px;
+        }
+
+        /* Vision Section */
+        .vision-section {
+            padding: 140px 0;
+            background: #fafafa;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 32px;
+            letter-spacing: -0.5px;
+        }
+
+        .vision-text {
+            font-size: 14px;
+            line-height: 1.9;
+            text-align: center;
+            color: #333;
+            max-width: 1100px;
+            margin: 0 auto 80px;
+        }
+
+        .vision-images {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 24px;
+        }
+
+        .vision-image-box {
+            aspect-ratio: 1;
+            background: #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .vision-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Recent Projects */
+        .projects-section {
+            padding: 140px 0;
+            background: #fff;
+        }
+
+        .projects-content {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 60px;
+            margin-top: 80px;
+        }
+
+        .project-main {
+            background: #e5e5e5;
+            border-radius: 12px;
+            aspect-ratio: 16/10;
+            overflow: hidden;
+        }
+
+        .project-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .project-item {
+            padding: 28px 32px;
+            background: #fafafa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .project-item:hover {
+            background: #f0f0f0;
+        }
+
+        .project-tag {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 0.5px;
+        }
+
+        .project-item h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .project-date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* Store Section */
+        .store-section {
+            padding: 140px 0;
+            background: #fafafa;
+        }
+
+        .store-nav {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin: 50px 0 70px;
+        }
+
+        .store-nav-item {
+            font-size: 14px;
+            font-weight: 600;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .store-nav-item.active {
+            color: #000;
+        }
+
+        .store-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-bottom: 50px;
+        }
+
+        .store-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 50px;
+        }
+
+        .store-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .store-image {
+            width: 100%;
+            height: 320px;
+            background: #e5e5e5;
+        }
+
+        .store-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .store-info {
+            padding: 28px 32px;
+        }
+
+        .store-info h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .store-info p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .online-box {
+            padding: 32px;
+            background: #fff;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+        }
+
+        .online-box h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .online-box p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* IP Portfolio */
+        .ip-section {
+            padding: 140px 0;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .ip-section .section-title {
+            color: #fff;
+        }
+
+        .ip-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 60px 0;
+        }
+
+        .ip-tab {
+            padding: 14px 32px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .ip-tab.active {
+            background: #fff;
+            color: #000;
+        }
+
+        .ip-showcase {
+            width: 100%;
+            height: 420px;
+            background: linear-gradient(180deg, #FFD43B 0%, #FFC107 100%);
+            border-radius: 16px;
+            margin: 70px 0;
+        }
+
+        .ip-description {
+            max-width: 1100px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .ip-description h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .ip-description p {
+            font-size: 14px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Media Section */
+        .media-section {
+            padding: 140px 0;
+            background: #fff;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin: 80px 0 70px;
+        }
+
+        .media-card {
+            cursor: pointer;
+        }
+
+        .media-image {
+            width: 100%;
+            height: 260px;
+            background: #e5e5e5;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .media-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-meta {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .media-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .view-more-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 18px 60px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 140px 0;
+            background: #fafafa;
+        }
+
+        .contact-desc {
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: center;
+            color: #555;
+            max-width: 950px;
+            margin: 32px auto 70px;
+        }
+
+        .contact-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .contact-card {
+            padding: 44px 36px;
+            background: #fff;
+            border-radius: 12px;
+        }
+
+        .contact-card h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .contact-card p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #666;
+            margin-bottom: 26px;
+        }
+
+        .contact-link {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 70px 0;
+            background: #000;
+            color: #fff;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .footer-logo {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .footer-info p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">LINE FRIENDS SQUARE</div>
+            <nav class="nav">
+                <a href="#about">About</a>
+                <a href="#store">Store</a>
+                <a href="#business">Business</a>
+                <a href="#media">Media</a>
+                <a href="#contact">Contact Us</a>
+                <a href="#" class="lang">KR</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Image -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-logo">LINE FRIENDS SQUARE</div>
+    </section>
+
+    <!-- Hero Title -->
+    <section class="hero-title-section">
+        <h1>Creating New<br>Retail Experience</h1>
+        <p>세계 곳곳에서 펼쳐지는 새로운 리테일 경험, 라인프렌즈 스퀘어를 만나보세요. 우리는 글로벌 IP와 K-POP의 만남으로 새로운 문화를 만들어갑니다.</p>
+    </section>
+
+    <!-- Vision -->
+    <section class="vision-section" id="about">
+        <div class="container">
+            <h2 class="section-title">VISION</h2>
+            <p class="vision-text">LINE FRIENDS SQUARE는 단순한 캐릭터 매장을 넘어, 글로벌 IP와 고객의 일상을 연결하는 혁신적인 Multi IP 플랫폼입니다.<br>라인프렌즈 오리지널 IP를 포함한 다양한 인기 캐릭터 상품은 물론, K-pop 아티스트와의 협업을 통해 전 세계 팬들에게 잊을 수 없는 특별한 경험을 선사합니다.</p>
+            <div class="vision-images">
+                <div class="vision-image-box"><img src="PC_about_us_Store-md.jpg" alt=""></div>
+                <div class="vision-image-box"><img src="PC_about_us_Store-main.jpg" alt=""></div>
+                <div class="vision-image-box"><img src="PC_about_us_Store-js.jpg" alt=""></div>
+                <div class="vision-image-box"><img src="PC_about_us_Store-bs.jpg" alt=""></div>
+                <div class="vision-image-box"><img src="PC_about_us_Media-main.jpg" alt=""></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Projects -->
+    <section class="projects-section">
+        <div class="container">
+            <h2 class="section-title">Recent Projects</h2>
+            <div class="projects-content">
+                <div class="project-main">
+                    <img src="PC_about_us_Store-main.jpg" alt="">
+                </div>
+                <div class="project-list">
+                    <div class="project-item">
+                        <span class="project-tag">JOGUMAN</span>
+                        <h3>YOUR STUBBY NEIGHBORHOOD</h3>
+                        <p class="project-date">2025.10.24 - 11.09 | Myeongdong</p>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-tag">DOOHAMBBA!</span>
+                        <h3>DOOHAMBBA! LAZY HOUSE</h3>
+                        <p class="project-date">2025.10.17 - 11.05 | Seongsu</p>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-tag">ATEEZ</span>
+                        <h3>Enter the MIGHTEEZ POP-UP</h3>
+                        <p class="project-date">2025.10.11 - 10.19 | K-POP SQUARE</p>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-tag">Cutest of the day</span>
+                        <h3>Cutest of the day: Who's the Class President?</h3>
+                        <p class="project-date">2025.9.26 – 10.13 | Gangnam</p>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-tag">NCT DREAM</span>
+                        <h3>Dreamiez's Dream Forest POP-UP</h3>
+                        <p class="project-date">2025.9.19 - 9.28 | K-POP SQUARE</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Store -->
+    <section class="store-section" id="store">
+        <div class="container">
+            <h2 class="section-title">STORE</h2>
+            <div class="store-nav">
+                <div class="store-nav-item active">라인프렌즈 스퀘어 직영</div>
+                <div class="store-nav-item">공식 파트너</div>
+                <div class="store-nav-item">온라인</div>
+                <div class="store-nav-item">글로벌</div>
+            </div>
+
+            <div class="store-grid-2">
+                <div class="store-card">
+                    <div class="store-image"><img src="PC_about_us_Store-md.jpg" alt=""></div>
+                    <div class="store-info">
+                        <h3>MYEONGDONG</h3>
+                        <p>서울특별시 중구 명동길 43<br>오전 11시 - 오후 10시</p>
+                    </div>
+                </div>
+                <div class="store-card">
+                    <div class="store-image"><img src="PC_about_us_Store-main.jpg" alt=""></div>
+                    <div class="store-info">
+                        <h3>HONGDAE</h3>
+                        <p>서울특별시 마포구 양화로 141<br>오전 11시 - 오후 10시</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store-grid-2">
+                <div class="online-box">
+                    <h4>LINE FRIENDS SQUARE →</h4>
+                    <p>인기 캐릭터 IP와 K-POP 굿즈를 만날 수 있는 글로벌 쇼핑 허브</p>
+                </div>
+                <div class="online-box">
+                    <h4>29cm →</h4>
+                    <p>취향을 큐레이션 하는 감각적인 스토어</p>
+                </div>
+            </div>
+
+            <div class="store-grid-2">
+                <div class="store-card">
+                    <div class="store-image"><img src="PC_about_us_Store-js.jpg" alt=""></div>
+                    <div class="store-info">
+                        <h3>K-POP SQUARE 롯데월드몰</h3>
+                        <p>서울특별시 송파구 올림픽로 300, 롯데월드몰 지하 1층<br>오전 11시 - 오후 10시</p>
+                    </div>
+                </div>
+                <div class="store-card">
+                    <div class="store-image"><img src="PC_about_us_Store-bs.jpg" alt=""></div>
+                    <div class="store-info">
+                        <h3>K-POP SQUARE 센텀시티</h3>
+                        <p>부산 해운대구 센텀4로 15 센텀시티몰 지하1층<br>오전 10시 30분 - 오후 8시</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store-grid-3">
+                <div class="store-card">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <h3>NEW YORK TIMES SQUARE</h3>
+                        <p>1515 Broadway, New York, NY 10036<br>AM 11 - PM 10</p>
+                    </div>
+                </div>
+                <div class="store-card">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <h3>HOLLYWOOD LOS ANGELES</h3>
+                        <p>6922 Hollywood Blvd #101, Los Angeles, CA 90028<br>AM 11 - PM 8</p>
+                    </div>
+                </div>
+                <div class="store-card">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <h3>UNIVERSAL CITYWALK</h3>
+                        <p>100 Universal City Plaza #180, Universal City, CA 91608<br>AM 11 - PM 9</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store-grid-2">
+                <div class="store-card">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <h3>SHIBUYA STORE</h3>
+                        <p>Parkway Sq'2, 1 Chome-19-10 Jinnan, Shibuya, Tokyo 150-0041<br>AM 11 - PM 8</p>
+                    </div>
+                </div>
+                <div class="store-card">
+                    <div class="store-image"></div>
+                    <div class="store-info">
+                        <h3>SHANGHAI METRO-CITY</h3>
+                        <p>Shanghai, Xuhui District, Xujiahui, 肇嘉浜路1111号<br>AM 10 - PM 10</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store-grid-3">
+                <div class="online-box">
+                    <h4>LINE FRIENDS SQUARE US →</h4>
+                    <p>라인프렌즈 미국 공식몰</p>
+                </div>
+                <div class="online-box">
+                    <h4>LINE FRIENDS JAPAN →</h4>
+                    <p>라인프렌즈 일본 공식몰</p>
+                </div>
+                <div class="online-box">
+                    <h4>LINE FRIENDS CHINA →</h4>
+                    <p>라인프렌즈 중국 공식몰</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IP Portfolio -->
+    <section class="ip-section">
+        <div class="container">
+            <h2 class="section-title">IP 포트폴리오</h2>
+            <div class="ip-tabs">
+                <button class="ip-tab active">LINE FRIENDS</button>
+                <button class="ip-tab">minini</button>
+                <button class="ip-tab">BT21</button>
+                <button class="ip-tab">JOGUMAN</button>
+                <button class="ip-tab">ZO&FRIENDS</button>
+                <button class="ip-tab">K-POP</button>
+                <button class="ip-tab">VIEW MORE</button>
+            </div>
+            <div class="ip-showcase"></div>
+            <div class="ip-description">
+                <h3>LINE FRIENDS</h3>
+                <p>세계 2억 명이 사용하는 모바일 메신저 '라인'의 스티커 캐릭터로 탄생한 'LINE FRIENDS'는 이제 모바일을 넘어 글로벌 캐릭터 브랜드가 되었습니다. 브랜드의 가치와 결을 함께하는 글로벌 파트너사와의 다양한 콜라보레이션을 통해 제품, 애니메이션, 게임, 카페, 호텔 등 다양한 영역에서 전세계 MZ팬들을 만나고 있습니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Media -->
+    <section class="media-section" id="media">
+        <div class="container">
+            <h2 class="section-title">MEDIA</h2>
+            <div class="media-grid">
+                <div class="media-card">
+                    <div class="media-image"><img src="PC_about_us_Media-main.jpg" alt=""></div>
+                    <div class="media-meta">
+                        <span>팝업스토어</span>
+                        <span>2026.05.15</span>
+                    </div>
+                    <h3>IPX, 호요버스와 리월 배경의 '원신 미니니(Genshin minini)' 팝업 오픈</h3>
+                </div>
+                <div class="media-card">
+                    <div class="media-image"><img src="PC_about_us_Media-01.jpg" alt=""></div>
+                    <div class="media-meta">
+                        <span>팝업스토어</span>
+                        <span>2026.05.10</span>
+                    </div>
+                    <h3>2025년 최고의 팝업 스토어를 만나보세요</h3>
+                </div>
+                <div class="media-card">
+                    <div class="media-image"></div>
+                    <div class="media-meta">
+                        <span>파트너십</span>
+                        <span>2026.04.29</span>
+                    </div>
+                    <h3>IPX, 브라운(BROWN) 탄생 15주년 맞아 「미소녀 전사 세일러문」과 깜짝 만남 예고</h3>
+                </div>
+            </div>
+            <button class="view-more-btn">VIEW MORE</button>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <h2 class="section-title">CONTACT US</h2>
+            <p class="contact-desc">LINE FRIENDS SQUARE는 글로벌 IP, K-POP, 라이프스타일 브랜드와 함께 새로운 리테일 경험을 만들어갑니다.<br>제품 협업, 유통 협업, 팝업 스토어, 공동 마케팅 등 다양한 파트너십이 열려 있습니다.</p>
+            <div class="contact-cards">
+                <div class="contact-card">
+                    <h4>고객 문의</h4>
+                    <p>온라인 주문 및 배송, 상품 관련한<br>궁금한 점은 고객센터에서 안내해드립니다.</p>
+                    <a href="#" class="contact-link">문의하기 →</a>
+                </div>
+                <div class="contact-card">
+                    <h4>제휴 제안</h4>
+                    <p>IP, 사업, 콘텐츠, 브랜드 협업 등<br>LINE FRIENDS SQUARE와의 제휴를 제안해주세요.</p>
+                    <a href="#" class="contact-link">제안하기 →</a>
+                </div>
+                <div class="contact-card">
+                    <h4>SNS</h4>
+                    <p>라인프렌즈 스퀘어의 다양한 소식을<br>SNS에서 만나보세요.</p>
+                    <a href="#" class="contact-link">바로가기 →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">LINE FRIENDS SQUARE</div>
+                <div class="footer-info">
+                    <p>서울특별시 강남구 영동대로 517 아셈타워 14층 | 대표이사: 홍길동</p>
+                    <p>사업자등록번호: 123-45-67890 | 통신판매업신고: 2024-서울강남-12345</p>
+                    <p>&copy; 2026 LINE FRIENDS SQUARE. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

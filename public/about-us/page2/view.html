@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE FRIENDS SQUARE - About Us (참고용)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .image-viewer {
+            max-width: 100%;
+            margin: 0 auto;
+            background: #fff;
+            overflow-x: auto;
+        }
+
+        .main-image {
+            width: 100%;
+            display: block;
+            image-rendering: auto;
+        }
+
+        .zoom-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .zoom-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(0, 0, 0, 1);
+            transform: scale(1.1);
+        }
+
+        .zoom-info {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        /* GNB Header */
+        .gnb-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 66px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-bottom: 1px solid #f3f3f3;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 370px;
+        }
+
+        .gnb-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gnb-logo-svg {
+            height: 22px;
+            width: auto;
+        }
+
+        .gnb-logo .about-badge {
+            background: #000;
+            color: #fff;
+            padding: 5px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-radius: 2px;
+        }
+
+        .gnb-nav {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .gnb-nav a {
+            font-size: 13px;
+            color: #111;
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
+
+        .gnb-nav a:hover {
+            color: #666;
+        }
+
+        .gnb-nav a.active {
+            color: #f83baa;
+            font-weight: 700;
+        }
+
+        .gnb-nav .lang-selector {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #a0a0a0;
+            cursor: pointer;
+        }
+
+        .gnb-nav .lang-selector::after {
+            content: '▲';
+            font-size: 8px;
+            transform: rotate(180deg);
+            display: inline-block;
+        }
+
+        .content-wrapper {
+            margin-top: 66px;
+        }
+
+        @media (max-width: 768px) {
+            .info-bar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- GNB Header -->
+    <header class="gnb-header">
+        <div class="gnb-logo">
+            <img src="gnb_logo.svg" alt="LINE FRIENDS SQUARE" class="gnb-logo-svg">
+        </div>
+        <nav class="gnb-nav">
+            <a href="#" class="active">About</a>
+            <a href="#">Store</a>
+            <a href="#">Media</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Shop</a>
+            <span class="lang-selector">KR</span>
+        </nav>
+    </header>
+
+    <div class="content-wrapper">
+        <div class="image-viewer">
+            <img src="PC_about_us_main_1-5x.jpg" alt="LINE FRIENDS SQUARE About Us" class="main-image" id="mainImage">
+        </div>
+    </div>
+
+    <div class="zoom-info" id="zoomInfo">확대: 100%</div>
+
+    <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomOut()" title="축소">−</button>
+        <button class="zoom-btn" onclick="zoomIn()" title="확대">+</button>
+        <button class="zoom-btn" onclick="resetZoom()" title="100%">⊙</button>
+    </div>
+
+    <script>
+        let currentZoom = 100;
+        const img = document.getElementById('mainImage');
+        const zoomInfo = document.getElementById('zoomInfo');
+
+        function updateZoom() {
+            img.style.width = currentZoom + '%';
+            zoomInfo.textContent = '확대: ' + currentZoom + '%';
+        }
+
+        function zoomIn() {
+            if (currentZoom < 500) {
+                currentZoom += 50;
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > 50) {
+                currentZoom -= 50;
+                updateZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 100;
+            updateZoom();
+        }
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '+' || e.key === '=') {
+                zoomIn();
+            } else if (e.key === '-') {
+                zoomOut();
+            } else if (e.key === '0') {
+                resetZoom();
+            }
+        });
+    </script>
+</body>
+</html>
