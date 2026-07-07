@@ -20,11 +20,38 @@ export default function CSLogsPage(): React.ReactNode {
   const [isUploadMode, setIsUploadMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isCSLoginMode, setIsCSLoginMode] = useState<boolean>(false);
+  const [csPassword, setCSPassword] = useState<string>('');
+  const [isCSAuthenticated, setIsCSAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     setIsAdmin(isAuthenticated());
+    // CS 담당자 로그인 상태 확인
+    const csAuth = sessionStorage.getItem('cs-authenticated');
+    if (csAuth === 'true') {
+      setIsCSAuthenticated(true);
+    }
     fetchCSLogs();
   }, []);
+
+  const handleCSLogin = () => {
+    if (csPassword === 'dauni') {
+      setIsCSAuthenticated(true);
+      sessionStorage.setItem('cs-authenticated', 'true');
+      setIsCSLoginMode(false);
+      setCSPassword('');
+      alert('CS 담당자 인증되었습니다.');
+    } else {
+      alert('비밀번호가 올바르지 않습니다.');
+      setCSPassword('');
+    }
+  };
+
+  const handleCSLogout = () => {
+    setIsCSAuthenticated(false);
+    sessionStorage.removeItem('cs-authenticated');
+    alert('로그아웃되었습니다.');
+  };
 
   const fetchCSLogs = async () => {
     try {
@@ -130,14 +157,39 @@ export default function CSLogsPage(): React.ReactNode {
                 <p className="text-[11px] text-gray-400 mt-0.5">CS 문의 및 응대 기록</p>
               </div>
             </div>
-            {isAdmin && (
-              <button
-                onClick={() => setIsUploadMode(true)}
-                className="px-4 py-2 bg-[#FF9D00] text-white rounded-lg hover:bg-[#e68d00] transition-colors text-sm font-medium"
-              >
-                + 새 파일 업로드
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {isAdmin && (
+                <button
+                  onClick={() => setIsUploadMode(true)}
+                  className="px-4 py-2 bg-[#FF9D00] text-white rounded-lg hover:bg-[#e68d00] transition-colors text-sm font-medium"
+                >
+                  + 새 파일 업로드
+                </button>
+              )}
+              {!isCSAuthenticated ? (
+                <button
+                  onClick={() => setIsCSLoginMode(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  CS 리뷰 등록하기
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setIsUploadMode(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
+                    + CS 리뷰 업로드
+                  </button>
+                  <button
+                    onClick={handleCSLogout}
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -183,7 +235,7 @@ export default function CSLogsPage(): React.ReactNode {
                       <div className="text-xs text-gray-400">{formatDate(selectedLog.uploadedAt)}</div>
                     </div>
                   </div>
-                  {isAdmin && (
+                  {(isAdmin || isCSAuthenticated) && (
                     <button
                       onClick={() => handleDeleteLog(selectedLog.id)}
                       className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -228,7 +280,7 @@ export default function CSLogsPage(): React.ReactNode {
 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">클릭하여 보기</span>
-                  {isAdmin && (
+                  {(isAdmin || isCSAuthenticated) && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -247,6 +299,60 @@ export default function CSLogsPage(): React.ReactNode {
           </div>
         )}
       </main>
+
+      {/* CS Login Modal */}
+      {isCSLoginMode && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-[#111]">CS 담당자 인증</h2>
+              <button
+                onClick={() => {
+                  setIsCSLoginMode(false);
+                  setCSPassword('');
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                비밀번호
+              </label>
+              <input
+                type="password"
+                value={csPassword}
+                onChange={(e) => setCSPassword(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCSLogin();
+                  }
+                }}
+                placeholder="비밀번호를 입력하세요"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+              />
+            </div>
+
+            <button
+              onClick={handleCSLogin}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              로그인
+            </button>
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-400 text-center">
+                💡 CS 담당자만 파일을 업로드하고 관리할 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Upload Modal */}
       {isUploadMode && (
