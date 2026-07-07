@@ -129,6 +129,14 @@ export default function CSLogsPage(): React.ReactNode {
     });
   };
 
+  const openHTMLInNewWindow = (log: CSLog) => {
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(log.content);
+      newWindow.document.close();
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F6F8FA] flex items-center justify-center">
@@ -210,60 +218,13 @@ export default function CSLogsPage(): React.ReactNode {
               </p>
             </div>
           </div>
-        ) : selectedLog ? (
-          // Detail View
-          <div>
-            <button
-              onClick={() => setSelectedLog(null)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              목록으로
-            </button>
-
-            <div className="bg-white rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <svg className="w-5 h-5 text-[#FF9D00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <div>
-                      <div className="text-sm font-medium text-gray-700">{selectedLog.fileName}</div>
-                      <div className="text-xs text-gray-400">{formatDate(selectedLog.uploadedAt)}</div>
-                    </div>
-                  </div>
-                  {(isAdmin || isCSAuthenticated) && (
-                    <button
-                      onClick={() => handleDeleteLog(selectedLog.id)}
-                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      삭제
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-6">
-                <iframe
-                  srcDoc={selectedLog.content}
-                  className="w-full border border-gray-200 rounded-lg"
-                  style={{ minHeight: '70vh' }}
-                  sandbox="allow-same-origin allow-scripts"
-                  title="CS Log Preview"
-                />
-              </div>
-            </div>
-          </div>
         ) : (
           // Grid View
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {csLogs.map((log) => (
               <div
                 key={log.id}
-                onClick={() => setSelectedLog(log)}
+                onClick={() => openHTMLInNewWindow(log)}
                 className="bg-white rounded-xl p-6 border border-gray-200 hover:border-[#FF9D00] hover:shadow-lg transition-all cursor-pointer group"
               >
                 <div className="flex items-start gap-3 mb-4">
@@ -279,7 +240,7 @@ export default function CSLogsPage(): React.ReactNode {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">클릭하여 보기</span>
+                  <span className="text-xs text-gray-500">클릭하여 새 창에서 보기</span>
                   {(isAdmin || isCSAuthenticated) && (
                     <button
                       onClick={(e) => {
