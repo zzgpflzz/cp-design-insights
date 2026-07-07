@@ -43,9 +43,9 @@ export default function IndexHub(): React.ReactNode {
         </svg>
       ),
       items: [
-        { title: '디자인 대시보드', url: 'https://cp-design-insights.vercel.app', description: '프로젝트 타임라인 및 로드맵' },
-        { title: 'UI 가이드라인', url: '/design-guidelines.html', description: '디자인 시스템 및 컴포넌트 가이드' },
-        { title: '앱 구축 대시보드', url: 'https://git-dev.linecorp.com/login?return_to=https%3A%2F%2Fgit-dev.linecorp.com%2Fpages%2Flf-commerce%2Flf-commerce-app-dashboard%2F', description: '앱 구축 현황 및 진행 대시보드' },
+        { title: '디자인 대시보드', url: 'https://cp-design-insights.vercel.app', description: '컨텐츠/UIUX/TF 업무 대시보드' },
+        { title: 'AX 디자인 md파일 v.1', url: '/design-guidelines.html', description: '디자인 시스템 및 컴포넌트 가이드' },
+        { title: '앱 구축 대시보드', url: 'https://git-dev.linecorp.com/pages/lf-commerce/lfsq-app-dashboard/260609_app_dash.html', description: '앱 구축 현황 및 진행 대시보드' },
         { title: '브랜드 에셋', url: '#', description: '로고, 컬러, 타이포그래피' },
         { title: '디자인 아카이브', url: '#', description: '과거 프로젝트 참고 자료' },
       ],
