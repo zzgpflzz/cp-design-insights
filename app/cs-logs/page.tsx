@@ -272,7 +272,6 @@ export default function CSLogsPage(): React.ReactNode {
           </div>
         </div>
       )}
-      </main>
 
       {/* Footer */}
       <footer className="py-10 mt-16">
