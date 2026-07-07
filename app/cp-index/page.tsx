@@ -62,10 +62,7 @@ export default function IndexHub(): React.ReactNode {
       ),
       items: [
         { title: '운영 대시보드', url: 'https://lfsq-dashboard-cp-online.myshopify.com/password', description: '팀 운영 지표 및 KPI' },
-        { title: '셀픽(Sellpick) 관리', url: '#', description: '상품 관리 및 재고 현황' },
-        { title: '정산 관리', url: '#', description: '매출 및 정산 데이터' },
-        { title: '고객 지원 로그', url: '#', description: 'CS 문의 및 응대 기록' },
-        { title: '운영 가이드', url: '#', description: '내부 프로세스 문서' },
+        { title: '고객 지원 로그', url: '/cs-logs', description: 'CS 문의 및 응대 기록 (HTML 업로드)' },
       ],
     },
     development: {
