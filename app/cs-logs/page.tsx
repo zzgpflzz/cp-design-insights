@@ -2,38 +2,49 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { isAuthenticated } from '@/lib/auth';
 
-interface ArchivedFile {
+interface CSLog {
   id: string;
   fileName: string;
   content: string;
-  uploadedAt: string;
+  uploadedAt: Date;
 }
 
 export default function CSLogsPage(): React.ReactNode {
   const router = useRouter();
-  const [archivedFiles, setArchivedFiles] = useState<ArchivedFile[]>([]);
-  const [selectedFile, setSelectedFile] = useState<ArchivedFile | null>(null);
+  const [csLogs, setCsLogs] = useState<CSLog[]>([]);
+  const [selectedLog, setSelectedLog] = useState<CSLog | null>(null);
   const [isUploadMode, setIsUploadMode] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  // 로컬 스토리지에서 아카이브 로드
   useEffect(() => {
-    const saved = localStorage.getItem('cs-logs-archive');
-    if (saved) {
-      try {
-        setArchivedFiles(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to load archived files:', e);
-      }
-    }
+    setIsAdmin(isAuthenticated());
+    fetchCSLogs();
   }, []);
 
-  // 아카이브를 로컬 스토리지에 저장
-  const saveToLocalStorage = (files: ArchivedFile[]) => {
-    localStorage.setItem('cs-logs-archive', JSON.stringify(files));
+  const fetchCSLogs = async () => {
+    try {
+      const q = query(collection(db, 'csLogs'), orderBy('uploadedAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const logs = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        fileName: doc.data().fileName,
+        content: doc.data().content,
+        uploadedAt: doc.data().uploadedAt?.toDate() || new Date(),
+      })) as CSLog[];
+      setCsLogs(logs);
+    } catch (error) {
+      console.error('Error fetching CS logs:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -43,41 +54,45 @@ export default function CSLogsPage(): React.ReactNode {
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const content = e.target?.result as string;
-      const newFile: ArchivedFile = {
-        id: Date.now().toString(),
-        fileName: file.name,
-        content,
-        uploadedAt: new Date().toISOString(),
-      };
 
-      const updated = [newFile, ...archivedFiles];
-      setArchivedFiles(updated);
-      saveToLocalStorage(updated);
-      setSelectedFile(newFile);
-      setIsUploadMode(false);
-      alert('파일이 아카이브에 추가되었습니다.');
+      try {
+        await addDoc(collection(db, 'csLogs'), {
+          fileName: file.name,
+          content,
+          uploadedAt: new Date(),
+        });
+
+        alert('파일이 업로드되었습니다.');
+        fetchCSLogs();
+        setIsUploadMode(false);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('파일 업로드 중 오류가 발생했습니다.');
+      }
     };
     reader.readAsText(file);
   };
 
-  const handleDeleteFile = (id: string) => {
+  const handleDeleteLog = async (id: string) => {
     if (!confirm('이 파일을 삭제하시겠습니까?')) return;
 
-    const updated = archivedFiles.filter(f => f.id !== id);
-    setArchivedFiles(updated);
-    saveToLocalStorage(updated);
+    try {
+      await deleteDoc(doc(db, 'csLogs', id));
+      alert('파일이 삭제되었습니다.');
+      fetchCSLogs();
 
-    if (selectedFile?.id === id) {
-      setSelectedFile(null);
+      if (selectedLog?.id === id) {
+        setSelectedLog(null);
+      }
+    } catch (error) {
+      console.error('Error deleting log:', error);
+      alert('파일 삭제 중 오류가 발생했습니다.');
     }
-
-    alert('파일이 삭제되었습니다.');
   };
 
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
+  const formatDate = (date: Date) => {
     return date.toLocaleString('ko-KR', {
       year: 'numeric',
       month: '2-digit',
@@ -86,6 +101,14 @@ export default function CSLogsPage(): React.ReactNode {
       minute: '2-digit',
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F6F8FA] flex items-center justify-center">
+        <div className="text-gray-500">로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F6F8FA]">
@@ -107,116 +130,122 @@ export default function CSLogsPage(): React.ReactNode {
                 <p className="text-[11px] text-gray-400 mt-0.5">CS 문의 및 응대 기록</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsUploadMode(true)}
-              className="px-4 py-2 bg-[#FF9D00] text-white rounded-lg hover:bg-[#e68d00] transition-colors text-sm font-medium"
-            >
-              + 새 파일 업로드
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setIsUploadMode(true)}
+                className="px-4 py-2 bg-[#FF9D00] text-white rounded-lg hover:bg-[#e68d00] transition-colors text-sm font-medium"
+              >
+                + 새 파일 업로드
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       {/* Main */}
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pt-10 pb-12">
-        <div className="grid grid-cols-12 gap-6">
-          {/* Sidebar - Archive List */}
-          <div className="col-span-3">
-            <div className="bg-white rounded-2xl overflow-hidden sticky top-24">
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                <h3 className="text-sm font-bold text-[#111]">아카이브</h3>
-                <p className="text-xs text-gray-400 mt-0.5">{archivedFiles.length}개 파일</p>
+        {csLogs.length === 0 ? (
+          <div className="bg-white rounded-2xl p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[#FF9D00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </div>
-              <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                {archivedFiles.length === 0 ? (
-                  <div className="p-6 text-center">
-                    <p className="text-sm text-gray-400">업로드된 파일이 없습니다</p>
+              <h2 className="text-xl font-bold text-[#111] mb-2">등록된 CS 로그가 없습니다</h2>
+              <p className="text-sm text-gray-500">
+                {isAdmin ? '새 파일을 업로드하여 시작하세요.' : '관리자에게 문의하세요.'}
+              </p>
+            </div>
+          </div>
+        ) : selectedLog ? (
+          // Detail View
+          <div>
+            <button
+              onClick={() => setSelectedLog(null)}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              목록으로
+            </button>
+
+            <div className="bg-white rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5 text-[#FF9D00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium text-gray-700">{selectedLog.fileName}</div>
+                      <div className="text-xs text-gray-400">{formatDate(selectedLog.uploadedAt)}</div>
+                    </div>
                   </div>
-                ) : (
-                  <ul>
-                    {archivedFiles.map((file) => (
-                      <li key={file.id}>
-                        <button
-                          onClick={() => setSelectedFile(file)}
-                          className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
-                            selectedFile?.id === file.id ? 'bg-orange-50' : ''
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0 flex-1">
-                              <div className="text-sm font-medium text-[#111] truncate">
-                                {file.fileName}
-                              </div>
-                              <div className="text-xs text-gray-400 mt-1">
-                                {formatDate(file.uploadedAt)}
-                              </div>
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteFile(file.id);
-                              }}
-                              className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDeleteLog(selectedLog.id)}
+                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      삭제
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-6">
+                <iframe
+                  srcDoc={selectedLog.content}
+                  className="w-full border border-gray-200 rounded-lg"
+                  style={{ minHeight: '70vh' }}
+                  sandbox="allow-same-origin allow-scripts"
+                  title="CS Log Preview"
+                />
               </div>
             </div>
           </div>
-
-          {/* Main Content */}
-          <div className="col-span-9">
-            {!selectedFile ? (
-              <div className="bg-white rounded-2xl p-12 text-center">
-                <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-[#FF9D00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        ) : (
+          // Grid View
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {csLogs.map((log) => (
+              <div
+                key={log.id}
+                onClick={() => setSelectedLog(log)}
+                className="bg-white rounded-xl p-6 border border-gray-200 hover:border-[#FF9D00] hover:shadow-lg transition-all cursor-pointer group"
+              >
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-orange-100 transition-colors">
+                    <svg className="w-5 h-5 text-[#FF9D00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h2 className="text-xl font-bold text-[#111] mb-2">파일을 선택하세요</h2>
-                  <p className="text-sm text-gray-500">
-                    왼쪽 아카이브에서 파일을 선택하거나 새 파일을 업로드하세요.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl overflow-hidden">
-                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-[#FF9D00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <div>
-                        <div className="text-sm font-medium text-gray-700">{selectedFile.fileName}</div>
-                        <div className="text-xs text-gray-400">{formatDate(selectedFile.uploadedAt)}</div>
-                      </div>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-[#111] mb-1 truncate">{log.fileName}</h3>
+                    <p className="text-xs text-gray-400">{formatDate(log.uploadedAt)}</p>
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <iframe
-                    srcDoc={selectedFile.content}
-                    className="w-full border border-gray-200 rounded-lg"
-                    style={{ minHeight: '70vh' }}
-                    sandbox="allow-same-origin allow-scripts"
-                    title="CS Log Preview"
-                  />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">클릭하여 보기</span>
+                  {isAdmin && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteLog(log.id);
+                      }}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
       </main>
 
       {/* Upload Modal */}
@@ -243,7 +272,7 @@ export default function CSLogsPage(): React.ReactNode {
               </div>
 
               <p className="text-sm text-gray-500 mb-6">
-                CS 로그 HTML 파일을 업로드하면 아카이브에 저장됩니다.
+                CS 로그 HTML 파일을 업로드하면 모든 사용자가 확인할 수 있습니다.
               </p>
 
               <label className="inline-block">
@@ -265,7 +294,7 @@ export default function CSLogsPage(): React.ReactNode {
 
               <div className="mt-6 pt-6 border-t border-gray-100">
                 <p className="text-xs text-gray-400">
-                  💡 파일은 브라우저 로컬 스토리지에 저장됩니다.
+                  💡 파일은 Firebase에 저장되며 모든 사용자가 볼 수 있습니다.
                 </p>
               </div>
             </div>
