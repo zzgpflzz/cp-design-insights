@@ -47,8 +47,6 @@ export default function IndexHub(): React.ReactNode {
         { title: '디자인 대시보드', url: 'https://cp-design-insights.vercel.app', description: '컨텐츠/UIUX/TF 업무 대시보드', openInNewTab: false },
         { title: 'AX 디자인 md파일 v.1', url: '/design-guidelines.html', description: '디자인 시스템 및 컴포넌트 가이드', openInNewTab: true },
         { title: '앱 구축 대시보드', url: 'https://git-dev.linecorp.com/pages/lf-commerce/lfsq-app-dashboard/260609_app_dash.html', description: '앱 구축 현황 및 진행 대시보드' },
-        { title: '브랜드 에셋', url: '#', description: '로고, 컬러, 타이포그래피' },
-        { title: '디자인 아카이브', url: '#', description: '과거 프로젝트 참고 자료' },
       ],
     },
     operations: {
@@ -77,11 +75,7 @@ export default function IndexHub(): React.ReactNode {
         </svg>
       ),
       items: [
-        { title: '개발 대시보드', url: 'https://jira.workers-hub.com/projects/IPXCP/issues/IPXCP-372?filter=allopenissues', description: '이슈 트래킹 및 개발 현황' },
-        { title: '배포 로그', url: '#', description: '최근 배포 히스토리' },
-        { title: 'API 문서', url: '#', description: 'REST API 엔드포인트 가이드' },
-        { title: '마이그레이션 현황', url: '#', description: 'DB 스키마 변경 이력' },
-        { title: '개발 환경 설정', url: '#', description: '로컬 개발 가이드' },
+        { title: 'JIRA', url: 'https://jira.workers-hub.com/projects/IPXCP/issues/IPXCP-372?filter=allopenissues', description: '이슈 트래킹 및 개발 현황' },
       ],
     },
   };
