@@ -47,6 +47,7 @@ export default function IndexHub(): React.ReactNode {
         { title: '디자인 대시보드', url: 'https://cp-design-insights.vercel.app', description: '컨텐츠/UIUX/TF 업무 대시보드', openInNewTab: false },
         { title: 'AX 디자인 md파일 v.1', url: '/design-guidelines.html', description: '디자인 시스템 및 컴포넌트 가이드', openInNewTab: true },
         { title: '앱 구축 대시보드', url: 'https://git-dev.linecorp.com/pages/lf-commerce/lfsq-app-dashboard/260609_app_dash.html', description: '앱 구축 현황 및 진행 대시보드' },
+        { title: 'Pipey v.1', url: '#', description: 'Pipey 서비스 대시보드 (준비중)' },
       ],
     },
     operations: {
