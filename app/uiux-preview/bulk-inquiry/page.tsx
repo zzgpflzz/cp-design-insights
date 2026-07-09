@@ -11,11 +11,9 @@ const imgProduct1 = "https://www.figma.com/api/mcp/asset/738af550-8cbf-4b20-9591
 const imgProduct2 = "https://www.figma.com/api/mcp/asset/46a95fff-a6f3-45ae-a6d6-523f03862674";
 
 // 아이콘 이미지
-const imgPath = "https://www.figma.com/api/mcp/asset/72e2bba1-7afb-4c58-8911-abed1466a634";
-const imgOval = "https://www.figma.com/api/mcp/asset/ca4e35a6-79d1-4f99-a8fc-fc4233578d97";
-const imgOval1 = "https://www.figma.com/api/mcp/asset/11df2008-fe0c-4f26-baa4-0f6525f9d195";
-const imgOval2 = "https://www.figma.com/api/mcp/asset/7c791b25-c2e9-4c7b-88e4-ea4f926d618c";
-const imgOval3 = "https://www.figma.com/api/mcp/asset/5d7cf930-27cc-42c0-bed2-bc5346cdd807";
+const imgCheckbox = "/Checkbox_X.svg";
+const imgRadioOn = "/radio_on.svg";
+const imgRadioOff = "/radio_off.svg";
 const imgDeleteIcon = "https://www.figma.com/api/mcp/asset/cf7798b5-15f5-47de-a7d5-76dc5c0bad84";
 const imgDropdownIcon = "https://www.figma.com/api/mcp/asset/f9d42d60-9364-4d2e-a98a-087fa3b36c50";
 
@@ -617,21 +615,19 @@ export default function BulkInquiryPage() {
                 </div>
                 <div className="flex gap-[24px] items-center">
                   <label className="flex gap-[6px] items-center cursor-pointer">
-                    <div className="relative w-[18px] h-[18px]">
-                      <img src={imgOval} alt="" className="w-full h-full" />
-                      {taxInvoice === 'yes' && (
-                        <img src={imgOval1} alt="" className="absolute left-[4.5px] top-[4.5px] w-[9px] h-[9px]" />
-                      )}
-                    </div>
+                    <img
+                      src={taxInvoice === 'yes' ? imgRadioOn : imgRadioOff}
+                      alt=""
+                      className="w-[18px] h-[18px]"
+                    />
                     <span className="text-[15px]" onClick={() => setTaxInvoice('yes')}>발행</span>
                   </label>
                   <label className="flex gap-[6px] items-center cursor-pointer">
-                    <div className="relative w-[18px] h-[18px]">
-                      <img src={imgOval2} alt="" className="w-full h-full" />
-                      {taxInvoice === 'no' && (
-                        <img src={imgOval3} alt="" className="absolute left-[4.5px] top-[4.5px] w-[9px] h-[9px]" />
-                      )}
-                    </div>
+                    <img
+                      src={taxInvoice === 'no' ? imgRadioOn : imgRadioOff}
+                      alt=""
+                      className="w-[18px] h-[18px]"
+                    />
                     <span className="text-[15px]" onClick={() => setTaxInvoice('no')}>미발행</span>
                   </label>
                 </div>
@@ -660,11 +656,12 @@ export default function BulkInquiryPage() {
         <div className="flex gap-[8px] items-center mb-[40px]">
           <button
             onClick={() => setAgreed(!agreed)}
-            className="relative w-[20px] h-[20px] flex-shrink-0"
+            className="w-[20px] h-[20px] flex-shrink-0"
           >
-            <div className="absolute inset-0 bg-black border border-black rounded-[3px]" />
-            {agreed && (
-              <img src={imgPath} alt="" className="absolute inset-[25%] w-[50%] h-[50%]" />
+            {agreed ? (
+              <img src={imgCheckbox} alt="" className="w-full h-full" />
+            ) : (
+              <div className="w-full h-full bg-white border border-[#dcdee0] rounded-[3px]" />
             )}
           </button>
           <span className="text-[16px] font-bold">
